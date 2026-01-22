@@ -1,0 +1,2477 @@
+# Product Requirements Document (PRD)
+## Dot Matrix Calendar Widgets for Android
+
+**Version:** 1.0  
+**Last Updated:** January 22, 2026  
+**Document Owner:** Product Team  
+**Status:** Final - Ready for Development
+
+---
+
+## Table of Contents
+
+1. [Executive Summary](#1-executive-summary)
+2. [Product Vision & Strategy](#2-product-vision--strategy)
+3. [User Research & Market Analysis](#3-user-research--market-analysis)
+4. [Product Scope & Features](#4-product-scope--features)
+5. [Technical Requirements](#5-technical-requirements)
+6. [User Experience Design](#6-user-experience-design)
+7. [Data Architecture](#7-data-architecture)
+8. [Security & Privacy](#8-security--privacy)
+9. [Monetization Strategy](#9-monetization-strategy)
+10. [Release Plan & Roadmap](#10-release-plan--roadmap)
+11. [Success Metrics & KPIs](#11-success-metrics--kpis)
+12. [Risk Management](#12-risk-management)
+13. [Appendices](#13-appendices)
+
+---
+
+## 1. Executive Summary
+
+### 1.1 Product Overview
+
+**Product Name:** Dot Matrix Calendar Widgets  
+**Platform:** Android (Minimum API 33 / Android 13)  
+**Category:** Personalization, Productivity  
+**Product Type:** Premium widget-first application
+
+Dot Matrix Calendar Widgets is a minimalist, highly customizable calendar widget system that transforms time visualization into an aesthetic home screen experience. The app uses a distinctive dot matrix design language to represent calendar data, allowing users to see year progress, track important dates, and create visually striking home screen layouts.
+
+### 1.2 Problem Statement
+
+Current calendar widgets on Android suffer from three critical issues:
+
+1. **Visual Homogeneity:** Most calendar widgets look similar, offering little differentiation for users seeking unique aesthetic expressions
+2. **Limited Customization:** Existing solutions provide shallow customization options that don't satisfy power users
+3. **Performance Issues:** Many widget apps drain battery through continuous background operations
+
+### 1.3 Solution
+
+A widget-first app that delivers:
+
+- **Distinctive Visual Identity:** Dot matrix representation of calendar data
+- **Deep Customization:** Control over every visual parameter (size, spacing, color, opacity, emoji replacement)
+- **Zero-Background Architecture:** No continuous services, optimal battery performance
+- **Future-Proof Design:** Built on stable Android APIs with forward compatibility
+
+### 1.4 Business Objectives
+
+- **Primary Goal:** Achieve 100,000+ active widget installs within 6 months
+- **Revenue Goal:** 15% Pro conversion rate within first year
+- **Retention Goal:** 70%+ 7-day widget retention rate
+- **Market Position:** Become the reference premium calendar widget on Android
+
+---
+
+## 2. Product Vision & Strategy
+
+### 2.1 Vision Statement
+
+*"Transform time into art. Make every glance at your home screen a moment of aesthetic pleasure while staying effortlessly informed."*
+
+### 2.2 Product Positioning
+
+**Market Position:** Premium minimalist calendar widgets  
+**Price Point:** Freemium with $4.99-$6.99 one-time Pro unlock  
+**Differentiation:** Dot matrix aesthetic + deep customization + zero battery impact
+
+### 2.3 Product Principles
+
+1. **Aesthetic First:** Every design decision prioritizes visual appeal
+2. **Performance Obsessed:** No compromises on battery or memory
+3. **Zero Friction:** No learning curve, instant gratification
+4. **Future-Ready:** Built to last through Android evolution
+5. **Privacy by Design:** No data collection, no cloud, no tracking
+
+### 2.4 Success Criteria
+
+**Must Achieve (MVP Success):**
+- Widget persists across device reboots
+- Renders correctly on 95%+ of Android 13+ devices
+- Updates reliably at midnight
+- Zero crashes related to widget rendering
+- <2% uninstall rate in first 24 hours
+
+**Should Achieve (Product-Market Fit):**
+- 4.5+ star rating on Play Store
+- Featured in "New & Updated" section
+- 10,000+ organic installs in first month
+- 20%+ of users customize beyond defaults
+
+**Could Achieve (Excellence):**
+- Featured by Android Authority, 9to5Google, or XDA
+- Community-created preset library emerges
+- 25%+ Pro conversion rate
+
+---
+
+## 3. User Research & Market Analysis
+
+### 3.1 Target User Personas
+
+#### Persona 1: "The Aesthetic Curator" (Primary - 45%)
+
+**Demographics:**
+- Age: 18-28
+- Gender: 60% female, 40% male
+- Occupation: Students, creative professionals, content creators
+- Tech Savviness: High
+
+**Behaviors:**
+- Spends 20+ minutes perfecting home screen layouts
+- Active on r/AndroidThemes, Pinterest, Instagram home screen communities
+- Uses icon packs, custom launchers (Nova, Niagara, Lawnchair)
+- Screenshots home screen 3-5 times per month for sharing
+
+**Goals:**
+- Create Instagram-worthy home screens
+- Stand out with unique aesthetic
+- Express personality through phone customization
+
+**Pain Points:**
+- Most widgets look generic or "corporate"
+- Limited color/theme matching options
+- Widgets break home screen aesthetic with poor design
+
+**Primary Use Case:** Aesthetic year-view widget as centerpiece of minimalist home screen
+
+---
+
+#### Persona 2: "The Productivity Optimizer" (Primary - 30%)
+
+**Demographics:**
+- Age: 25-40
+- Gender: 55% male, 45% female
+- Occupation: Developers, project managers, entrepreneurs
+- Tech Savviness: Very High
+
+**Behaviors:**
+- Uses 5+ productivity apps simultaneously
+- Values at-a-glance information density
+- Frequent launcher switcher, tests new productivity tools
+- Participates in productivity communities (Notion, Todoist forums)
+
+**Goals:**
+- See year/month progress instantly
+- Track important deadlines visually
+- Minimize app-opening for basic information
+
+**Pain Points:**
+- Calendar widgets require opening the app
+- No visual progress tracking
+- Can't mark important dates on widget itself
+
+**Primary Use Case:** Month view widget with emoji markers for project milestones
+
+---
+
+#### Persona 3: "The Minimalist Enthusiast" (Secondary - 15%)
+
+**Demographics:**
+- Age: 22-35
+- Gender: Even split
+- Occupation: Designers, writers, mindfulness practitioners
+- Tech Savviness: Medium-High
+
+**Behaviors:**
+- Maintains <2 screens of apps
+- Prefers dark mode, monochrome aesthetics
+- Uses KWGT/KLWP for custom setups
+- Values simplicity and intentionality
+
+**Goals:**
+- Reduce visual clutter
+- Create calm, focused digital environment
+- See only essential information
+
+**Pain Points:**
+- Most widgets are too busy or colorful
+- Hard to find truly minimal designs
+- Calendar widgets show too much information
+
+**Primary Use Case:** Progress bar widget showing year completion percentage
+
+---
+
+#### Persona 4: "The Habit Tracker" (Secondary - 10%)
+
+**Demographics:**
+- Age: 20-45
+- Gender: 65% female, 35% male
+- Occupation: Health enthusiasts, students, goal-setters
+- Tech Savviness: Medium
+
+**Behaviors:**
+- Uses habit tracking apps (Streaks, Habitica)
+- Journals daily or tracks moods
+- Sets monthly/yearly goals
+- Shares progress on social media
+
+**Goals:**
+- Visualize streaks and patterns
+- Mark special days (workouts, study sessions, events)
+- Celebrate progress visually
+
+**Pain Points:**
+- Habit apps don't show on home screen
+- Can't see calendar + habits together
+- No aesthetic habit visualization
+
+**Primary Use Case:** Month widget with emoji dots for tracked habits (💪 workout days, 📚 reading days)
+
+---
+
+### 3.2 Competitive Analysis
+
+#### Direct Competitors
+
+**1. Month: Calendar Widget**
+- **Strengths:** Simple, clean design; good Play Store presence (1M+ downloads)
+- **Weaknesses:** Limited customization; generic aesthetic; subscription model
+- **Differentiation:** Our dot matrix design is more distinctive; one-time purchase vs. subscription
+
+**2. Overdrop Widget**
+- **Strengths:** Beautiful weather+calendar combo; strong design
+- **Weaknesses:** Battery-heavy; requires location; subscription
+- **Differentiation:** We're calendar-only, zero-background, no permissions
+
+**3. KWGT Custom Widgets**
+- **Strengths:** Unlimited customization; huge community
+- **Weaknesses:** Steep learning curve; requires manual setup; complex
+- **Differentiation:** We're ready-to-use with no learning curve; opinionated design
+
+**4. Google Calendar Widget**
+- **Strengths:** Free; reliable; syncs with Calendar app
+- **Weaknesses:** Ugly; no customization; corporate design
+- **Differentiation:** We're aesthetic-first; highly customizable; no account required
+
+#### Indirect Competitors
+
+**5. Minimalist Launcher Apps (Niagara, Before Launcher)**
+- **Overlap:** Minimalist aesthetic; calendar integration
+- **Differentiation:** We work with any launcher; widget-focused
+
+**6. Notion/Obsidian Widget Makers**
+- **Overlap:** Customization; power users
+- **Differentiation:** Native Android; no cloud dependency; optimized performance
+
+### 3.3 Market Opportunity
+
+**Total Addressable Market (TAM):**
+- Android users globally: ~3 billion
+- Android 13+ users: ~1.2 billion (40% adoption)
+
+**Serviceable Addressable Market (SAM):**
+- Users who customize home screens: ~120 million (10% of Android 13+)
+- Users who use widgets: ~60 million (50% of customizers)
+
+**Serviceable Obtainable Market (SOM):**
+- Calendar widget users seeking premium alternatives: ~6 million (10% of widget users)
+- **Target Year 1:** 100,000 installs (1.6% of SOM)
+- **Target Year 2:** 500,000 installs (8.3% of SOM)
+
+**Market Trends Favoring Launch:**
+- Android Material You design increasing customization interest (+40% year-over-year searches for "home screen setup")
+- Widget renaissance post-iOS 14 widget introduction (spillover to Android)
+- Growing minimalist aesthetic trend (#minimalism has 50M+ posts on Instagram)
+- Decline of subscription fatigue → preference for one-time purchases
+
+---
+
+## 4. Product Scope & Features
+
+### 4.1 MVP Feature Set (Phase 1 - Launch)
+
+#### 4.1.1 Core Widget Types
+
+**Widget 1: Year View**
+
+**Description:** Full year calendar in dot matrix format, showing all 365/366 days
+
+**Specifications:**
+- **Layout:** 12 rows (months) × 31 columns (max days)
+- **Dot Representation:** Each dot = one day
+- **Empty Spaces:** Grayed out for months with <31 days (e.g., February shows 28/29 dots)
+- **Current Day Indicator:** Highlighted with distinct color/size/emoji
+- **Visual Options:**
+  - Dot size: 2dp - 8dp (default: 4dp)
+  - Dot spacing: 1dp - 6dp (default: 2dp)
+  - Opacity: 30% - 100% (default: 80%)
+  - Shape: Circle, Square, Rounded Square
+  
+**Widget Sizes Supported:**
+- 4×4 (recommended minimum)
+- 5×4, 5×5, 6×4, 6×5 (optimal)
+- Responsive to any size ≥4×4
+
+**Behavior:**
+- Updates at midnight (00:00 local time)
+- Tapping opens month view widget editor or app (user configurable)
+- No scrolling (static view)
+
+**Free vs. Pro:**
+- Free: 1 instance, basic themes
+- Pro: Unlimited instances, all themes
+
+---
+
+**Widget 2: Month View**
+
+**Description:** Single month calendar in dot matrix format with emoji support
+
+**Specifications:**
+- **Layout:** 5-6 rows (weeks) × 7 columns (days)
+- **Week Start:** Configurable (Sunday/Monday)
+- **Month Label:** Optional header showing "January 2026" (can be hidden)
+- **Current Day:** Highlighted
+- **Today Indicator:** Ring or glow effect around current date dot
+- **Visual Options:**
+  - Same dot customization as Year View
+  - Optional: Day initials (S M T W T F S) as column headers
+  - Optional: Week numbers on left edge
+
+**Emoji Replacement System:**
+- Users can assign emojis to specific dates
+- Example: 🎂 on birthday, 💪 on workout days, ✈️ on travel days
+- Emoji replaces dot entirely
+- **Rule Types:**
+  - Specific Date: "January 15, 2026 → 🎂"
+  - Recurring Date: "Every 15th → 💰"
+  - Recurring Day: "Every Monday → 🏋️"
+  - Date Range: "Jan 20-25 → ✈️"
+
+**Widget Sizes Supported:**
+- 3×3 (minimum, tight spacing)
+- 4×3, 4×4, 5×4 (optimal)
+- Responsive to any size ≥3×3
+
+**Behavior:**
+- Auto-advances to current month on 1st of month
+- Manual month switching via tap zones (tap left = previous month, tap right = next month)
+- Updates at midnight
+
+**Free vs. Pro:**
+- Free: 1 instance, max 3 emoji rules
+- Pro: Unlimited instances, unlimited emoji rules
+
+---
+
+**Widget 3: Progress View**
+
+**Description:** Minimalist progress bar showing year/month completion
+
+**Specifications:**
+- **Progress Modes:**
+  - Year Progress: 0-100% of current year
+  - Month Progress: 0-100% of current month
+  - Quarter Progress: 0-100% of current quarter
+  - Week Progress: 0-100% of current week
+
+**Visual Styles:**
+- **Bar Style:** Horizontal/Vertical progress bar with dots
+  - Filled dots = completed days
+  - Empty dots = remaining days
+- **Percentage Style:** Just "47% of 2026" text with subtle dot decoration
+- **Ring Style:** Circular progress ring made of dots
+
+**Customization:**
+- Bar thickness: Thin, Medium, Thick
+- Label options: Percentage only, Percentage + label, Label only, None
+- Dot density: Sparse (12 dots), Medium (52 dots), Dense (365 dots for year)
+
+**Widget Sizes Supported:**
+- 2×1 (minimum, bar only)
+- 3×1, 4×1 (optimal for bar)
+- 2×2 (for ring style)
+
+**Behavior:**
+- Updates at midnight
+- Tapping cycles through progress modes (year→month→quarter→week)
+
+**Free vs. Pro:**
+- Free: 1 instance, bar style only
+- Pro: Unlimited instances, all styles
+
+---
+
+#### 4.1.2 Theme System
+
+**Theme Architecture:**
+
+The app uses a centralized theme system with three base modes and unlimited color variations.
+
+**Base Modes:**
+
+**1. Light Mode**
+- Background: Pure white (#FFFFFF) or off-white (#FAFAFA)
+- Dots: Dark gray (#212121) or custom color
+- Accent (current day): Vibrant color (customizable)
+- Text: Dark (#000000, 87% opacity)
+
+**2. Dark Mode (OLED Optimized)**
+- Background: Pure black (#000000) for OLED power savings
+- Dots: Light gray (#E0E0E0) or custom color
+- Accent: Vibrant color (customizable)
+- Text: White (#FFFFFF, 87% opacity)
+- **OLED Optimization:** True black background to turn off pixels on OLED screens
+
+**3. Glassmorphism Mode** ⭐ (Pro Only)
+- Background: Semi-transparent with blur effect (20-80% opacity)
+- Dots: Adaptive color based on wallpaper
+- Frosted glass appearance
+- **Technical Note:** Uses `RenderEffect` API (Android 12+) when available, fallback to semi-transparent on older devices
+- **Performance:** Pre-blurred background bitmap cached per widget instance
+
+**Color Customization:**
+
+Each theme supports full color customization:
+- **Dot Color:** Any hex color
+- **Background Color:** Any hex color + opacity slider
+- **Accent Color:** For current day/selections
+- **Text Color:** For labels/headers
+
+**Preset Themes (Curated):**
+
+To reduce decision paralysis, we provide 12 curated presets:
+
+| Preset Name | Description | Example Colors |
+|------------|-------------|---------------|
+| Classic Light | Black dots, white background | #000000 on #FFFFFF |
+| OLED Dark | White dots, pure black | #FFFFFF on #000000 |
+| Nord Aurora | Popular Nord theme palette | Polar Night + Aurora colors |
+| Sunset Glow | Warm orange/pink gradient | #FF6B6B, #FFA500 |
+| Ocean Breeze | Cool blue tones | #0077BE, #B3E5FC |
+| Forest Calm | Green/earth tones | #2E7D32, #C8E6C9 |
+| Monochrome | Pure grayscale | #808080 on #F5F5F5 |
+| Cyberpunk | Neon on dark | #00FFFF on #0D1117 |
+| Pastel Dream | Soft pastel colors | #FFD6E8, #C7CEEA |
+| Minimal Beige | Warm neutral | #D4C5B9 on #F7F3EF |
+| Tokyo Night | VS Code theme inspired | #1A1B26, #7AA2F7 |
+| Dracula | Popular Dracula theme | #282A36, #BD93F9 |
+
+**Theme Switching:**
+- Instant preview in widget editor
+- Auto-sync to system dark mode (optional)
+- Per-widget theme (each widget can have different theme)
+
+---
+
+#### 4.1.3 Widget Customization Interface
+
+**Customization Flow:**
+
+1. User adds widget to home screen via launcher
+2. App opens to Widget Configuration Screen
+3. User selects widget type (Year/Month/Progress)
+4. User customizes appearance in live preview
+5. User saves → widget appears on home screen
+6. User can re-edit anytime by tapping widget
+
+**Configuration Screen Layout:**
+
+```
+┌─────────────────────────────────────┐
+│         Live Preview Area           │
+│  [Actual size widget preview]       │
+│  (updates in real-time)             │
+└─────────────────────────────────────┘
+
+Widget Type: [Year View ▼]
+
+┌─ Appearance ────────────────────────┐
+│ Theme:       [Classic Light ▼]      │
+│ Dot Size:    [====●====] 4dp        │
+│ Dot Spacing: [===●=====] 2dp        │
+│ Opacity:     [=======●=] 80%        │
+│ Shape:       ● Circle  ○ Square     │
+└─────────────────────────────────────┘
+
+┌─ Colors ────────────────────────────┐
+│ Dot Color:    [■ #212121] [Picker] │
+│ Background:   [■ #FFFFFF] [Picker] │
+│ Accent:       [■ #2196F3] [Picker] │
+└─────────────────────────────────────┘
+
+┌─ Emoji Rules ───────────────────────┐ (Pro)
+│ [+ Add Rule]                         │
+│                                      │
+│ No rules yet. Tap to add emoji      │
+│ to specific dates.                   │
+└─────────────────────────────────────┘
+
+               [Save Widget]
+```
+
+**Live Preview:**
+- Renders actual RemoteViews in preview
+- Updates instantly on any change (no "Apply" button)
+- Shows exact appearance on home screen
+
+**No Learning Curve Design:**
+- All options visible at once (no nested menus)
+- Defaults work beautifully out of box
+- Tooltips on first open only (can be disabled)
+
+---
+
+#### 4.1.4 Emoji Rule System (Pro Feature)
+
+**Purpose:** Allow users to mark special dates with emojis for visual tracking
+
+**Rule Manager Interface:**
+
+```
+┌─ Emoji Rules ───────────────────────┐
+│ Widget: "Month View - Home Screen"  │
+│                                      │
+│ [+ Add New Rule]                     │
+│                                      │
+│ ┌─────────────────────────────────┐ │
+│ │ 🎂 Birthday                     │ │
+│ │ Every January 15                │ │
+│ │                      [Edit] [×] │ │
+│ └─────────────────────────────────┘ │
+│                                      │
+│ ┌─────────────────────────────────┐ │
+│ │ 💪 Workout Day                  │ │
+│ │ Every Monday, Wednesday, Friday │ │
+│ │                      [Edit] [×] │ │
+│ └─────────────────────────────────┘ │
+│                                      │
+│ ┌─────────────────────────────────┐ │
+│ │ ✈️ Vacation                     │ │
+│ │ January 20-25, 2026             │ │
+│ │                      [Edit] [×] │ │
+│ └─────────────────────────────────┘ │
+│                                      │
+│        Free: 3 rules max            │
+│        [Unlock Pro] for unlimited   │
+└─────────────────────────────────────┘
+```
+
+**Rule Types:**
+
+1. **Specific Date**
+   - Input: Date picker
+   - Example: January 15, 2026
+   - Recurrence: None
+
+2. **Recurring Date**
+   - Input: Day + Month picker
+   - Example: Every 15th of the month
+   - Recurrence: Monthly
+
+3. **Recurring Day**
+   - Input: Day of week multi-select
+   - Example: Every Monday + Friday
+   - Recurrence: Weekly
+
+4. **Date Range**
+   - Input: Start date + End date
+   - Example: December 24-26 (every year)
+   - Recurrence: Optional (one-time or annually)
+
+**Emoji Picker:**
+- Recently used emojis
+- Categorized emoji grid (Smileys, Activities, Objects, etc.)
+- Search by keyword
+- Skin tone support
+
+**Rule Priority:**
+- If multiple rules apply to same date, user-defined priority order
+- Drag-to-reorder in rule list
+
+**Free Limitations:**
+- Maximum 3 rules per widget
+- Rules apply to 1 widget only
+
+**Pro Benefits:**
+- Unlimited rules
+- Rules can apply to multiple widgets
+- Import/export rule sets
+
+---
+
+### 4.2 Post-MVP Features (Phase 2 - Month 2-3)
+
+#### 4.2.1 Preset Marketplace (Community Sharing)
+
+**Purpose:** Allow users to share and discover widget configurations
+
+**Features:**
+- Browse community-created presets
+- One-tap apply to new widget
+- Export own configuration as preset
+- Upvote/download counters
+- Categories: Minimalist, Colorful, Seasonal, Productivity, Aesthetic
+
+**Implementation:**
+- Static JSON hosting (no backend required initially)
+- Local caching of downloaded presets
+- Deep links for sharing (e.g., `dotmatrix://preset/abc123`)
+
+**Monetization:**
+- Free: Download up to 5 presets
+- Pro: Unlimited downloads + ability to upload own presets
+
+---
+
+#### 4.2.2 Advanced Customization
+
+**Gradient Dots:**
+- Dots can have gradient fills instead of solid colors
+- Linear or radial gradients
+- Per-dot or global gradient
+
+**Dot Patterns:**
+- Checkerboard
+- Stripe
+- Random scatter
+- Custom patterns
+
+**Animation Effects:** (Experimental, low priority)
+- Gentle pulse on current day
+- Ripple effect on date change
+- Fade-in for new month
+- **Performance Requirement:** Must not impact battery (<0.1% drain per day)
+
+---
+
+#### 4.2.3 Event Integration (Optional Cloud Sync)
+
+**Note:** This feature conflicts with privacy-first principle. Only add if user demand is overwhelming.
+
+**Concept:**
+- Optional Google Calendar sync
+- Shows event markers on widget
+- Read-only (no event creation from widget)
+
+**Privacy Controls:**
+- Explicit opt-in required
+- User controls which calendars sync
+- Data stored locally only
+- Can disable at any time
+
+**Pro Feature:** Yes
+
+---
+
+### 4.3 Phase 3 Features (Month 4-6)
+
+#### 4.3.1 Wear OS Glance Widgets
+
+**Platform:** Wear OS 3+ watches
+
+**Widget Types:**
+- Circular month view (optimized for round displays)
+- Progress ring for year/month
+- Minimal complications
+
+**Challenges:**
+- Different rendering engine (Glance API)
+- Screen size variations
+- Performance on watch hardware
+
+**Priority:** Medium (depends on Wear OS adoption metrics)
+
+---
+
+#### 4.3.2 Lock Screen Widgets (Android 14+)
+
+**Platform:** Android 14+ lock screen widget API
+
+**Widget Types:**
+- Minimal progress bar
+- Single day indicator
+- Today's emoji (if rules exist)
+
+**Limitations:**
+- Smaller size constraints
+- Limited interactivity
+- System design restrictions
+
+**Priority:** High (new platform feature with low competition)
+
+---
+
+### 4.4 Features Explicitly Out of Scope
+
+To maintain focus and quality, the following features are **NOT planned**:
+
+❌ **Event Creation/Editing:** App is view-only, not a calendar app  
+❌ **Reminders/Notifications:** No background services  
+❌ **Social Features:** No user accounts, comments, or social network  
+❌ **Cloud Sync:** Privacy-first means local-only  
+❌ **Live Widgets:** No real-time updates (e.g., countdown timers)  
+❌ **iOS Version:** Android-only for foreseeable future  
+❌ **Tablet-Specific UI:** Phone UI scales to tablets  
+❌ **Multiple Languages:** English-only for MVP (i18n in Phase 2)
+
+---
+
+## 5. Technical Requirements
+
+### 5.1 Android Platform Requirements
+
+#### 5.1.1 Version Support
+
+**Minimum SDK Version:** API 33 (Android 13)
+- **Rationale:** 
+  - Removes need for legacy widget API compatibility
+  - Simplifies blur effect implementation (RenderEffect API)
+  - Android 13+ represents 60%+ of active devices (as of Q4 2025)
+  - Allows use of modern Material 3 components
+
+**Target SDK Version:** API 35 (Android 15 - Latest Stable)
+- **Update Cadence:** Match latest stable Android release within 30 days of Play Store requirement change
+- **Testing:** All features tested on beta Android releases before public launch
+
+**Supported Device Types:**
+- Phones (primary)
+- Foldables (tested on Galaxy Z Fold/Flip, Pixel Fold)
+- Tablets (UI scales appropriately, no custom tablet layout)
+- Chrome OS (via Android container - low priority)
+
+#### 5.1.2 Launcher Compatibility
+
+**Tested Launchers:**
+- Google Pixel Launcher (reference implementation)
+- Samsung One UI Home
+- Nova Launcher
+- Microsoft Launcher
+- Niagara Launcher
+- Lawnchair
+- Action Launcher
+
+**Compatibility Requirements:**
+- Widget resizing must work on all major launchers
+- No launcher-specific code (use standard AppWidgetManager APIs only)
+- Graceful degradation if launcher doesn't support transparency/blur
+
+---
+
+### 5.2 Widget Architecture
+
+#### 5.2.1 Core Implementation
+
+**Widget Framework:**
+```kotlin
+// Base Widget Provider
+class DotMatrixWidgetProvider : AppWidgetProvider() {
+    
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray
+    ) {
+        // Update all widget instances
+        appWidgetIds.forEach { widgetId ->
+            val views = buildRemoteViews(context, widgetId)
+            appWidgetManager.updateAppWidget(widgetId, views)
+        }
+    }
+    
+    override fun onAppWidgetOptionsChanged(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int,
+        newOptions: Bundle
+    ) {
+        // Handle widget resize
+        val views = buildRemoteViews(context, appWidgetId)
+        appWidgetManager.updateAppWidget(appWidgetId, views)
+    }
+    
+    private fun buildRemoteViews(
+        context: Context,
+        widgetId: Int
+    ): RemoteViews {
+        val config = WidgetConfigRepository.get(widgetId)
+        return when (config.type) {
+            WidgetType.YEAR -> buildYearView(config)
+            WidgetType.MONTH -> buildMonthView(config)
+            WidgetType.PROGRESS -> buildProgressView(config)
+        }
+    }
+}
+```
+
+**RemoteViews Architecture:**
+
+All widgets use `RemoteViews` exclusively:
+- **Layout:** Static XML layouts inflated once
+- **Content:** Bitmap images rendered on-demand
+- **Updates:** Text and image setters only (no custom View classes)
+
+**Why RemoteViews Only:**
+- Guaranteed forward compatibility (stable API since API 1)
+- No risk of custom view rendering breaking
+- Efficient IPC (Inter-Process Communication)
+- Launcher compatibility guaranteed
+
+---
+
+#### 5.2.2 Rendering Strategy
+
+**Bitmap Rendering Pipeline:**
+
+```
+User Config → Layout Calculator → Dot Renderer → Bitmap Cache → RemoteViews
+```
+
+**Step-by-Step Process:**
+
+1. **Layout Calculation:**
+```kotlin
+data class DotLayout(
+    val rows: Int,
+    val columns: Int,
+    val dotSize: Float,
+    val spacing: Float,
+    val totalWidth: Int,
+    val totalHeight: Int
+)
+
+fun calculateLayout(
+    widgetWidth: Int,
+    widgetHeight: Int,
+    config: WidgetConfig
+): DotLayout {
+    // Calculate optimal dot size and spacing
+    // to fit widget dimensions
+}
+```
+
+2. **Dot Rendering:**
+```kotlin
+class DotRenderer {
+    fun renderToBitmap(
+        layout: DotLayout,
+        config: WidgetConfig,
+        currentDate: LocalDate
+    ): Bitmap {
+        val bitmap = Bitmap.createBitmap(
+            layout.totalWidth,
+            layout.totalHeight,
+            Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(bitmap)
+        
+        // Render background
+        if (config.background.hasBlur) {
+            renderBlurredBackground(canvas, config)
+        } else {
+            canvas.drawColor(config.background.color)
+        }
+        
+        // Render dots
+        forEachDay { row, col, date ->
+            val emoji = config.emojiRules.find(date)
+            if (emoji != null) {
+                renderEmoji(canvas, emoji, row, col)
+            } else {
+                renderDot(canvas, config, row, col, date)
+            }
+        }
+        
+        return bitmap
+    }
+}
+```
+
+3. **Bitmap Caching:**
+```kotlin
+object WidgetBitmapCache {
+    private val cache = LruCache<String, Bitmap>(maxSize = 20 * 1024 * 1024) // 20MB
+    
+    fun get(widgetId: Int, cacheKey: String): Bitmap? {
+        return cache.get("$widgetId-$cacheKey")
+    }
+    
+    fun put(widgetId: Int, cacheKey: String, bitmap: Bitmap) {
+        cache.put("$widgetId-$cacheKey", bitmap)
+    }
+    
+    fun invalidate(widgetId: Int) {
+        // Remove all cached bitmaps for this widget
+        cache.evictAll { key -> key.startsWith("$widgetId-") }
+    }
+}
+```
+
+**Cache Invalidation Triggers:**
+- Date change (midnight)
+- User modifies widget config
+- System theme change (dark mode toggle)
+- Widget resize
+
+**Memory Management:**
+- Maximum 20MB total cache across all widgets
+- LRU eviction policy
+- Bitmap compression: ARGB_8888 for quality, RGB_565 for memory-constrained devices
+- Automatic cleanup on low memory warnings
+
+---
+
+#### 5.2.3 Update Mechanism
+
+**Update Triggers:**
+
+1. **Date Change (Primary):**
+```kotlin
+class MidnightAlarmReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action == Intent.ACTION_TIME_TICK ||
+            intent.action == Intent.ACTION_DATE_CHANGED) {
+            
+            // Update all widgets
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            val widgetIds = appWidgetManager.getAppWidgetIds(
+                ComponentName(context, DotMatrixWidgetProvider::class.java)
+            )
+            
+            DotMatrixWidgetProvider().onUpdate(
+                context,
+                appWidgetManager,
+                widgetIds
+            )
+        }
+    }
+}
+```
+
+2. **Manual Update:**
+   - User opens app and modifies widget
+   - Immediate `updateAppWidget()` call
+
+3. **System Events:**
+   - `ACTION_TIMEZONE_CHANGED`: Update all widgets
+   - `ACTION_LOCALE_CHANGED`: Update all widgets (future i18n)
+   - `ACTION_CONFIGURATION_CHANGED`: Check if dark mode toggled
+
+**Update Frequency:**
+- **Scheduled:** Once per day at midnight (via AlarmManager exact alarm)
+- **On-Demand:** Instant when user changes config
+- **No Background Service:** Zero continuous background execution
+
+**AlarmManager Configuration:**
+```kotlin
+fun scheduleMidnightUpdate(context: Context) {
+    val alarmManager = context.getSystemService<AlarmManager>()
+    
+    val intent = Intent(context, MidnightAlarmReceiver::class.java)
+    val pendingIntent = PendingIntent.getBroadcast(
+        context,
+        REQUEST_CODE_MIDNIGHT,
+        intent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
+    
+    // Calculate next midnight
+    val midnight = LocalDateTime.now()
+        .plusDays(1)
+        .truncatedTo(ChronoUnit.DAYS)
+        .atZone(ZoneId.systemDefault())
+        .toInstant()
+        .toEpochMilli()
+    
+    // Use exact alarm (requires SCHEDULE_EXACT_ALARM permission on Android 12+)
+    alarmManager.setExact(
+        AlarmManager.RTC_WAKEUP,
+        midnight,
+        pendingIntent
+    )
+}
+```
+
+**Battery Optimization Handling:**
+- Request `SCHEDULE_EXACT_ALARM` permission on Android 12+
+- Graceful degradation: If exact alarms denied, use `setInexact()` (may wake up 1-15 min after midnight)
+- No persistent wake locks
+- No foreground services
+
+---
+
+### 5.3 Performance Requirements
+
+#### 5.3.1 Rendering Performance
+
+**Benchmarks (Target Device: Mid-range phone, e.g., Pixel 6a):**
+
+| Operation | Target | Maximum Acceptable |
+|-----------|--------|-------------------|
+| Widget Render (Year View) | <50ms | 100ms |
+| Widget Render (Month View) | <30ms | 60ms |
+| Widget Render (Progress View) | <20ms | 40ms |
+| Bitmap Cache Hit | <5ms | 10ms |
+| Configuration Save | <100ms | 200ms |
+| App Launch to Widget Preview | <500ms | 1000ms |
+
+**Optimization Strategies:**
+
+1. **Pre-computation:**
+   - Calculate all dot positions on background thread
+   - Cache layout calculations per widget size
+
+2. **Lazy Loading:**
+   - Emoji textures loaded on-demand
+   - Blur effects computed only once per theme change
+
+3. **Efficient Drawing:**
+```kotlin
+// Bad: Allocating objects inside draw loop
+for (day in days) {
+    val paint = Paint().apply { color = dotColor } // ❌ Allocates every iteration
+    canvas.drawCircle(x, y, radius, paint)
+}
+
+// Good: Reuse paint object
+val paint = Paint().apply { color = dotColor }
+for (day in days) {
+    canvas.drawCircle(x, y, radius, paint) // ✅ No allocation
+}
+```
+
+4. **Bitmap Pooling:**
+   - Reuse Bitmap objects when possible
+   - Use `Bitmap.recycle()` on old bitmaps before creating new ones
+
+---
+
+#### 5.3.2 Memory Requirements
+
+**Memory Budget per Widget:**
+
+| Widget Type | Bitmap Size (ARGB_8888) | Memory Usage |
+|-------------|------------------------|--------------|
+| Year View (5×5) | 1000×1000px | ~4MB |
+| Month View (4×4) | 800×800px | ~2.5MB |
+| Progress View (4×1) | 800×200px | ~0.6MB |
+
+**Total Memory Budget:**
+- **App Process:** <50MB total
+- **Widget Bitmaps:** Max 20MB (cached)
+- **Database:** <5MB (configs + emoji rules)
+
+**Low Memory Handling:**
+```kotlin
+override fun onLowMemory() {
+    super.onLowMemory()
+    // Clear bitmap cache
+    WidgetBitmapCache.clear()
+    // Force garbage collection (last resort)
+    System.gc()
+}
+
+override fun onTrimMemory(level: Int) {
+    super.onTrimMemory(level)
+    when (level) {
+        TRIM_MEMORY_RUNNING_CRITICAL -> {
+            WidgetBitmapCache.clear()
+        }
+        TRIM_MEMORY_UI_HIDDEN -> {
+            WidgetBitmapCache.trimToSize(10 * 1024 * 1024) // 10MB
+        }
+    }
+}
+```
+
+---
+
+#### 5.3.3 Battery Impact
+
+**Target:** <0.5% battery drain per 24 hours with 3 active widgets
+
+**Battery Optimization Strategies:**
+
+1. **No Background Services:**
+   - Zero continuous execution
+   - No `WorkManager` periodic tasks
+   - No location services
+   - No network requests (after initial install)
+
+2. **Minimal Wake Locks:**
+   - Midnight alarm wakes device for <1 second
+   - No partial wake locks held
+
+3. **Efficient Rendering:**
+   - Render only when necessary (date change or config change)
+   - Skip re-renders if cached bitmap still valid
+
+4. **Testing:**
+   - Use Android Battery Historian to verify <0.5% drain
+   - Test on OLED devices with pure black themes (should show 0% additional drain from OLED pixel turn-off)
+
+---
+
+### 5.4 Data Persistence & State Management
+
+#### 5.4.1 Database Schema (Room)
+
+**Entity: WidgetConfig**
+```kotlin
+@Entity(tableName = "widget_configs")
+data class WidgetConfig(
+    @PrimaryKey
+    val widgetId: Int,
+    
+    val widgetType: WidgetType, // YEAR, MONTH, PROGRESS
+    
+    // Appearance
+    val themeId: String, // "classic_light", "oled_dark", "custom"
+    val dotSize: Float, // 2.0 - 8.0 dp
+    val dotSpacing: Float, // 1.0 - 6.0 dp
+    val dotOpacity: Float, // 0.3 - 1.0
+    val dotShape: DotShape, // CIRCLE, SQUARE, ROUNDED_SQUARE
+    
+    // Colors
+    val dotColor: Int, // ARGB color
+    val backgroundColor: Int,
+    val accentColor: Int,
+    val backgroundOpacity: Float, // 0.0 - 1.0 for glassmorphism
+    
+    // Glassmorphism
+    val hasBlur: Boolean,
+    val blurRadius: Float, // 0 - 25dp
+    
+    // Month View Specific
+    val showMonthLabel: Boolean,
+    val showWeekHeaders: Boolean,
+    val weekStartDay: Int, // 0 = Sunday, 1 = Monday
+    
+    // Progress View Specific
+    val progressMode: ProgressMode, // YEAR, MONTH, QUARTER, WEEK
+    val progressStyle: ProgressStyle, // BAR, RING, PERCENTAGE
+    
+    // Metadata
+    val createdAt: Long,
+    val lastUpdated: Long
+)
+```
+
+**Entity: EmojiRule**
+```kotlin
+@Entity(
+    tableName = "emoji_rules",
+    foreignKeys = [
+        ForeignKey(
+            entity = WidgetConfig::class,
+            parentColumns = ["widgetId"],
+            childColumns = ["widgetId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
+data class EmojiRule(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+    
+    val widgetId: Int,
+    
+    val emoji: String, // UTF-8 emoji character(s)
+    
+    val ruleType: RuleType, // SPECIFIC_DATE, RECURRING_DATE, RECURRING_DAY, DATE_RANGE
+    
+    // For SPECIFIC_DATE and DATE_RANGE
+    val startDate: LocalDate?,
+    val endDate: LocalDate?,
+    
+    // For RECURRING_DATE
+    val dayOfMonth: Int?, // 1-31
+    val monthOfYear: Int?, // 1-12, null = every month
+    
+    // For RECURRING_DAY
+    val daysOfWeek: String?, // Comma-separated: "1,3,5" for Mon/Wed/Fri
+    
+    val priority: Int, // Higher = shown first if multiple rules match
+    
+    val isEnabled: Boolean,
+    
+    val createdAt: Long
+)
+```
+
+**DAOs:**
+```kotlin
+@Dao
+interface WidgetConfigDao {
+    @Query("SELECT * FROM widget_configs WHERE widgetId = :widgetId")
+    suspend fun getConfig(widgetId: Int): WidgetConfig?
+    
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveConfig(config: WidgetConfig)
+    
+    @Delete
+    suspend fun deleteConfig(config: WidgetConfig)
+    
+    @Query("SELECT * FROM widget_configs")
+    suspend fun getAllConfigs(): List<WidgetConfig>
+}
+
+@Dao
+interface EmojiRuleDao {
+    @Query("SELECT * FROM emoji_rules WHERE widgetId = :widgetId ORDER BY priority DESC")
+    suspend fun getRulesForWidget(widgetId: Int): List<EmojiRule>
+    
+    @Insert
+    suspend fun insertRule(rule: EmojiRule): Long
+    
+    @Update
+    suspend fun updateRule(rule: EmojiRule)
+    
+    @Delete
+    suspend fun deleteRule(rule: EmojiRule)
+    
+    @Query("SELECT COUNT(*) FROM emoji_rules WHERE widgetId = :widgetId")
+    suspend fun getRuleCount(widgetId: Int): Int
+}
+```
+
+---
+
+#### 5.4.2 SharedPreferences (App-Level Settings)
+
+**Stored Data:**
+```kotlin
+object AppPreferences {
+    const val KEY_DEFAULT_THEME = "default_theme"
+    const val KEY_AUTO_DARK_MODE = "auto_dark_mode"
+    const val KEY_FIRST_LAUNCH = "first_launch"
+    const val KEY_PRO_UNLOCKED = "pro_unlocked"
+    const val KEY_ONBOARDING_COMPLETED = "onboarding_completed"
+    
+    fun getDefaultTheme(context: Context): String {
+        return context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+            .getString(KEY_DEFAULT_THEME, "classic_light") ?: "classic_light"
+    }
+    
+    // ... other preference getters/setters
+}
+```
+
+**Backup Configuration:**
+```xml
+<!-- res/xml/backup_rules.xml -->
+<data-extraction-rules>
+    <cloud-backup>
+        <include domain="sharedpref" path="app_prefs.xml"/>
+        <include domain="database" path="widget_database.db"/>
+    </cloud-backup>
+    
+    <device-transfer>
+        <include domain="sharedpref" path="app_prefs.xml"/>
+        <include domain="database" path="widget_database.db"/>
+    </device-transfer>
+</data-extraction-rules>
+```
+
+**Auto Backup Benefits:**
+- User reinstalls app → widget configs restored
+- User switches devices → configs transfer via Google Backup
+
+---
+
+#### 5.4.3 State Restoration
+
+**Widget Recreation After Reboot:**
+
+```kotlin
+class BootCompletedReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
+            // Reschedule midnight alarm
+            scheduleMidnightUpdate(context)
+            
+            // Force update all widgets (in case date changed during shutdown)
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            val widgetIds = appWidgetManager.getAppWidgetIds(
+                ComponentName(context, DotMatrixWidgetProvider::class.java)
+            )
+            
+            if (widgetIds.isNotEmpty()) {
+                DotMatrixWidgetProvider().onUpdate(
+                    context,
+                    appWidgetManager,
+                    widgetIds
+                )
+            }
+        }
+    }
+}
+```
+
+**Handling Widget Deletion:**
+
+```kotlin
+override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+    super.onDeleted(context, appWidgetIds)
+    
+    // Clean up database
+    appWidgetIds.forEach { widgetId ->
+        viewModelScope.launch {
+            widgetConfigDao.deleteConfig(widgetId)
+            // Emoji rules auto-deleted via CASCADE foreign key
+        }
+    }
+    
+    // Clear bitmap cache
+    appWidgetIds.forEach { widgetId ->
+        WidgetBitmapCache.invalidate(widgetId)
+    }
+}
+```
+
+---
+
+### 5.5 API Level Compatibility & Feature Flags
+
+**Feature Detection Pattern:**
+
+```kotlin
+object FeatureFlags {
+    fun hasBlurSupport(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S // Android 12+
+    }
+    
+    fun hasExactAlarmPermission(context: Context): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = context.getSystemService<AlarmManager>()
+            return alarmManager?.canScheduleExactAlarms() == true
+        }
+        return true // Pre-Android 12 doesn't need permission
+    }
+    
+    fun hasDynamicColors(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S // Material You
+    }
+}
+```
+
+**Graceful Degradation:**
+
+| Feature | Android 13 (Min) | Android 14 | Android 15+ |
+|---------|------------------|-----------|-------------|
+| Blur Effect | Software blur fallback | RenderEffect | RenderEffect |
+| Exact Alarms | Permission required | Permission required | Permission required |
+| Dynamic Colors | Not supported | Supported | Supported |
+| Lock Screen Widgets | Not supported | Supported | Supported |
+
+**Example: Blur Rendering**
+```kotlin
+fun applyBlur(bitmap: Bitmap, radius: Float): Bitmap {
+    return if (FeatureFlags.hasBlurSupport()) {
+        // Use RenderEffect (hardware-accelerated)
+        val renderEffect = RenderEffect.createBlurEffect(
+            radius, radius,
+            Shader.TileMode.CLAMP
+        )
+        // Apply to bitmap...
+    } else {
+        // Fallback to software blur (slower but compatible)
+        RenderScriptBlur.blur(bitmap, radius)
+    }
+}
+```
+
+---
+
+### 5.6 Testing Strategy
+
+#### 5.6.1 Unit Tests
+
+**Coverage Target:** 80%+ of business logic
+
+**Key Test Areas:**
+- Date calculations (edge cases: leap years, month boundaries)
+- Emoji rule matching logic
+- Layout calculation algorithms
+- Color manipulation utilities
+
+**Example Test:**
+```kotlin
+@Test
+fun `emoji rule matches specific date`() {
+    val rule = EmojiRule(
+        emoji = "🎂",
+        ruleType = RuleType.SPECIFIC_DATE,
+        startDate = LocalDate.of(2026, 1, 15),
+        ...
+    )
+    
+    assertTrue(rule.matches(LocalDate.of(2026, 1, 15)))
+    assertFalse(rule.matches(LocalDate.of(2026, 1, 16)))
+}
+
+@Test
+fun `year view layout calculation fits widget bounds`() {
+    val layout = calculateYearLayout(
+        widgetWidth = 1000,
+        widgetHeight = 1000,
+        dotSize = 4f,
+        spacing = 2f
+    )
+    
+    // 12 months × 31 days = 372 dots max
+    // With spacing, should fit in 1000×1000
+    assertTrue(layout.totalWidth <= 1000)
+    assertTrue(layout.totalHeight <= 1000)
+}
+```
+
+---
+
+#### 5.6.2 Instrumentation Tests
+
+**Test Devices:**
+- Pixel 6a (reference device)
+- Samsung Galaxy S23 (OneUI)
+- OnePlus 11 (OxygenOS)
+- Motorola Edge (stock Android)
+
+**Test Scenarios:**
+- Widget add/remove cycle
+- Widget resize handling
+- Configuration changes (dark mode, language)
+- Device reboot persistence
+- Low memory conditions
+- Battery saver mode
+
+**Example Test:**
+```kotlin
+@Test
+fun widgetPersistsAfterReboot() {
+    // Add widget
+    val widgetId = addWidgetToHost()
+    
+    // Configure widget
+    configureWidget(widgetId, WidgetConfig(...))
+    
+    // Simulate reboot
+    device.executeShellCommand("am broadcast -a android.intent.action.BOOT_COMPLETED")
+    
+    // Verify widget still exists and renders correctly
+    val widgetView = waitForWidgetRender(widgetId)
+    assertNotNull(widgetView)
+}
+```
+
+---
+
+#### 5.6.3 Performance Testing
+
+**Tools:**
+- Android Profiler (CPU, Memory, Network)
+- Battery Historian
+- Perfetto Tracing
+- Macrobenchmark library
+
+**Benchmarks:**
+```kotlin
+@Test
+fun benchmarkYearViewRender() = benchmarkRule.measureRepeated {
+    val bitmap = runWithTimingDisabled {
+        WidgetBitmapCache.clear()
+        createWidgetConfig(WidgetType.YEAR)
+    }
+    
+    // Measure this block
+    DotRenderer().renderToBitmap(layout, config, LocalDate.now())
+}
+```
+
+**Acceptance Criteria:**
+- P50 render time <50ms
+- P95 render time <100ms
+- No memory leaks after 100 widget renders
+- Battery drain <0.5% over 24 hours
+
+---
+
+#### 5.6.4 Launcher Compatibility Testing
+
+**Test Matrix:**
+
+| Launcher | Version | Resize | Transparency | Blur |
+|----------|---------|--------|--------------|------|
+| Pixel Launcher | Latest | ✅ | ✅ | ✅ |
+| Samsung One UI | 6.0+ | ✅ | ✅ | ✅ |
+| Nova Launcher | 8.0+ | ✅ | ✅ | ⚠️ |
+| Microsoft Launcher | 6.0+ | ✅ | ✅ | ❌ |
+| Niagara | 1.0+ | ⚠️ | ✅ | ❌ |
+
+✅ = Fully supported  
+⚠️ = Partially supported / quirks  
+❌ = Not supported
+
+**Bug Tracking:**
+- Document launcher-specific issues in GitHub repo
+- Add workarounds or warnings in app if needed
+
+---
+
+## 6. User Experience Design
+
+### 6.1 App Navigation Structure
+
+```
+App Launch
+    │
+    ├─ First Launch Flow (one-time)
+    │   ├─ Welcome Screen
+    │   ├─ Permission Request (Optional: Exact Alarms)
+    │   └─ Add Your First Widget CTA
+    │
+    └─ Main App (returning users)
+        ├─ Home Screen (Widget Gallery)
+        │   ├─ Tab: My Widgets
+        │   ├─ Tab: Templates
+        │   └─ Tab: Discover (Phase 2)
+        │
+        ├─ Widget Editor (when adding/editing widget)
+        │   ├─ Live Preview (top)
+        │   ├─ Customization Controls (bottom)
+        │   └─ Save/Cancel
+        │
+        ├─ Emoji Rules Manager
+        │   ├─ Rule List
+        │   ├─ Add/Edit Rule Dialog
+        │   └─ Import/Export (Pro)
+        │
+        ├─ Theme Gallery
+        │   ├─ Preset Themes
+        │   ├─ Custom Themes (Pro)
+        │   └─ Theme Editor (Pro)
+        │
+        ├─ Settings
+        │   ├─ Default Theme
+        │   ├─ Auto Dark Mode
+        │   ├─ Backup & Restore
+        │   └─ About
+        │
+        └─ Pro Upgrade Screen
+            ├─ Feature List
+            ├─ Pricing
+            └─ Purchase Button
+```
+
+---
+
+### 6.2 Screen-by-Screen Specifications
+
+#### 6.2.1 Home Screen (Widget Gallery)
+
+**Purpose:** Central hub for managing all widgets
+
+**Layout:**
+```
+┌─────────────────────────────────────────┐
+│  ☰  Dot Matrix Widgets        [+ New]  │ ← Header
+├─────────────────────────────────────────┤
+│  [My Widgets] [Templates] [Discover]    │ ← Tabs
+├─────────────────────────────────────────┤
+│                                         │
+│  ┌───────────────┐  ┌───────────────┐  │
+│  │  Year View    │  │  Month View   │  │
+│  │  Home Screen  │  │  Work Page    │  │
+│  │  Last update: │  │  Last update: │  │
+│  │  2 hours ago  │  │  2 hours ago  │  │
+│  │               │  │               │  │
+│  │  [Edit] [⋮]   │  │  [Edit] [⋮]   │  │
+│  └───────────────┘  └───────────────┘  │
+│                                         │
+│  ┌───────────────┐                     │
+│  │  Progress     │                     │
+│  │  Lock Screen  │                     │
+│  │  Last update: │                     │
+│  │  5 min ago    │                     │
+│  │               │                     │
+│  │  [Edit] [⋮]   │                     │
+│  └───────────────┘                     │
+│                                         │
+│  No widgets yet? [+ Add Your First]    │ ← Empty state
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Components:**
+
+1. **Header:**
+   - App logo + title
+   - [+ New] button → Widget Type Selector
+
+2. **Tabs:**
+   - **My Widgets:** User's created widgets (empty if none)
+   - **Templates:** Pre-configured widget templates
+   - **Discover:** Community presets (Phase 2, Pro only)
+
+3. **Widget Cards:**
+   - Thumbnail preview
+   - Widget name (editable)
+   - Location (which home screen, if detectable)
+   - Last update timestamp
+   - [Edit] button → Widget Editor
+   - [⋮] menu → Duplicate, Delete, Export Config
+
+4. **Empty State:**
+   - Illustration of a beautiful widget
+   - "No widgets yet? Add your first widget to get started"
+   - [+ Add Your First] button
+
+**Interactions:**
+- Tap card → Opens Widget Editor
+- Long press card → Quick actions (Duplicate, Delete)
+- Swipe to delete (optional)
+
+---
+
+#### 6.2.2 Widget Editor
+
+**Purpose:** Configure all widget appearance settings
+
+**Layout:**
+```
+┌─────────────────────────────────────────┐
+│  ← Widget Editor                   [✓]  │ ← Header
+├─────────────────────────────────────────┤
+│                                         │
+│        ┌───────────────────────┐       │
+│        │                       │       │
+│        │   LIVE PREVIEW        │       │ ← Preview Area
+│        │   (Actual size)       │       │
+│        │                       │       │
+│        └───────────────────────┘       │
+│                                         │
+│  Widget: [Month View ▼]                │
+│                                         │
+├─ Appearance ────────────────────────────┤
+│  Theme: [Classic Light ▼] [Customize]  │
+│                                         │
+│  Dot Size     [====●====] 4dp          │
+│  Dot Spacing  [===●=====] 2dp          │
+│  Opacity      [=======●=] 80%          │
+│  Shape        ● Circle  ○ Square       │
+│                                         │
+├─ Colors ─────────────────────────────────┤
+│  Dots        [■ #212121] [🎨]          │
+│  Background  [■ #FFFFFF] [🎨]          │
+│  Accent      [■ #2196F9] [🎨]          │
+│                                         │
+├─ Month Settings ─────────────────────────┤
+│  ☑ Show month label                    │
+│  ☑ Show week headers (S M T W T F S)   │
+│  Week starts: [Sunday ▼]               │
+│                                         │
+├─ Emoji Rules ────────────────────────────┤ (Pro)
+│  [+ Add Rule]                  3 / ∞   │
+│                                         │
+│  🎂 Birthday · Every Jan 15   [Edit] [×]│
+│  💪 Workout · Mon/Wed/Fri     [Edit] [×]│
+│  ✈️ Vacation · Jan 20-25      [Edit] [×]│
+│                                         │
+│         [Unlock Pro for Unlimited]     │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Key UX Principles:**
+
+1. **Live Preview:**
+   - Updates instantly on ANY change (no "Apply" button)
+   - Renders actual RemoteViews (what user will see)
+   - Shows exact size based on widget dimensions
+
+2. **No Save Button:**
+   - Changes auto-save on back navigation
+   - [✓] button in header = "Save & Exit"
+   - No "Discard Changes?" dialog (all changes are saved)
+
+3. **Progressive Disclosure:**
+   - Basic settings visible by default
+   - Advanced settings behind [Customize] button
+   - Pro features clearly labeled with 🔒 icon
+
+4. **Contextual Help:**
+   - Tap (i) icon next to each setting → tooltip
+   - Example: "Dot Size: Controls how large each calendar day appears"
+
+---
+
+#### 6.2.3 Emoji Rule Manager
+
+**Purpose:** Add/edit emoji markers for specific dates
+
+**Add Rule Dialog:**
+```
+┌─────────────────────────────────────────┐
+│  Add Emoji Rule                    [×]  │
+├─────────────────────────────────────────┤
+│                                         │
+│  Emoji: [😊]  [Choose Emoji]            │
+│                                         │
+│  Rule Type:                             │
+│  ○ Specific Date                        │
+│  ● Recurring Day of Week                │
+│  ○ Recurring Date (e.g., 15th monthly)  │
+│  ○ Date Range                           │
+│                                         │
+│  ┌─ When (Recurring Day) ──────────┐   │
+│  │  ☑ Monday    ☑ Tuesday          │   │
+│  │  ☐ Wednesday ☑ Thursday         │   │
+│  │  ☐ Friday    ☐ Saturday         │   │
+│  │  ☐ Sunday                        │   │
+│  └──────────────────────────────────┘   │
+│                                         │
+│  Label (optional): [Workout Day]        │
+│                                         │
+│  Preview:                               │
+│  💪 will appear every Mon, Tue, Thu     │
+│                                         │
+│              [Cancel]  [Save Rule]      │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Rule List:**
+```
+┌─────────────────────────────────────────┐
+│  ← Emoji Rules                          │
+├─────────────────────────────────────────┤
+│  Widget: Month View - Home              │
+│                                         │
+│  [+ Add Rule]              Free: 3 / 3  │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │ 🎂 Birthday                     │   │
+│  │ Every January 15                │   │
+│  │                      [Edit] [×] │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │ 💪 Workout Day                  │   │
+│  │ Every Mon, Tue, Thu             │   │
+│  │                      [Edit] [×] │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │ ✈️ Vacation                     │   │
+│  │ Jan 20-25, 2026 (one-time)      │   │
+│  │                      [Edit] [×] │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │ 🔒 Unlock Pro for Unlimited     │   │ ← Paywall
+│  │                                 │   │
+│  │  [Upgrade to Pro - $5.99]       │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**UX Details:**
+
+- **Drag to Reorder:** Rules can be reordered by priority (higher = shown first if multiple match)
+- **Swipe to Delete:** Swipe left on rule → Delete
+- **Bulk Actions:** Select multiple → Delete all
+- **Import/Export (Pro):** Export rules as JSON file, import on another device
+
+---
+
+#### 6.2.4 Theme Gallery
+
+**Purpose:** Browse and apply pre-made themes
+
+**Layout:**
+```
+┌─────────────────────────────────────────┐
+│  ← Themes                               │
+├─────────────────────────────────────────┤
+│  [Preset Themes] [My Themes] [Custom]   │ ← Tabs
+├─────────────────────────────────────────┤
+│                                         │
+│  ┌────────┐ ┌────────┐ ┌────────┐     │
+│  │Classic │ │ OLED   │ │ Nord   │     │
+│  │ Light  │ │ Dark   │ │ Aurora │     │
+│  │        │ │        │ │        │     │
+│  │  ✓     │ │        │ │  🔒    │     │ ← Checkmark = applied
+│  └────────┘ └────────┘ └────────┘     │    Lock = Pro only
+│                                         │
+│  ┌────────┐ ┌────────┐ ┌────────┐     │
+│  │ Sunset │ │ Ocean  │ │ Forest │     │
+│  │  Glow  │ │ Breeze │ │  Calm  │     │
+│  │        │ │        │ │        │     │
+│  │  🔒    │ │  🔒    │ │  🔒    │     │
+│  └────────┘ └────────┘ └────────┘     │
+│                                         │
+│  ┌────────┐ ┌────────┐ ┌────────┐     │
+│  │ Mono-  │ │Cyber-  │ │ Pastel │     │
+│  │ chrome │ │ punk   │ │ Dream  │     ││  │        │ │        │ │        │     │
+│  │        │ │  🔒    │ │  🔒    │     │
+│  └────────┘ └────────┘ └────────┘     │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Interaction:**
+- Tap theme → Preview expands
+- Tap again → Apply to current widget
+- Long press → "Set as Default Theme"
+
+---
+
+#### 6.2.5 Pro Upgrade Screen
+
+**Purpose:** Convert free users to Pro
+
+**Layout:**
+```
+┌─────────────────────────────────────────┐
+│  ×                                      │
+├─────────────────────────────────────────┤
+│                                         │
+│          🎨 Unlock Pro                  │
+│                                         │
+│  ✓ Unlimited Widgets                   │
+│    Create as many widgets as you want  │
+│                                         │
+│  ✓ Unlimited Emoji Rules                │
+│    Mark every special day              │
+│                                         │
+│  ✓ Glassmorphism Mode                  │
+│    Beautiful frosted glass effect      │
+│                                         │
+│  ✓ Premium Themes                      │
+│    Access 10+ exclusive themes         │
+│                                         │
+│  ✓ Cloud Backup (Coming Soon)          │
+│    Sync across devices                 │
+│                                         │
+│  ✓ Priority Support                    │
+│    Get help faster                     │
+│                                         │
+│  ────────────────────────────────────  │
+│                                         │
+│         One-time purchase              │
+│             $5.99                       │
+│         No subscription                │
+│                                         │
+│      [Unlock Pro Features]             │
+│                                         │
+│      [Restore Purchase]                │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Trigger Points:**
+
+User sees this screen when they:
+1. Try to add 2nd widget (free limit = 1)
+2. Try to add 4th emoji rule (free limit = 3)
+3. Try to enable Glassmorphism mode
+4. Try to unlock premium themes
+5. Tap "Upgrade to Pro" from Settings
+
+**Conversion Tactics:**
+- Show actual preview of locked features
+- Highlight "One-time purchase, no subscription"
+- Include social proof: "Join 10,000+ Pro users"
+- Limited-time launch discount (optional)
+
+---
+
+### 6.3 Onboarding Flow (First Launch)
+
+**Goal:** Get user to add their first widget within 2 minutes
+
+**Step 1: Welcome**
+```
+┌─────────────────────────────────────────┐
+│                                         │
+│                                         │
+│        [Beautiful widget preview]       │
+│                                         │
+│      Transform Your Home Screen        │
+│                                         │
+│  Beautiful, customizable calendar       │
+│  widgets that feel premium             │
+│                                         │
+│              [Get Started]              │
+│                                         │
+│              [Skip Tour]                │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Step 2: Permission (Optional)**
+```
+┌─────────────────────────────────────────┐
+│                                         │
+│            🕐                           │
+│                                         │
+│      Stay Up to Date                   │
+│                                         │
+│  Allow exact alarms so your widgets    │
+│  update precisely at midnight          │
+│                                         │
+│  (Optional but recommended)            │
+│                                         │
+│         [Allow] [Skip for Now]         │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Step 3: Add First Widget**
+```
+┌─────────────────────────────────────────┐
+│                                         │
+│      Choose Your First Widget          │
+│                                         │
+│  ┌─────────┐  ┌─────────┐  ┌────────┐ │
+│  │  Year   │  │  Month  │  │Progress│ │
+│  │  View   │  │  View   │  │  Bar   │ │
+│  │         │  │         │  │        │ │
+│  │ See the │  │ Current │  │ Visual │ │
+│  │ entire  │  │ month   │  │ year   │ │
+│  │ year    │  │ + emoji │  │ % done │ │
+│  └─────────┘  └─────────┘  └────────┘ │
+│                                         │
+│           [I'll Do This Later]         │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Post-Onboarding:**
+- User lands in Widget Editor for chosen widget
+- Can customize and save
+- Prompted to add to home screen via launcher
+
+---
+
+### 6.4 Accessibility
+
+#### 6.4.1 Requirements
+
+**Must Support:**
+- TalkBack screen reader
+- Large text (up to 200% scaling)
+- High contrast mode
+- Color blindness modes (protanopia, deuteranopia, tritanopia)
+
+**Implementation:**
+
+1. **Content Descriptions:**
+```kotlin
+// All interactive elements have descriptions
+imageView.contentDescription = "Edit widget configuration"
+dotView.contentDescription = "January 15, 2026 - Birthday"
+```
+
+2. **Semantic Groups:**
+```xml
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:importantForAccessibility="yes">
+    
+    <TextView
+        android:id="@+id/label"
+        android:labelFor="@+id/slider" />
+    
+    <SeekBar
+        android:id="@+id/slider"
+        android:contentDescription="Dot size: 4 density-independent pixels" />
+        
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
+
+3. **Touch Target Sizes:**
+   - Minimum 48dp × 48dp for all tappable elements
+   - Increased spacing in lists for easier tapping
+
+4. **Color Contrast:**
+   - All text meets WCAG AA standard (4.5:1 contrast ratio)
+   - Interactive elements have 3:1 contrast with background
+
+---
+
+## 7. Data Architecture
+
+### 7.1 Data Flow Diagram
+
+```
+User Input (Widget Config)
+        ↓
+   [App UI Layer]
+        ↓
+  [ViewModel Layer]
+        ↓
+  [Repository Layer] ←→ [Room Database]
+        ↓                      ↓
+  [Widget Renderer]      [Backup System]
+        ↓
+  [Bitmap Cache]
+        ↓
+  [AppWidget Manager]
+        ↓
+  [Home Screen Widget]
+```
+
+### 7.2 Repository Pattern
+
+```kotlin
+class WidgetConfigRepository(
+    private val configDao: WidgetConfigDao,
+    private val rulesDao: EmojiRuleDao
+) {
+    suspend fun getWidgetConfig(widgetId: Int): WidgetConfig? {
+        return configDao.getConfig(widgetId)
+    }
+    
+    suspend fun saveWidgetConfig(config: WidgetConfig) {
+        configDao.saveConfig(config)
+        // Invalidate cache
+        WidgetBitmapCache.invalidate(config.widgetId)
+        // Trigger widget update
+        updateWidget(config.widgetId)
+    }
+    
+    suspend fun getEmojiRules(widgetId: Int): List<EmojiRule> {
+        return rulesDao.getRulesForWidget(widgetId)
+    }
+    
+    suspend fun canAddRule(widgetId: Int): Boolean {
+        val count = rulesDao.getRuleCount(widgetId)
+        return ProManager.isPro() || count < 3
+    }
+    
+    // ... other methods
+}
+```
+
+---
+
+## 8. Security & Privacy
+
+### 8.1 Privacy Policy
+
+**Data Collection:** NONE
+
+**User Data Stored Locally:**
+- Widget configurations
+- Emoji rules
+- App preferences
+
+**Data Shared:** NONE
+- No analytics
+- No crash reporting (opt-in only, via Play Console)
+- No advertising
+
+**Third-Party SDKs:**
+- Google Play Billing (for Pro purchases only)
+- No other SDKs
+
+### 8.2 Permissions
+
+**Required:** NONE
+
+**Optional:**
+- `SCHEDULE_EXACT_ALARM` (Android 12+): For precise midnight updates
+  - Requested on first launch with clear explanation
+  - App works without it (uses inexact alarms)
+
+**Requested but Not Used:**
+- NONE (we don't request storage, location, camera, contacts, etc.)
+
+### 8.3 Security Best Practices
+
+- No network requests (except Play Billing)
+- No WebView usage
+- No eval() or dynamic code execution
+- All data stored with app-private permissions
+- ProGuard/R8 code obfuscation enabled
+
+---
+
+## 9. Monetization Strategy
+
+### 9.1 Pricing Model
+
+**Free Tier:**
+- 1 active widget
+- 3 emoji rules per widget
+- Basic themes (Light, Dark)
+- All widget types (Year, Month, Progress)
+
+**Pro Tier (One-Time Purchase):**
+- **Price:** $5.99 USD
+- Unlimited widgets
+- Unlimited emoji rules
+- Glassmorphism mode
+- All premium themes (10+)
+- Priority support
+- Future Pro features (cloud backup, preset marketplace uploads)
+
+**Pricing Rationale:**
+- $5.99 is below typical "premium app" threshold ($9.99)
+- One-time purchase differentiates from subscription fatigue
+- Low enough for impulse buy, high enough to signal quality
+- Comparable to icon pack prices ($2.99-$7.99)
+
+### 9.2 Conversion Funnel
+
+```
+100 Free Users
+    ↓
+80 Add 1st Widget (80% activation)
+    ↓
+40 Customize Widget (50% engagement)
+    ↓
+20 Hit Free Limit (50% reach limit)
+    ↓
+3-5 Convert to Pro (15-25% conversion of engaged users)
+```
+
+**Target Conversion Rate:** 15% overall (industry average: 5-10%)
+
+### 9.3 Paywall Triggers
+
+**Hard Paywalls (feature blocked):**
+1. Adding 2nd widget → "Unlock Pro for unlimited widgets"
+2. Adding 4th emoji rule → "Unlock Pro for unlimited emoji rules"
+3. Enabling Glassmorphism → "Unlock Pro for Glassmorphism mode"
+4. Selecting premium theme → "Unlock Pro to use this theme"
+
+**Soft Paywalls (feature teased):**
+1. "Upgrade to Pro" button in Settings (always visible)
+2. "Pro" badge on locked themes in gallery
+3. "🔒 Pro Feature" label on glassmorphism toggle
+
+**No Nagging:**
+- No pop-ups after X days
+- No "rate our app" prompts
+- No interstitial ads (ever)
+
+### 9.4 Refund Policy
+
+- Standard Google Play refund window (48 hours)
+- No questions asked refunds via Play Console
+- Manual refund consideration for edge cases (e.g., accidental purchase by child)
+
+---
+
+## 10. Release Plan & Roadmap
+
+### 10.1 Development Phases
+
+**Phase 0: Pre-Development (Week 1-2)**
+- Finalize PRD (this document)
+- Set up development environment
+- Create design mockups in Figma
+- Set up GitHub repository
+- Choose tech stack finalize
+
+**Phase 1: MVP Development (Week 3-10)**
+- Week 3-4: Core widget rendering engine
+- Week 5-6: Widget configuration UI
+- Week 7: Emoji rule system
+- Week 8: Theme system
+- Week 9: Pro unlock & billing
+- Week 10: Bug fixes & polish
+
+**Phase 2: Beta Testing (Week 11-12)**
+- Week 11: Closed beta (50 users via TestFlight)
+- Week 12: Open beta (500 users via Play Store Beta)
+- Iterate based on feedback
+
+**Phase 3: Launch (Week 13)**
+- Week 13: Public launch on Google Play Store
+- Press outreach (Android Police, 9to5Google, etc.)
+- Social media campaign (Twitter, Reddit r/AndroidThemes)
+
+**Phase 4: Post-Launch Iteration (Month 2-3)**
+- Monitor crash reports & user feedback
+- Ship bug fixes weekly
+- Add Phase 2 features (preset marketplace)
+
+**Phase 5: Growth (Month 4-6)**
+- Feature updates (lock screen widgets, Wear OS)
+- Marketing push (paid ads, influencer partnerships)
+- Reach 100K installs
+
+---
+
+### 10.2 Feature Roadmap
+
+#### Q1 2026 (Launch Quarter)
+- ✅ MVP Release (3 widget types, basic themes, Pro unlock)
+- ✅ Bug fixes & stability improvements
+- 🔜 Community preset marketplace (Phase 2)
+
+#### Q2 2026
+- Lock screen widgets (Android 14+)
+- Advanced customization (gradient dots, patterns)
+- Multi-language support (Spanish, French, German, Japanese)
+
+#### Q3 2026
+- Wear OS Glance widgets
+- Event integration (optional Google Calendar sync)
+- Widget animation effects (experimental)
+
+#### Q4 2026
+- Preset creator tool (Pro feature)
+- Collaborative widget sharing
+- Year-in-review feature (stats on widget usage)
+
+---
+
+### 10.3 Launch Checklist
+
+**Pre-Launch (1 week before):**
+- [ ] Final QA pass on 10+ devices
+- [ ] Privacy policy published on website
+- [ ] Play Store listing optimized (screenshots, description)
+- [ ] Press kit prepared (logos, demo video, screenshots)
+- [ ] Support email set up (support@dotmatrixwidgets.com)
+- [ ] Social media accounts created (Twitter, Instagram)
+
+**Launch Day:**
+- [ ] Submit to Play Store (production track)
+- [ ] Send press release to Android blogs
+- [ ] Post on r/Android, r/AndroidThemes, r/androidapps
+- [ ] Tweet launch announcement
+- [ ] Monitor crash reports & user reviews
+
+**Post-Launch (1 week after):**
+- [ ] Respond to all Play Store reviews
+- [ ] Fix any critical bugs reported
+- [ ] Publish launch retrospective blog post
+- [ ] Plan next feature based on user feedback
+
+---
+
+## 11. Success Metrics & KPIs
+
+### 11.1 Primary Metrics (North Star)
+
+**Widget Retention Rate:**
+- **Definition:** % of users who still have widget active after 7/30 days
+- **Target:**
+  - 7-day retention: 70%
+  - 30-day retention: 50%
+- **Measurement:** Track widget IDs via AppWidget Manager
+
+**Pro Conversion Rate:**
+- **Definition:** % of users who purchase Pro within 30 days
+- **Target:** 15%
+- **Measurement:** Google Play Billing API
+
+---
+
+### 11.2 Secondary Metrics
+
+**Activation:**
+- **Definition:** % of installs who add at least 1 widget
+- **Target:** 80%
+
+**Engagement:**
+- **Definition:** % of users who customize widget beyond defaults
+- **Target:** 50%
+
+**Quality:**
+- **Definition:** Average Play Store rating
+- **Target:** 4.5+ stars
+
+**Growth:**
+- **Definition:** Monthly active installs
+- **Target:** 10K Month 1 → 100K Month 6
+
+**Monetization:**
+- **Definition:** Monthly revenue from Pro purchases
+- **Target:** $1,500 Month 1 → $15,000 Month 6
+
+---
+
+### 11.3 Analytics Implementation
+
+**Tools:**
+- Google Play Console (installs, crashes, ANRs)
+- Firebase Analytics (opt-in only, for event tracking)
+
+**Events to Track:**
+```kotlin
+// User adds first widget
+analyticsLogger.logEvent("widget_added", Bundle().apply {
+    putString("widget_type", "year_view")
+    putBoolean("is_first_widget", true)
+})
+
+// User customizes widget
+analyticsLogger.logEvent("widget_customized", Bundle().apply {
+    putString("changed_property", "dot_size")
+})
+
+// User hits paywall
+analyticsLogger.logEvent("paywall_shown", Bundle().apply {
+    putString("trigger", "second_widget_attempt")
+})
+
+// User converts to Pro
+analyticsLogger.logEvent("pro_purchased", Bundle().apply {
+    putDouble("price", 5.99)
+    putString("currency", "USD")
+})
+```
+
+**Privacy Note:** All analytics are:
+- Opt-in (user can disable in Settings)
+- Anonymous (no user IDs or personal data)
+- Used solely to improve product
+
+---
+
+## 12. Risk Management
+
+### 12.1 Technical Risks
+
+| Risk | Probability | Impact | Mitigation |
+|------|-------------|--------|------------|
+| Widget API breaking changes in future Android | Medium | High | Use only stable APIs, maintain feature flags, test on beta Android releases |
+| Launcher incompatibility | Low | Medium | Test on top 10 launchers, document quirks, provide workarounds |
+| Memory leaks causing crashes | Medium | High | Extensive testing, bitmap pooling, aggressive cache management |
+| Battery drain complaints | Low | High | Zero background services, benchmark battery usage pre-launch |
+| Rendering performance on low-end devices | Medium | Medium | Optimize rendering pipeline, test on budget phones (e.g., Moto G series) |
+
+---
+
+### 12.2 Business Risks
+
+| Risk | Probability | Impact | Mitigation |
+|------|-------------|--------|------------|
+| Low conversion to Pro | Medium | High | A/B test pricing ($4.99 vs $5.99 vs $7.99), optimize paywall messaging |
+| High uninstall rate | Low | High | Exceptional onboarding, ensure widgets persist across reboots, fast support response |
+| Play Store rejection | Low | High | Follow all policies strictly, test billing thoroughly, accurate metadata |
+| Negative reviews due to bugs | Medium | High | Extensive QA, staged rollout (10% → 50% → 100%), monitor crashes daily |
+| Competitor clone | High | Medium | Speed to market, build community, unique brand identity |
+
+---
+
+### 12.3 Market Risks
+
+| Risk | Probability | Impact | Mitigation |
+|------|-------------|--------|------------|
+| Market saturation (too many widget apps) | Medium | Medium | Differentiate with unique dot matrix aesthetic, superior performance |
+| Google launches similar feature | Low | High | Pivot to complementary features (e.g., advanced customization) |
+| Android removes widget support | Very Low | Very High | No mitigation possible (existential risk) |
+| User preference shifts away from widgets | Low | High | Diversify into lock screen widgets, Wear OS to hedge |
+
+---
+
+## 13. Appendices
+
+### 13.1 Glossary
+
+- **AppWidgetProvider:** Android class for creating home screen widgets
+- **RemoteViews:** Android UI framework for widgets (limited to specific view types)
+- **Dot Matrix:** Grid-based visual representation (dots arranged in rows/columns)
+- **Glassmorphism:** Design style with frosted glass transparency effect
+- **LRU Cache:** Least Recently Used cache (evicts oldest unused items first)
+- **AlarmManager:** Android system service for scheduling tasks
+- **RenderEffect:** Android 12+ API for hardware-accelerated visual effects
+
+---
+
+### 13.2 Technical Stack
+
+**Language:** java 100%  
+**Minimum SDK:** API 33 (Android 13)  
+**Target SDK:** API 35 (Android 15)
+
+**Core Libraries:**
+- Jetpack Compose (UI)
+- Room (Database)
+- Kotlin Coroutines (Async)
+- Hilt (Dependency Injection)
+- Coil (Image loading for emoji rendering)
+
+**Billing:**
+- Google Play Billing Library 6.0+
+
+**Testing:**
+- JUnit 5 (Unit tests)
+- Espresso (UI tests)
+- Robolectric (Widget tests)
+- Macrobenchmark (Performance tests)
+
+**Build:**
+- Gradle 8.0+
+- R8 (Code shrinking & obfuscation)
+- Version catalogs for dependency management
+
+---
+
+### 13.3 Open Questions (To Resolve Before Development)
+
+1. **Should we support widget backups via Google Drive?**
+   - Pro: User convenience, great PR
+   - Con: Requires cloud permissions, conflicts with privacy-first stance
+   - **Decision:** Phase 2 feature, opt-in only
+
+2. **Should emoji rules sync across multiple widgets?**
+   - Pro: User expects consistency
+   - Con: Complex data model, potential confusion
+   - **Decision:** Pro feature only, with clear UI indicators
+
+3. **Should we allow custom dot shapes beyond circle/square?**
+   - Pro: More customization
+   - Con: Complexity in rendering, diminishing returns
+   - **Decision:** Phase 3 feature if user demand exists
+
+4. **Pricing: $4.99 vs $5.99 vs $7.99?**
+   - **Decision:** Launch at $5.99, A/B test in Month 2
+
+5. **Support Android 12 (API 32)?**
+   - Pro: +10% potential users
+   - Con: Complicates blur implementation, exact alarm handling
+   - **Decision:** No, stick with API 33 minimum for cleaner codebase
+
+---
+
+### 13.4 Resources & References
+
+**Design Inspiration:**
+- Minimal Calendar Widget by Fausto Núñez Alberro
+- KWGT Community Themes (r/AndroidThemes)
+- Material Design 3 Guidelines
+
+**Technical References:**
+- Android Widgets Documentation: https://developer.android.com/develop/ui/views/appwidgets
+- RemoteViews API: https://developer.android.com/reference/android/widget/RemoteViews
+- Battery Optimization: https://developer.android.com/topic/performance/power
+
+**Market Research:**
+- r/AndroidThemes (115K members)
+- XDA Forums - Themes Section
+- Android Authority Widget App Roundups
+
+---
+
+### 13.5 Contact & Ownership
+
+**Product Owner:** [harmit kalal]
+**Technical Lead:** [harmit kalal]  
+**Designer:** [harmit kalal]  
+
+**Repository:** https://github.com/[username]/dot-matrix-widgets  
+**Support Email:** support@dotmatrixwidgets.com  
+**Marketing Site:** https://dotmatrixwidgets.com (TBD)
+
+---
+
+## Document History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | Jan 22, 2026 | Product Team | Initial PRD creation |
+
+---
+
+**END OF DOCUMENT**
+
+---

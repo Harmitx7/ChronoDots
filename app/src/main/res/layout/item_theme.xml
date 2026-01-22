@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/spacing_sm"
+    app:cardCornerRadius="@dimen/radius_md"
+    app:cardElevation="0dp">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
+
+        <!-- Theme Preview Background -->
+        <View
+            android:id="@+id/theme_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- Theme Name -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="@dimen/spacing_sm"
+            android:background="#40000000">
+
+            <TextView
+                android:id="@+id/theme_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAppearance="@style/TextAppearance.DotMatrix.Label"
+                android:textColor="@android:color/white"
+                android:text="Theme Name" />
+
+            <!-- Pro badge -->
+            <TextView
+                android:id="@+id/pro_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PRO"
+                android:textSize="10sp"
+                android:textColor="@color/accent"
+                android:background="@color/primary_background"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp"
+                android:visibility="gone" />
+
+            <!-- Selected indicator -->
+            <ImageView
+                android:id="@+id/selected_indicator"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/checkbox_on_background"
+                android:visibility="gone"
+                android:contentDescription="Selected" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</com.google.android.material.card.MaterialCardView>

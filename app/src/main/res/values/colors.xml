@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Background - Deep muted indigo/charcoal purple -->
+    <color name="primary_background">#1A1625</color>
+    <color name="primary_background_light">#F5F3F7</color>
+    
+    <!-- Secondary Surface - Warm beige/sand -->
+    <color name="secondary_surface">#E8DDD0</color>
+    <color name="secondary_surface_dark">#2D2640</color>
+    
+    <!-- Accent - Soft gold/amber -->
+    <color name="accent">#D4A574</color>
+    <color name="accent_light">#E8C9A0</color>
+    
+    <!-- Text Colors -->
+    <color name="text_primary">#FAFAFA</color>
+    <color name="text_primary_light">#1A1625</color>
+    <color name="text_secondary">#B0A8C0</color>
+    <color name="text_secondary_light">#6B6480</color>
+    <color name="text_disabled">#5A5270</color>
+    
+    <!-- Dot Colors -->
+    <color name="dot_default">#E0E0E0</color>
+    <color name="dot_default_light">#212121</color>
+    <color name="dot_past">#7A7490</color>
+    <color name="dot_future">#4A4560</color>
+    <color name="dot_today">#D4A574</color>
+    
+    <!-- Theme: Classic Light -->
+    <color name="theme_classic_light_bg">#FFFFFF</color>
+    <color name="theme_classic_light_dot">#212121</color>
+    <color name="theme_classic_light_accent">#2196F3</color>
+    
+    <!-- Theme: OLED Dark -->
+    <color name="theme_oled_dark_bg">#000000</color>
+    <color name="theme_oled_dark_dot">#E0E0E0</color>
+    <color name="theme_oled_dark_accent">#BB86FC</color>
+    
+    <!-- Theme: Nord Aurora -->
+    <color name="theme_nord_bg">#2E3440</color>
+    <color name="theme_nord_dot">#ECEFF4</color>
+    <color name="theme_nord_accent">#88C0D0</color>
+    
+    <!-- Theme: Sunset Glow -->
+    <color name="theme_sunset_bg">#1A1015</color>
+    <color name="theme_sunset_dot">#FFD6E8</color>
+    <color name="theme_sunset_accent">#FF6B6B</color>
+    
+    <!-- Theme: Ocean Breeze -->
+    <color name="theme_ocean_bg">#0A1929</color>
+    <color name="theme_ocean_dot">#B3E5FC</color>
+    <color name="theme_ocean_accent">#0077BE</color>
+    
+    <!-- Theme: Forest Calm -->
+    <color name="theme_forest_bg">#0D1F0D</color>
+    <color name="theme_forest_dot">#C8E6C9</color>
+    <color name="theme_forest_accent">#2E7D32</color>
+    
+    <!-- Theme: Monochrome -->
+    <color name="theme_mono_bg">#F5F5F5</color>
+    <color name="theme_mono_dot">#808080</color>
+    <color name="theme_mono_accent">#424242</color>
+    
+    <!-- Theme: Cyberpunk -->
+    <color name="theme_cyber_bg">#0D1117</color>
+    <color name="theme_cyber_dot">#00FFFF</color>
+    <color name="theme_cyber_accent">#FF00FF</color>
+    
+    <!-- Theme: Pastel Dream -->
+    <color name="theme_pastel_bg">#FFF5F5</color>
+    <color name="theme_pastel_dot">#C7CEEA</color>
+    <color name="theme_pastel_accent">#FFD6E8</color>
+    
+    <!-- Theme: Minimal Beige -->
+    <color name="theme_beige_bg">#F7F3EF</color>
+    <color name="theme_beige_dot">#D4C5B9</color>
+    <color name="theme_beige_accent">#8B7355</color>
+    
+    <!-- Theme: Tokyo Night -->
+    <color name="theme_tokyo_bg">#1A1B26</color>
+    <color name="theme_tokyo_dot">#C0CAF5</color>
+    <color name="theme_tokyo_accent">#7AA2F7</color>
+    
+    <!-- Theme: Dracula -->
+    <color name="theme_dracula_bg">#282A36</color>
+    <color name="theme_dracula_dot">#F8F8F2</color>
+    <color name="theme_dracula_accent">#BD93F9</color>
+    
+    <!-- Glassmorphism -->
+    <color name="glass_tint">#40FFFFFF</color>
+    <color name="glass_tint_dark">#40000000</color>
+    
+    <!-- UI Colors -->
+    <color name="card_background">#2D2640</color>
+    <color name="card_background_light">#FFFFFF</color>
+    <color name="divider">#3D3650</color>
+    <color name="ripple">#20FFFFFF</color>
+    
+    <!-- Status -->
+    <color name="success">#4CAF50</color>
+    <color name="warning">#FF9800</color>
+    <color name="error">#F44336</color>
+</resources>

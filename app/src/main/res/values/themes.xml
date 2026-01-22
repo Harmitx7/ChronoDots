@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.DotMatrixCalendar" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color -->
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorPrimaryDark">@color/primary_background</item>
+        <item name="colorOnPrimary">@color/text_primary</item>
+        
+        <!-- Secondary brand color -->
+        <item name="colorSecondary">@color/secondary_surface</item>
+        <item name="colorOnSecondary">@color/text_primary_light</item>
+        
+        <!-- Background -->
+        <item name="android:colorBackground">@color/primary_background</item>
+        <item name="colorSurface">@color/card_background</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        
+        <!-- Status bar -->
+        <item name="android:statusBarColor">@color/primary_background</item>
+        <item name="android:navigationBarColor">@color/primary_background</item>
+        
+        <!-- Text -->
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+    </style>
+
+    <!-- Card Style -->
+    <!-- Card Style -->
+    <style name="Widget.DotMatrix.Card" parent="Widget.Material3.CardView.Filled">
+        <item name="cardBackgroundColor">@color/card_background</item>
+        <item name="cardCornerRadius">28dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="contentPadding">16dp</item>
+        <item name="strokeWidth">0dp</item>
+    </style>
+    
+    <!-- Button Styles -->
+    <style name="Widget.DotMatrix.Button.Primary" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/accent</item>
+        <item name="android:textColor">@color/text_primary_light</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    
+    <style name="Widget.DotMatrix.Button.Secondary" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="strokeColor">@color/accent</item>
+        <item name="android:textColor">@color/accent</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+    
+    <!-- Text Styles -->
+    <style name="TextAppearance.DotMatrix.Headline" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+    
+    <style name="TextAppearance.DotMatrix.Title" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+    
+    <style name="TextAppearance.DotMatrix.Body" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+    
+    <style name="TextAppearance.DotMatrix.Label" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+    
+    <!-- Slider Style -->
+    <style name="Widget.DotMatrix.Slider" parent="Widget.Material3.Slider">
+        <item name="thumbColor">@color/accent</item>
+        <item name="trackColorActive">@color/accent</item>
+        <item name="trackColorInactive">@color/divider</item>
+    </style>
+</resources>

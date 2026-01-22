@@ -1,0 +1,318 @@
+1. Design Philosophy
+1.1 Core Design Goals
+
+Premium, modern, and calm
+
+Minimal visual noise
+
+Strong depth through soft layers
+
+Designed for glanceability, not interaction overload
+
+Widget-first thinking (UI must work at small sizes)
+
+1.2 Visual Inspiration (From Reference Image)
+
+The reference UI demonstrates:
+
+Soft rounded containers
+
+Layered card system
+
+Muted color palette with high contrast text
+
+Friendly visual language (avatars → emojis in our case)
+
+Clear hierarchy using elevation, not borders
+
+We translate this language into:
+
+Calendar dots instead of avatars
+
+Emojis instead of profile pictures
+
+Time-based data instead of monetary data
+
+2. Color System
+2.1 Base Palette (Inspired, Not Copied)
+Primary Background
+
+Deep muted indigo / charcoal purple
+Used as main canvas for app screens
+
+Secondary Surface
+
+Warm beige / sand tone
+Used for cards, widget foregrounds
+
+Accent
+
+Soft gold / amber
+Used for:
+
+Today indicator
+
+Active dot
+
+Emoji highlight
+
+Text
+
+Primary: Near-white
+
+Secondary: Muted lavender-gray
+
+Disabled: Low-opacity gray
+
+3. Theme Variants (Mandatory)
+3.1 Light Mode
+
+Background: Soft off-white
+
+Cards: Warm beige
+
+Dots: Neutral gray / muted color
+
+Emoji: Full color
+
+3.2 Dark Mode (OLED Optimized)
+
+Background: Near-black / deep indigo
+
+Cards: Dark muted purple
+
+Dots: Soft glow
+
+Reduced contrast strain
+
+3.3 Glassmorphism Mode (Premium)
+
+Semi-transparent frosted surfaces
+
+Blur radius adjustable
+
+Tint color inherits wallpaper hue
+
+Subtle noise texture to avoid banding
+
+4. Typography System
+4.1 Font Style
+
+Sans-serif, rounded geometric
+
+High legibility at small widget sizes
+
+4.2 Hierarchy
+
+Title (Month / Year): Medium weight
+
+Numeric data (dates): Bold
+
+Labels: Regular
+
+Secondary info: Reduced opacity
+
+Typography must never overpower dots.
+
+5. Layout System
+5.1 Grid Rules
+
+8dp base spacing system
+
+Widgets snap to grid internally
+
+Equal dot spacing horizontally and vertically
+
+5.2 Corner Radius
+
+Large cards: 28–32dp
+
+Small widgets: 20–24dp
+
+Dots: Perfect circles
+
+5.3 Elevation
+
+No hard shadows
+
+Soft ambient elevation
+
+Glass mode uses light glow instead of shadow
+
+6. Widget Design Specifications
+6.1 Year View Widget
+
+Structure
+
+Header: Year label (top-left)
+
+Main body: Dot matrix (365 / 366 dots)
+
+Subtle month separators
+
+Today dot slightly larger or glowing
+
+Interaction
+
+Tap opens full editor
+
+No scrolling inside widget
+
+6.2 Month View Widget
+
+Structure
+
+Month name at top
+
+5–6 rows of dots
+
+Optional weekday guide (very subtle)
+
+Customization
+
+Dot → Emoji replacement per date
+
+Highlight today with accent color
+
+Adjustable dot density
+
+6.3 Progress Widget
+
+Structure
+
+Horizontal or circular dot line
+
+Current position highlighted
+
+Emoji at current progress point
+
+Purpose
+
+Aesthetic + motivational
+
+Extremely shareable
+
+7. Emoji Integration Design
+7.1 Emoji as Visual Elements
+
+Emojis replace dots without breaking grid
+
+Emojis scaled to dot size
+
+No animation by default (battery safe)
+
+7.2 Emoji Rules UI
+
+Inspired by the reference “Split With” list:
+
+List-style rules
+
+Emoji on left
+
+Rule description on right
+
+Toggle enabled/disabled
+
+8. App Screens Design
+8.1 Home / Widget Gallery
+
+Vertical card layout
+
+Each card previews a widget
+
+“Add Widget” CTA prominent
+
+8.2 Widget Editor
+
+Live preview at top
+
+Controls below in cards:
+
+Dot size
+
+Spacing
+
+Theme
+
+Emoji rules
+
+8.3 Theme Selector
+
+Large rounded preview tiles
+
+One-tap switch
+
+Glass mode shows blur preview
+
+8.4 Pro Unlock Screen
+
+Clean, minimal
+
+Focus on benefits, not price
+
+No dark patterns
+
+9. Motion & Feedback
+9.1 Animations
+
+Subtle fades
+
+Soft scale on selection
+
+No bouncing or playful motion
+
+9.2 Haptics
+
+Light haptic on:
+
+Widget added
+
+Theme changed
+
+Emoji assigned
+
+10. Accessibility
+
+High contrast mode support
+
+Dot size scalable
+
+Emoji alternatives for colorblind users
+
+Text never embedded in images
+
+11. Design Constraints (Widget-Safe)
+
+No gestures inside widgets
+
+No scrolling
+
+No dynamic video or heavy blur
+
+Must render via RemoteViews
+
+12. Design Success Criteria
+
+Widget readable in 2 seconds
+
+Looks premium even at smallest size
+
+No clutter
+
+Screenshots feel shareable
+
+Feels like “designed”, not “assembled”
+
+13. Design Deliverables Checklist
+
+Color tokens
+
+Theme tokens
+
+Widget layout specs
+
+Emoji sizing rules
+
+Accessibility notes
+
+Dark / Light / Glass previews
