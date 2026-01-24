@@ -119,7 +119,9 @@ public class DotRenderer {
         // Reduce padding for cleaner minimal look
         float padding = config.isHasBlur() ? 20f : 12f;
         
-        float density = 2.5f; // Approximate density
+        // Scale density proportionally to widget size
+        // Base assumption: height of 500px = density 2.5 (standard widget)
+        float density = height / 200f;
         float dotSizePx = config.getDotSize() * density;
         float spacingPx = config.getDotSpacing() * density;
         
@@ -235,9 +237,10 @@ public class DotRenderer {
         
         float padding = config.isHasBlur() ? 20f : 12f;
         
-        // Scale up for Month View (fewer dots, so they should be bigger)
+        // Scale proportionally to widget size
+        // Month view has fewer dots so scale up by 7x to fill space nicely
         float baseScale = 7.0f; 
-        float density = 2.5f * baseScale;
+        float density = (height / 200f) * baseScale;
         float dotSizePx = config.getDotSize() * density;
         float spacingPx = config.getDotSpacing() * density;
         
@@ -374,7 +377,7 @@ public class DotRenderer {
         float ratio = (float) completed / total;
         int filledDots = Math.round(ratio * dotCount);
         
-        float density = 2.5f;
+        float density = height / 200f;
         float dotSizePx = config.getDotSize() * density;
         float spacingPx = config.getDotSpacing() * density;
         
@@ -427,9 +430,9 @@ public class DotRenderer {
         
         float padding = config.isHasBlur() ? 16f : 8f;
         
-        // Scale up for Week View (fewer dots/cols)
+        // Scale proportionally to widget size (Week view uses 7x scale for fewer dots)
         float baseScale = 7.0f;
-         float density = 2.5f * baseScale;
+        float density = (height / 200f) * baseScale;
         float dotSizePx = config.getDotSize() * density;
         float spacingPx = config.getDotSpacing() * density;
         

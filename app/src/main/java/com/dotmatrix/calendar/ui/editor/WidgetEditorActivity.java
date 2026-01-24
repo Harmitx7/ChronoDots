@@ -425,11 +425,15 @@ public class WidgetEditorActivity extends AppCompatActivity {
             switch (config.getWidgetType()) {
                 case MONTH:
                     aspectRatio = 1.0f; // Square
-                    displayHeightDp = 300;
+                    displayHeightDp = 280;
                     break;
                 case WEEK:
                     aspectRatio = 4.0f; // Wide strip
                     displayHeightDp = 100;
+                    break;
+                case PROGRESS:
+                    aspectRatio = 2.5f; // Wide rectangle
+                    displayHeightDp = 120;
                     break;
                 case YEAR:
                 default:
@@ -438,9 +442,11 @@ public class WidgetEditorActivity extends AppCompatActivity {
                     break;
             }
             
-            // High resolution for rendering
-            int renderWidth = 800;
-            int renderHeight = (int) (renderWidth / aspectRatio);
+            // Use device density to calculate render dimensions that match
+            // what a typical 4x2 home screen widget would be (~400dp x 200dp)
+            float density = getResources().getDisplayMetrics().density;
+            int renderHeight = (int) (displayHeightDp * density);
+            int renderWidth = (int) (renderHeight * aspectRatio);
             
             LocalDate today = LocalDate.now();
             Bitmap preview;
@@ -484,8 +490,8 @@ public class WidgetEditorActivity extends AppCompatActivity {
                 android.view.View card = (android.view.View) binding.previewImage.getParent();
                 if (card != null) {
                     android.view.ViewGroup.LayoutParams params = card.getLayoutParams();
-                    float density = getResources().getDisplayMetrics().density;
-                    params.height = (int) (displayHeightDp * density);
+                    float cardDensity = getResources().getDisplayMetrics().density;
+                    params.height = (int) (displayHeightDp * cardDensity);
                     card.setLayoutParams(params);
                 }
                 
