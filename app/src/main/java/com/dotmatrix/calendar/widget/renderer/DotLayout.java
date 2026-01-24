@@ -28,79 +28,157 @@ public class DotLayout {
 
     /**
      * Calculate layout for Year View (12 months × 31 days).
+     * Dots are now fully responsive - they scale to fill the available space optimally.
      */
-    public static DotLayout forYearView(int width, int height, float dotSize, float spacing) {
+    /**
+     * Calculate layout for Year View (12 months × 31 days).
+     * Respects user preference, scaling down ONLY if needed to fit.
+     */
+    public static DotLayout forYearView(int width, int height, float preferredDotSize, float preferredSpacing) {
         int rows = 12;       // 12 months
         int columns = 31;    // Max 31 days
         
-        // Calculate the actual dot size to fit
-        float availableWidth = width - spacing;
-        float availableHeight = height - spacing;
+        // 1. Try with preferred values
+        float spacing = preferredSpacing;
+        float dotSize = preferredDotSize;
         
-        float maxDotWidth = (availableWidth - (columns - 1) * spacing) / columns;
-        float maxDotHeight = (availableHeight - (rows - 1) * spacing) / rows;
+        // 2. Check required dimensions
+        float requiredWidth = columns * dotSize + (columns - 1) * spacing;
+        float requiredHeight = rows * dotSize + (rows - 1) * spacing;
         
-        float actualDotSize = Math.min(dotSize, Math.min(maxDotWidth, maxDotHeight));
-        actualDotSize = Math.max(actualDotSize, 2); // Minimum 2px
+        // 3. Scale down if too big
+        if (requiredWidth > width || requiredHeight > height) {
+            float scaleX = width / requiredWidth;
+            float scaleY = height / requiredHeight;
+            float scale = Math.min(scaleX, scaleY);
+            
+            // Apply scale (keeping minimums to avoid disappearing dots)
+            dotSize = Math.max(dotSize * scale, 2f);
+            spacing = Math.max(spacing * scale, 1f);
+        }
         
-        float gridWidth = columns * actualDotSize + (columns - 1) * spacing;
-        float gridHeight = rows * actualDotSize + (rows - 1) * spacing;
+        // 4. Re-calculate final grid dimensions
+        float finalGridWidth = columns * dotSize + (columns - 1) * spacing;
+        float finalGridHeight = rows * dotSize + (rows - 1) * spacing;
         
-        float startX = (width - gridWidth) / 2;
-        float startY = (height - gridHeight) / 2;
+        // 5. Center
+        float startX = (width - finalGridWidth) / 2;
+        float startY = (height - finalGridHeight) / 2;
         
-        return new DotLayout(rows, columns, actualDotSize, spacing, 
+        return new DotLayout(rows, columns, dotSize, spacing, 
                            width, height, startX, startY);
     }
 
     /**
      * Calculate layout for Month View (up to 6 weeks × 7 days).
+     * Dots are now fully responsive - they scale to fill the available space optimally.
      */
-    public static DotLayout forMonthView(int width, int height, float dotSize, 
-                                          float spacing, boolean hasHeader) {
-        int rows = hasHeader ? 7 : 6;  // 6 weeks max + optional header
-        int columns = 7;               // 7 days
+    /**
+     * Calculate layout for Month View (up to 6 weeks × 7 days).
+     * Respects user preference, scaling down ONLY if needed to fit.
+     */
+    public static DotLayout forMonthView(int width, int height, float preferredDotSize, 
+                                          float preferredSpacing, boolean hasHeader) {
+        int rows = hasHeader ? 7 : 6;
+        int columns = 7;
         
-        float availableWidth = width - spacing;
-        float availableHeight = height - spacing;
+        float spacing = preferredSpacing;
+        float dotSize = preferredDotSize;
         
-        float maxDotWidth = (availableWidth - (columns - 1) * spacing) / columns;
-        float maxDotHeight = (availableHeight - (rows - 1) * spacing) / rows;
+        float requiredWidth = columns * dotSize + (columns - 1) * spacing;
+        float requiredHeight = rows * dotSize + (rows - 1) * spacing;
         
-        float actualDotSize = Math.min(dotSize, Math.min(maxDotWidth, maxDotHeight));
-        actualDotSize = Math.max(actualDotSize, 2);
+        if (requiredWidth > width || requiredHeight > height) {
+            float scaleX = width / requiredWidth;
+            float scaleY = height / requiredHeight;
+            float scale = Math.min(scaleX, scaleY);
+            
+            dotSize = Math.max(dotSize * scale, 3f);
+            spacing = Math.max(spacing * scale, 2f);
+        }
         
-        float gridWidth = columns * actualDotSize + (columns - 1) * spacing;
-        float gridHeight = rows * actualDotSize + (rows - 1) * spacing;
+        float finalGridWidth = columns * dotSize + (columns - 1) * spacing;
+        float finalGridHeight = rows * dotSize + (rows - 1) * spacing;
         
-        float startX = (width - gridWidth) / 2;
-        float startY = (height - gridHeight) / 2;
+        float startX = (width - finalGridWidth) / 2;
+        float startY = (height - finalGridHeight) / 2;
         
-        return new DotLayout(rows, columns, actualDotSize, spacing,
+        return new DotLayout(rows, columns, dotSize, spacing,
                            width, height, startX, startY);
     }
 
     /**
      * Calculate layout for Progress View.
+     * Dots are now fully responsive - they scale to fill the available space optimally.
      */
-    public static DotLayout forProgressView(int width, int height, float dotSize, 
-                                             float spacing, int dotCount) {
+    /**
+     * Calculate layout for Progress View.
+     * Respects user preference, scaling down ONLY if needed to fit.
+     */
+    public static DotLayout forProgressView(int width, int height, float preferredDotSize, 
+                                             float preferredSpacing, int dotCount) {
         int columns = dotCount;
         int rows = 1;
         
-        float availableWidth = width - spacing * 2;
-        float maxDotWidth = (availableWidth - (columns - 1) * spacing) / columns;
+        float spacing = preferredSpacing;
+        float dotSize = preferredDotSize;
         
-        float actualDotSize = Math.min(dotSize, Math.min(maxDotWidth, height - spacing * 2));
-        actualDotSize = Math.max(actualDotSize, 2);
+        float requiredWidth = columns * dotSize + (columns - 1) * spacing;
+        float requiredHeight = dotSize;
         
-        float gridWidth = columns * actualDotSize + (columns - 1) * spacing;
-        float gridHeight = actualDotSize;
+        if (requiredWidth > width || requiredHeight > height) {
+            float scaleX = width / requiredWidth;
+            float scaleY = height / requiredHeight;
+            float scale = Math.min(scaleX, scaleY);
+            
+            dotSize = Math.max(dotSize * scale, 3f);
+            spacing = Math.max(spacing * scale, 1f);
+        }
         
-        float startX = (width - gridWidth) / 2;
-        float startY = (height - gridHeight) / 2;
+        float finalGridWidth = columns * dotSize + (columns - 1) * spacing;
+        float finalGridHeight = dotSize;
         
-        return new DotLayout(rows, columns, actualDotSize, spacing,
+        float startX = (width - finalGridWidth) / 2;
+        float startY = (height - finalGridHeight) / 2;
+        
+        return new DotLayout(rows, columns, dotSize, spacing,
+                           width, height, startX, startY);
+    }
+
+    /**
+     * Calculate layout for Week View (7 days).
+     */
+    /**
+     * Calculate layout for Week View (7 days).
+     * Respects user preference, scaling down ONLY if needed to fit.
+     */
+    public static DotLayout forWeekView(int width, int height, float preferredDotSize, 
+                                         float preferredSpacing, boolean hasHeader) {
+        int rows = hasHeader ? 2 : 1;
+        int columns = 7;
+        
+        float spacing = preferredSpacing;
+        float dotSize = preferredDotSize;
+        
+        float requiredWidth = columns * dotSize + (columns - 1) * spacing;
+        float requiredHeight = rows * dotSize + (rows - 1) * spacing;
+        
+        if (requiredWidth > width || requiredHeight > height) {
+            float scaleX = width / requiredWidth;
+            float scaleY = height / requiredHeight;
+            float scale = Math.min(scaleX, scaleY);
+            
+            dotSize = Math.max(dotSize * scale, 4f);
+            spacing = Math.max(spacing * scale, 2f);
+        }
+        
+        float finalGridWidth = columns * dotSize + (columns - 1) * spacing;
+        float finalGridHeight = rows * dotSize + (rows - 1) * spacing;
+        
+        float startX = (width - finalGridWidth) / 2;
+        float startY = (height - finalGridHeight) / 2;
+        
+        return new DotLayout(rows, columns, dotSize, spacing,
                            width, height, startX, startY);
     }
 

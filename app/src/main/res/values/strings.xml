@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Dot Matrix Calendar</string>
+    <string name="app_name">ChronoDots</string>
     
     <!-- Widget Names -->
     <string name="widget_year_name">Year View</string>
     <string name="widget_year_description">See your entire year in dot matrix format</string>
     <string name="widget_month_name">Month View</string>
     <string name="widget_month_description">Current month with emoji support</string>
+    <string name="widget_week_name">Week View</string>
+    <string name="widget_week_description">Current week strip focus</string>
     <string name="widget_progress_name">Progress View</string>
     <string name="widget_progress_description">Visual year/month progress bar</string>
     

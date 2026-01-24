@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Segmented Button Style for Widget Type -->
+    <style name="Widget.DotMatrix.Button.Segmented" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="strokeColor">@color/divider</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="android:checkedButton">@color/accent</item>
+    </style>
+    
+    <!-- Theme Pill Button -->
+    <style name="Widget.DotMatrix.Button.ThemePill" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textColor">@color/accent</item>
+        <item name="strokeColor">@color/accent</item>
+        <item name="strokeWidth">2dp</item>
+        <item name="cornerRadius">24dp</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+    </style>
+</resources>

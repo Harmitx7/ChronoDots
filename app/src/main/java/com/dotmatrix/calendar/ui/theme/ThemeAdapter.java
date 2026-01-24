@@ -61,7 +61,16 @@ public class ThemeAdapter extends RecyclerView.Adapter<ThemeAdapter.ThemeViewHol
 
         void bind(ThemePreset theme) {
             // Set background color
-            binding.themeBackground.setBackgroundColor(theme.getBackgroundColor());
+            int backgroundColor = theme.getBackgroundColor();
+            
+            // Resolve dynamic colors for preview
+            if ("dynamic_harmony".equals(theme.getId()) || "chameleon_pro".equals(theme.getId())) {
+                com.dotmatrix.calendar.util.DynamicColorHelper helper = 
+                    new com.dotmatrix.calendar.util.DynamicColorHelper(itemView.getContext());
+                backgroundColor = helper.getBackgroundColor();
+            }
+            
+            binding.themeBackground.setBackgroundColor(backgroundColor);
             
             // Set name
             binding.themeName.setText(theme.getName());

@@ -71,7 +71,7 @@ public class AppPreferences {
 
     // Pro Unlocked
     public boolean isProUnlocked() {
-        return prefs.getBoolean(KEY_PRO_UNLOCKED, false);
+        return true; // Bypassed for USER request
     }
 
     public void setProUnlocked(boolean unlocked) {

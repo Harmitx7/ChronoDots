@@ -21,10 +21,13 @@
         android:theme="@style/Theme.DotMatrixCalendar"
         tools:targetApi="35">
 
-        <!-- Main Activity -->
+
+
+        <!-- Fluid Calendar Activity (Main) -->
         <activity
-            android:name=".ui.main.MainActivity"
+            android:name=".ui.fluid.FluidCalendarActivity"
             android:exported="true"
+            android:label="Fluid Calendar"
             android:theme="@style/Theme.DotMatrixCalendar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,7 +39,7 @@
         <activity
             android:name=".ui.editor.WidgetEditorActivity"
             android:exported="true"
-            android:theme="@style/Theme.DotMatrixCalendar">
+            android:theme="@style/Theme.DotMatrixCalendar.Editor">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
@@ -96,6 +99,18 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_progress_info" />
+        </receiver>
+
+        <!-- Week View Widget Provider -->
+        <receiver
+            android:name=".widget.provider.WeekViewWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_week_info" />
         </receiver>
 
         <!-- Midnight Update Receiver -->

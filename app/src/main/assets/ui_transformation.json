@@ -1,0 +1,644 @@
+{
+  "ui_transformation": {
+    "version": "1.0",
+    "target_platform": "android",
+    "design_system": "dot_matrix_minimal",
+    
+    "theme": {
+      "name": "brutalist_minimal",
+      "color_palette": {
+        "background": "#FAFAFA",
+        "background_dark": "#000000",
+        "primary_text": "#000000",
+        "secondary_text": "#6B6B6B",
+        "tertiary_text": "#B8B8B8",
+        "accent_primary": "#FF6B2C",
+        "accent_secondary": "#0066FF",
+        "dot_past": "#000000",
+        "dot_current": "#FF6B2C",
+        "dot_future": "#E5E5E5",
+        "dot_inactive": "rgba(229, 229, 229, 0.3)"
+      },
+      
+      "typography": {
+        "date_number": {
+          "font_family": "SF Pro Display",
+          "font_weight": 900,
+          "font_size": 128,
+          "line_height": 1.0,
+          "letter_spacing": -0.02,
+          "color": "#000000"
+        },
+        "month_label": {
+          "font_family": "SF Pro Text",
+          "font_weight": 700,
+          "font_size": 18,
+          "line_height": 1.2,
+          "letter_spacing": 0.15,
+          "text_transform": "uppercase",
+          "color": "#000000"
+        },
+        "day_label": {
+          "font_family": "SF Pro Text",
+          "font_weight": 400,
+          "font_size": 18,
+          "line_height": 1.2,
+          "color": "#6B6B6B"
+        },
+        "week_header": {
+          "font_family": "SF Pro Text",
+          "font_weight": 500,
+          "font_size": 12,
+          "letter_spacing": 0.05,
+          "color": "#B8B8B8"
+        }
+      },
+      
+      "spacing": {
+        "screen_padding_horizontal": 32,
+        "screen_padding_top": 80,
+        "screen_padding_bottom": 40,
+        "section_gap": 48,
+        "element_gap": 16,
+        "dot_size": 34,
+        "dot_gap": 10,
+        "row_height": 44
+      }
+    },
+    
+    "layout": {
+      "structure": "vertical_stack",
+      "sections": [
+        {
+          "id": "date_header",
+          "type": "header",
+          "height_ratio": 0.35,
+          "children": [
+            {
+              "id": "date_number",
+              "type": "text",
+              "content": "{{current_day}}",
+              "style": "date_number",
+              "alignment": "left",
+              "padding_left": 32,
+              "padding_top": 80,
+              "animation": {
+                "on_mount": "fade_scale_in",
+                "on_update": "flip_number",
+                "duration": 600,
+                "easing": "cubic_bezier(0.34, 1.56, 0.64, 1)"
+              }
+            },
+            {
+              "id": "month_year_row",
+              "type": "row",
+              "justify": "space_between",
+              "padding_horizontal": 32,
+              "padding_top": 8,
+              "children": [
+                {
+                  "id": "month_year",
+                  "type": "text",
+                  "content": "{{month_name}} {{year}}",
+                  "style": "month_label",
+                  "animation": {
+                    "on_mount": "slide_fade_in_left",
+                    "duration": 500,
+                    "delay": 100
+                  }
+                },
+                {
+                  "id": "day_of_week",
+                  "type": "text",
+                  "content": "{{day_abbr}}",
+                  "style": "day_label",
+                  "animation": {
+                    "on_mount": "slide_fade_in_right",
+                    "duration": 500,
+                    "delay": 150
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "calendar_section",
+          "type": "calendar_grid",
+          "height_ratio": 0.65,
+          "padding_horizontal": 32,
+          "padding_top": 48,
+          "children": [
+            {
+              "id": "week_headers",
+              "type": "row",
+              "justify": "space_evenly",
+              "margin_bottom": 16,
+              "items": ["M", "T", "W", "T", "F", "S", "S"],
+              "style": "week_header",
+              "animation": {
+                "on_mount": "stagger_fade_in",
+                "stagger_delay": 30,
+                "duration": 300,
+                "initial_delay": 200
+              }
+            },
+            {
+              "id": "dot_grid",
+              "type": "grid",
+              "columns": 7,
+              "rows": "auto",
+              "gap": 10,
+              "animation": {
+                "on_mount": "stagger_scale_in",
+                "on_month_change": "cascade_transition",
+                "on_day_change": "pulse_current_day"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    
+    "animations": {
+      "global_settings": {
+        "reduced_motion": false,
+        "default_duration": 400,
+        "default_easing": "cubic_bezier(0.4, 0.0, 0.2, 1)"
+      },
+      
+      "definitions": {
+        "fade_scale_in": {
+          "type": "compound",
+          "properties": {
+            "opacity": {
+              "from": 0,
+              "to": 1,
+              "duration": 600,
+              "easing": "ease_out"
+            },
+            "scale": {
+              "from": 0.8,
+              "to": 1.0,
+              "duration": 600,
+              "easing": "cubic_bezier(0.34, 1.56, 0.64, 1)"
+            }
+          }
+        },
+        
+        "flip_number": {
+          "type": "sequential",
+          "steps": [
+            {
+              "property": "rotationX",
+              "from": 0,
+              "to": 90,
+              "duration": 300,
+              "easing": "ease_in"
+            },
+            {
+              "property": "content",
+              "action": "update",
+              "duration": 0
+            },
+            {
+              "property": "rotationX",
+              "from": -90,
+              "to": 0,
+              "duration": 300,
+              "easing": "ease_out"
+            }
+          ]
+        },
+        
+        "slide_fade_in_left": {
+          "type": "compound",
+          "properties": {
+            "opacity": {
+              "from": 0,
+              "to": 1,
+              "duration": 500
+            },
+            "translateX": {
+              "from": -30,
+              "to": 0,
+              "duration": 500,
+              "easing": "ease_out_cubic"
+            }
+          }
+        },
+        
+        "slide_fade_in_right": {
+          "type": "compound",
+          "properties": {
+            "opacity": {
+              "from": 0,
+              "to": 1,
+              "duration": 500
+            },
+            "translateX": {
+              "from": 30,
+              "to": 0,
+              "duration": 500,
+              "easing": "ease_out_cubic"
+            }
+          }
+        },
+        
+        "stagger_fade_in": {
+          "type": "stagger",
+          "base_animation": {
+            "opacity": {
+              "from": 0,
+              "to": 1,
+              "duration": 300
+            },
+            "translateY": {
+              "from": -10,
+              "to": 0,
+              "duration": 300
+            }
+          },
+          "stagger_delay": 30
+        },
+        
+        "stagger_scale_in": {
+          "type": "stagger",
+          "base_animation": {
+            "opacity": {
+              "from": 0,
+              "to": 1,
+              "duration": 400
+            },
+            "scale": {
+              "from": 0,
+              "to": 1,
+              "duration": 400,
+              "easing": "elastic_out"
+            }
+          },
+          "stagger_delay": 25,
+          "stagger_direction": "diagonal_top_left",
+          "initial_delay": 300
+        },
+        
+        "pulse_current_day": {
+          "type": "keyframe",
+          "keyframes": [
+            { "time": 0, "scale": 1.0, "shadow_opacity": 0.3 },
+            { "time": 0.5, "scale": 1.2, "shadow_opacity": 0.6 },
+            { "time": 1, "scale": 1.0, "shadow_opacity": 0.3 }
+          ],
+          "duration": 800,
+          "easing": "ease_in_out",
+          "iterations": 1
+        },
+        
+        "cascade_transition": {
+          "type": "sequential_stagger",
+          "exit_animation": {
+            "opacity": {
+              "from": 1,
+              "to": 0,
+              "duration": 200
+            },
+            "scale": {
+              "from": 1,
+              "to": 0.8,
+              "duration": 200
+            }
+          },
+          "enter_animation": {
+            "opacity": {
+              "from": 0,
+              "to": 1,
+              "duration": 300
+            },
+            "scale": {
+              "from": 0,
+              "to": 1,
+              "duration": 300
+            },
+            "translateY": {
+              "from": 20,
+              "to": 0,
+              "duration": 300
+            }
+          },
+          "stagger_delay": 30,
+          "transition_delay": 100
+        },
+        
+        "dot_tap_feedback": {
+          "type": "spring",
+          "properties": {
+            "scale": {
+              "from": 1.0,
+              "to": 0.85,
+              "return_to": 1.0,
+              "spring_config": {
+                "stiffness": 400,
+                "damping": 17
+              }
+            }
+          }
+        },
+        
+        "midnight_transition": {
+          "type": "orchestrated",
+          "sequence": [
+            {
+              "step": "highlight_old_day",
+              "animation": {
+                "scale": { "from": 1.0, "to": 0.9 },
+                "opacity": { "from": 1.0, "to": 0.6 }
+              },
+              "duration": 300,
+              "target": "current_day_dot"
+            },
+            {
+              "step": "update_date_number",
+              "animation": "flip_number",
+              "duration": 600,
+              "delay": 200,
+              "target": "date_number"
+            },
+            {
+              "step": "highlight_new_day",
+              "animation": {
+                "scale": { "from": 0, "to": 1.2, "final": 1.0 },
+                "opacity": { "from": 0, "to": 1 },
+                "shadow_radius": { "from": 0, "to": 12 }
+              },
+              "duration": 600,
+              "delay": 400,
+              "easing": "elastic_out",
+              "target": "new_current_day_dot"
+            },
+            {
+              "step": "ripple_effect",
+              "animation": {
+                "scale": { "from": 1.0, "to": 2.5 },
+                "opacity": { "from": 0.5, "to": 0 }
+              },
+              "duration": 800,
+              "delay": 500,
+              "target": "ripple_overlay"
+            }
+          ]
+        },
+        
+        "month_swipe_transition": {
+          "type": "gesture_driven",
+          "trigger": "swipe_horizontal",
+          "animation": {
+            "exit_direction": "{{swipe_direction}}",
+            "exit_animation": {
+              "translateX": {
+                "from": 0,
+                "to": "{{direction === 'left' ? -100% : 100%}}",
+                "duration": 350
+              },
+              "opacity": {
+                "from": 1,
+                "to": 0,
+                "duration": 250
+              }
+            },
+            "enter_animation": {
+              "translateX": {
+                "from": "{{direction === 'left' ? 100% : -100%}}",
+                "to": 0,
+                "duration": 400
+              },
+              "opacity": {
+                "from": 0,
+                "to": 1,
+                "duration": 350
+              }
+            }
+          },
+          "spring_config": {
+            "stiffness": 300,
+            "damping": 30
+          }
+        },
+        
+        "breathing_idle": {
+          "type": "infinite_loop",
+          "animation": {
+            "scale": {
+              "from": 1.0,
+              "to": 1.03,
+              "duration": 2000,
+              "easing": "ease_in_out",
+              "alternate": true
+            },
+            "opacity": {
+              "from": 1.0,
+              "to": 0.95,
+              "duration": 2000,
+              "easing": "ease_in_out",
+              "alternate": true
+            }
+          },
+          "target": "current_day_dot",
+          "pause_on_interaction": true
+        }
+      }
+    },
+    
+    "interactions": {
+      "dot_tap": {
+        "trigger": "on_tap",
+        "target": "dot",
+        "feedback_animation": "dot_tap_feedback",
+        "haptic": "light",
+        "action": {
+          "type": "show_date_detail",
+          "transition": "modal_slide_up",
+          "duration": 400
+        }
+      },
+      
+      "date_number_tap": {
+        "trigger": "on_tap",
+        "target": "date_number",
+        "feedback_animation": {
+          "scale": { "from": 1.0, "to": 0.97, "return": 1.0 },
+          "duration": 150
+        },
+        "haptic": "medium",
+        "action": {
+          "type": "navigate_to_full_calendar",
+          "transition": "hero_zoom",
+          "duration": 500
+        }
+      },
+      
+      "month_swipe": {
+        "trigger": "on_swipe_horizontal",
+        "target": "calendar_section",
+        "threshold": 50,
+        "animation": "month_swipe_transition",
+        "haptic": "selection_changed",
+        "action": {
+          "type": "change_month",
+          "direction": "{{swipe_direction}}"
+        }
+      },
+      
+      "long_press_dot": {
+        "trigger": "on_long_press",
+        "target": "dot",
+        "duration": 500,
+        "feedback_animation": {
+          "scale": { "from": 1.0, "to": 1.15 },
+          "shadow_radius": { "from": 0, "to": 8 }
+        },
+        "haptic": "heavy",
+        "action": {
+          "type": "show_emoji_picker",
+          "transition": "scale_fade_in"
+        }
+      }
+    },
+    
+    "dot_states": {
+      "past_day": {
+        "background_color": "#000000",
+        "opacity": 1.0,
+        "scale": 1.0,
+        "shadow": {
+          "enabled": false
+        },
+        "transition": {
+          "duration": 300,
+          "easing": "ease_out"
+        }
+      },
+      
+      "current_day": {
+        "background_color": "#FF6B2C",
+        "opacity": 1.0,
+        "scale": 1.0,
+        "shadow": {
+          "enabled": true,
+          "color": "rgba(255, 107, 44, 0.4)",
+          "offset_x": 0,
+          "offset_y": 4,
+          "blur_radius": 12,
+          "spread_radius": 0
+        },
+        "idle_animation": "breathing_idle",
+        "transition": {
+          "duration": 600,
+          "easing": "elastic_out"
+        }
+      },
+      
+      "future_day": {
+        "background_color": "#E5E5E5",
+        "opacity": 0.6,
+        "scale": 1.0,
+        "shadow": {
+          "enabled": false
+        },
+        "transition": {
+          "duration": 300,
+          "easing": "ease_out"
+        }
+      },
+      
+      "inactive_day": {
+        "background_color": "#E5E5E5",
+        "opacity": 0.3,
+        "scale": 0.85,
+        "shadow": {
+          "enabled": false
+        },
+        "transition": {
+          "duration": 300,
+          "easing": "ease_out"
+        }
+      },
+      
+      "emoji_day": {
+        "background_color": "transparent",
+        "opacity": 1.0,
+        "scale": 1.0,
+        "content_type": "emoji",
+        "emoji_config": {
+          "font_size": 24,
+          "vertical_align": "center"
+        },
+        "shadow": {
+          "enabled": true,
+          "color": "rgba(0, 0, 0, 0.1)",
+          "offset_y": 2,
+          "blur_radius": 4
+        }
+      },
+      
+      "hover_state": {
+        "scale": 1.1,
+        "opacity": 1.0,
+        "shadow": {
+          "blur_radius": 8
+        },
+        "transition": {
+          "duration": 200,
+          "easing": "ease_out"
+        }
+      },
+      
+      "pressed_state": {
+        "scale": 0.9,
+        "opacity": 0.8,
+        "transition": {
+          "duration": 100,
+          "easing": "ease_in"
+        }
+      }
+    },
+    
+    "performance": {
+      "enable_gpu_acceleration": true,
+      "use_compositing_layers": true,
+      "lazy_render": {
+        "enabled": true,
+        "viewport_buffer": 2
+      },
+      "animation_optimization": {
+        "will_change_properties": ["transform", "opacity"],
+        "use_transform3d": true,
+        "reduce_motion_threshold": 0.5
+      },
+      "caching": {
+        "cache_dot_bitmaps": true,
+        "cache_duration": 300000,
+        "max_cache_size_mb": 20
+      }
+    },
+    
+    "accessibility": {
+      "reduced_motion": {
+        "enabled": true,
+        "fallback_animations": {
+          "fade_scale_in": "simple_fade",
+          "stagger_scale_in": "instant_show",
+          "flip_number": "cross_fade"
+        }
+      },
+      "screen_reader": {
+        "date_number_label": "Today is {{day}}, {{month}} {{year}}",
+        "dot_label": "{{date}}, {{month}}. {{state}}",
+        "navigation_hints": true
+      },
+      "touch_targets": {
+        "minimum_size": 44,
+        "expand_invisible_hit_area": true
+      }
+    }
+  }
+}

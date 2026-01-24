@@ -26,46 +26,85 @@ public class ThemePreset {
 
     // Predefined themes from design doc
     public static final ThemePreset[] ALL_THEMES = {
-        // Free themes
-        new ThemePreset("classic_light", "Classic Light",
-                0xFFFFFFFF, 0xFF212121, 0xFF2196F3, false, false),
-        
-        new ThemePreset("oled_dark", "OLED Dark",
-                0xFF000000, 0xFFE0E0E0, 0xFFBB86FC, true, false),
-        
-        new ThemePreset("monochrome", "Monochrome",
-                0xFFF5F5F5, 0xFF808080, 0xFF424242, false, false),
-        
-        // Pro themes (but glassmorphism is free per user request)
-        new ThemePreset("glassmorphism", "Glassmorphism",
-                0x40FFFFFF, 0xFFFFFFFF, 0xFFD4A574, true, false), // isPro = false
+        // TIER 1: CORE AESTHETICS
+        // 1. Phantom Black (OLED Premium)
+        new ThemePreset("phantom_black", "Phantom Black",
+                0xFF000000, 0xFFE8E8E8, 0xFFFFFFFF, true, false),
 
-        new ThemePreset("nord_aurora", "Nord Aurora",
-                0xFF2E3440, 0xFFECEFF4, 0xFF88C0D0, true, true),
-        
-        new ThemePreset("sunset_glow", "Sunset Glow",
-                0xFF1A1015, 0xFFFFD6E8, 0xFFFF6B6B, true, true),
-        
-        new ThemePreset("ocean_breeze", "Ocean Breeze",
-                0xFF0A1929, 0xFFB3E5FC, 0xFF0077BE, true, true),
-        
-        new ThemePreset("forest_calm", "Forest Calm",
-                0xFF0D1F0D, 0xFFC8E6C9, 0xFF2E7D32, true, true),
-        
-        new ThemePreset("cyberpunk", "Cyberpunk",
-                0xFF0D1117, 0xFF00FFFF, 0xFFFF00FF, true, true),
-        
-        new ThemePreset("pastel_dream", "Pastel Dream",
-                0xFFFFF5F5, 0xFFC7CEEA, 0xFFFFD6E8, false, true),
-        
-        new ThemePreset("minimal_beige", "Minimal Beige",
-                0xFFF7F3EF, 0xFFD4C5B9, 0xFF8B7355, false, true),
-        
-        new ThemePreset("tokyo_night", "Tokyo Night",
-                0xFF1A1B26, 0xFFC0CAF5, 0xFF7AA2F7, true, true),
-        
-        new ThemePreset("dracula", "Dracula",
-                0xFF282A36, 0xFFF8F8F2, 0xFFBD93F9, true, true),
+        // 2. Arctic Frost (Premium Light)
+        new ThemePreset("arctic_frost", "Arctic Frost",
+                0xFFFAFAFA, 0xFF1A1A1A, 0xFF000000, false, false),
+
+        // 3. Liquid Glass (Glassmorphism Premium) - PRO
+        new ThemePreset("liquid_glass", "Liquid Glass",
+                0x1FFFFFFF, 0xFFF5F5F5, 0xFFFFFFFF, true, true), // 12% white bg
+
+
+
+        // 4. Smoke & Mirrors (Dark Glassmorphism) - PRO
+        new ThemePreset("smoke_mirrors", "Smoke & Mirrors",
+                0x59000000, 0xFFEDECEC, 0xFFFFFFFF, true, true), // 45% black bg
+
+        // TIER 2: CHROMATIC NEUTRALS
+        // 5. Moonlit Slate
+        new ThemePreset("moonlit_slate", "Moonlit Slate",
+                0xFFF7F8FA, 0xFF2C3E50, 0xFF34495E, false, false),
+
+        // 6. Warm Concrete
+        new ThemePreset("warm_concrete", "Warm Concrete",
+                0xFFF7F5F2, 0xFF3E3935, 0xFF4A423D, false, false),
+
+        // 7. Graphite Mist
+        new ThemePreset("graphite_mist", "Graphite Mist",
+                0xFFE5E5E5, 0xFF2A2A2A, 0xFF1A1A1A, false, false),
+
+        // TIER 3: SUBTLE CHROMATIC
+        // 8. Sakura Dawn - PRO
+        new ThemePreset("sakura_dawn", "Sakura Dawn",
+                0xFFFFF5F7, 0xFF8B5A6B, 0xFFA0647A, false, true),
+
+        // 9. Sage Whisper - PRO
+        new ThemePreset("sage_whisper", "Sage Whisper",
+                0xFFF5F7F5, 0xFF3D4F3D, 0xFF4A5F4A, false, true),
+
+        // 10. Coastal Blue - PRO
+        new ThemePreset("coastal_blue", "Coastal Blue",
+                0xFFF5F8FA, 0xFF2C4A5E, 0xFF3B5F7A, false, true),
+
+        // TIER 4: BOLD CHROMATIC
+        // 11. Ember Glow - PRO
+        new ThemePreset("ember_glow", "Ember Glow",
+                0xFF1A1513, 0xFFD4A574, 0xFFE8A65A, true, true),
+
+        // 12. Arctic Aurora - PRO
+        new ThemePreset("arctic_aurora", "Arctic Aurora",
+                0xFF0D1217, 0xFF6B9FBF, 0xFF5FA8D3, true, true),
+
+        // 13. Neon Night - PRO
+        new ThemePreset("neon_night", "Neon Night",
+                0xFF0A0E14, 0xFFA07CFF, 0xFFB085FF, true, true),
+
+        // TIER 5: GRADIENT PREMIUM (Solids for now)
+        // 14. Sunset Gradient - PRO
+        new ThemePreset("sunset_gradient", "Sunset Gradient",
+                0xFFFF6B6B, 0xFFFFFFFF, 0xFFFFFFFF, true, true),
+
+        // 15. Ocean Depths - PRO
+        new ThemePreset("ocean_depths", "Ocean Depths",
+                0xFF667EEA, 0xFFFFFFFF, 0xFFFFFFFF, true, true),
+
+        // 16. Rose Gold Luxury - PRO
+        new ThemePreset("rose_gold", "Rose Gold Luxury",
+                0xFFFFDEE9, 0xFF8B5A6B, 0xFFA0647A, false, true),
+
+        // TIER 6: DYNAMIC
+        // 17. Dynamic Harmony
+        new ThemePreset("dynamic_harmony", "Dynamic Harmony",
+                0x00000000, 0x00000000, 0x00000000, false, false),
+
+        // 18. Chameleon Pro - PRO
+        new ThemePreset("chameleon_pro", "Chameleon Pro",
+                0x00000000, 0x00000000, 0x00000000, false, true),
     };
 
     /**
@@ -77,7 +116,7 @@ public class ThemePreset {
                 return theme;
             }
         }
-        return ALL_THEMES[0]; // Default to classic light
+        return ALL_THEMES[0]; // Default to Phantom Black
     }
 
     /**
@@ -123,21 +162,30 @@ public class ThemePreset {
     public void applyTo(WidgetConfig config) {
         config.setThemeId(id);
         
-        // Special handling for Glassmorphism to ensure premium look
-        if (id.equals("glassmorphism")) {
-            config.setBackgroundColor(0xFFFFFFFF); // White base
-            config.setBackgroundOpacity(0.15f);    // Very subtle fill (15%)
-            config.setDotColor(0xFFFFFFFF);        // White dots
-            config.setAccentColor(0xFFFFFFFF);     // White accent (or maybe a gold/color?)
-            // actually let's keep the preset colors but force opacity
-            
-            // Re-apply preset colors but override opacity
+        // Handle Blur/Glass Themes
+        if (id.equals("liquid_glass")) {
+            config.setBackgroundColor(backgroundColor);
+            config.setBackgroundOpacity(0.12f);    
             config.setDotColor(dotColor);
             config.setAccentColor(accentColor);
-            
+            config.setHasBlur(true);
+            config.setBlurRadius(25f);
+        } else if (id.equals("smoke_mirrors")) {
+            config.setBackgroundColor(backgroundColor);
+            config.setBackgroundOpacity(0.35f);    
+            config.setDotColor(dotColor);
+            config.setAccentColor(accentColor);
             config.setHasBlur(true);
             config.setBlurRadius(30f);
+        } else if (id.equals("dynamic_harmony") || id.equals("chameleon_pro")) {
+            // Material You / Dynamic markers
+            config.setBackgroundColor(0); // Config logic will handle this
+            config.setDotColor(0);
+            config.setAccentColor(0);
+            config.setHasBlur(false);
+            config.setBackgroundOpacity(1.0f);
         } else {
+            // Standard Solid Themes
             config.setBackgroundColor(backgroundColor);
             config.setDotColor(dotColor);
             config.setAccentColor(accentColor);

@@ -16,7 +16,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.dotmatrix.calendar.R;
 import com.dotmatrix.calendar.data.preferences.AppPreferences;
-import com.dotmatrix.calendar.ui.main.MainActivity;
+import com.dotmatrix.calendar.ui.fluid.FluidCalendarActivity;
 
 /**
  * Onboarding activity for first-time users.
@@ -62,7 +62,7 @@ public class OnboardingActivity extends AppCompatActivity {
         preferences.setFirstLaunchCompleted();
         preferences.setOnboardingCompleted(true);
         
-        startActivity(new Intent(this, MainActivity.class));
+        startActivity(new Intent(this, FluidCalendarActivity.class));
         finish();
     }
 

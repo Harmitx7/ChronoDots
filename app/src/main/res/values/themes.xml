@@ -24,11 +24,19 @@
         <item name="android:textColorSecondary">@color/text_secondary</item>
     </style>
 
-    <!-- Card Style -->
-    <!-- Card Style -->
+    <!-- Card Style - Glass Enhanced -->
     <style name="Widget.DotMatrix.Card" parent="Widget.Material3.CardView.Filled">
-        <item name="cardBackgroundColor">@color/card_background</item>
-        <item name="cardCornerRadius">28dp</item>
+        <item name="cardBackgroundColor">@color/surface_glass_overlay</item>
+        <item name="cardCornerRadius">24dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="contentPadding">20dp</item>
+        <item name="strokeWidth">2dp</item>
+        <item name="strokeColor">@color/glass_stroke</item>
+    </style>
+    
+    <style name="Widget.DotMatrix.Card.Stat" parent="Widget.Material3.CardView.Filled">
+        <item name="cardBackgroundColor">@color/dashboard_stat_card_bg</item>
+        <item name="cardCornerRadius">16dp</item>
         <item name="cardElevation">0dp</item>
         <item name="contentPadding">16dp</item>
         <item name="strokeWidth">0dp</item>
@@ -36,14 +44,14 @@
     
     <!-- Button Styles -->
     <style name="Widget.DotMatrix.Button.Primary" parent="Widget.Material3.Button">
-        <item name="backgroundTint">@color/accent</item>
+        <item name="backgroundTint">@color/accent_refined</item>
         <item name="android:textColor">@color/text_primary_light</item>
         <item name="cornerRadius">16dp</item>
     </style>
     
     <style name="Widget.DotMatrix.Button.Secondary" parent="Widget.Material3.Button.OutlinedButton">
-        <item name="strokeColor">@color/accent</item>
-        <item name="android:textColor">@color/accent</item>
+        <item name="strokeColor">@color/accent_refined</item>
+        <item name="android:textColor">@color/accent_refined</item>
         <item name="cornerRadius">16dp</item>
     </style>
     
@@ -65,10 +73,42 @@
         <item name="android:textColor">@color/text_secondary</item>
     </style>
     
-    <!-- Slider Style -->
+    <style name="TextAppearance.DotMatrix.Display" parent="TextAppearance.Material3.DisplayLarge">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+    
+    <style name="TextAppearance.DotMatrix.Caption" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+    
+    <!-- Slider Style - Glass Enhanced -->
     <style name="Widget.DotMatrix.Slider" parent="Widget.Material3.Slider">
-        <item name="thumbColor">@color/accent</item>
-        <item name="trackColorActive">@color/accent</item>
-        <item name="trackColorInactive">@color/divider</item>
+        <item name="thumbColor">@color/accent_refined</item>
+        <item name="trackColorActive">@color/accent_refined</item>
+        <item name="trackColorInactive">@color/glass_highlight</item>
+        <item name="haloColor">@color/accent_glow</item>
+    </style>
+    
+    <!-- Widget Editor Theme - Dark OLED -->
+    <style name="Theme.DotMatrixCalendar.Editor" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/editor_accent</item>
+        <item name="colorOnPrimary">@color/text_primary</item>
+        <item name="android:colorBackground">@color/editor_background</item>
+        <item name="colorSurface">@color/editor_card_bg</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="android:statusBarColor">@color/editor_background</item>
+        <item name="android:navigationBarColor">@color/editor_background</item>
+        <item name="android:windowBackground">@color/editor_background</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/editor_text_muted</item>
+    </style>
+    
+    <!-- Alert Dialog Theme - Dark Style -->
+    <style name="AlertDialogTheme" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorSurface">@color/editor_card_bg</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:background">@color/editor_card_bg</item>
     </style>
 </resources>

@@ -3,29 +3,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primary_background"
+    android:background="@color/editor_background"
     android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="@dimen/spacing_md">
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="24dp">
 
-        <!-- Toolbar -->
+        <!-- Header Toolbar -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="@dimen/spacing_md">
+            android:layout_marginBottom="16dp">
 
             <ImageButton
                 android:id="@+id/btn_back"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_menu_revert"
+                android:src="@drawable/ic_arrow_back"
                 android:contentDescription="@string/cancel"
                 app:tint="@color/text_primary" />
 
@@ -34,135 +36,158 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/widget_editor"
-                android:textAppearance="@style/TextAppearance.DotMatrix.Title"
+                android:textSize="20sp"
+                android:textStyle="bold"
                 android:textColor="@color/text_primary"
                 android:gravity="center" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_save"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:text="@string/save"
-                style="@style/Widget.DotMatrix.Button.Primary" />
+                android:textSize="14sp"
+                android:paddingHorizontal="24dp"
+                app:cornerRadius="20dp"
+                app:backgroundTint="@color/editor_card_bg"
+                android:textColor="@color/text_primary" />
 
         </LinearLayout>
 
         <!-- Live Preview Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="@dimen/preview_height"
-            android:layout_marginBottom="@dimen/spacing_lg"
-            app:cardBackgroundColor="@color/card_background"
-            app:cardCornerRadius="@dimen/radius_lg"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="@color/editor_card_bg"
+            app:cardCornerRadius="20dp"
             app:cardElevation="0dp">
 
             <ImageView
                 android:id="@+id/preview_image"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerInside"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:minHeight="100dp"
+                android:padding="16dp"
+                android:scaleType="fitCenter"
                 android:contentDescription="@string/widget_editor" />
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Widget Type Selector -->
+        <!-- Widget Type Section -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Widget Type"
-            android:textAppearance="@style/TextAppearance.DotMatrix.Label"
-            android:textColor="@color/text_secondary"
-            android:layout_marginBottom="@dimen/spacing_sm" />
+            android:textSize="13sp"
+            android:textColor="@color/editor_text_muted"
+            android:layout_marginBottom="8dp" />
 
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/widget_type_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing_lg"
-            app:singleSelection="true"
-            app:selectionRequired="true">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_type_year"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/widget_year_name"
-                style="@style/Widget.Material3.Button.OutlinedButton" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_type_month"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/widget_month_name"
-                style="@style/Widget.Material3.Button.OutlinedButton" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_type_progress"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/widget_progress_name"
-                style="@style/Widget.Material3.Button.OutlinedButton" />
-
-        </com.google.android.material.button.MaterialButtonToggleGroup>
-
-        <!-- Appearance Section -->
+        <!-- Segmented Control for Widget Type -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing_md"
-            app:cardBackgroundColor="@color/card_background"
-            app:cardCornerRadius="@dimen/radius_lg"
+            android:layout_marginBottom="20dp"
+            app:cardBackgroundColor="@color/editor_card_bg"
+            app:cardCornerRadius="28dp"
+            app:cardElevation="0dp"
+            app:contentPadding="4dp">
+
+            <LinearLayout
+                android:id="@+id/widget_type_container"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btn_type_year"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/widget_year_name"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_primary"
+                    android:background="@drawable/bg_segment_item" />
+
+                <TextView
+                    android:id="@+id/btn_type_month"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/widget_month_name"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_primary"
+                    android:background="@drawable/bg_segment_item_selected" />
+
+                <TextView
+                    android:id="@+id/btn_type_week"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/widget_week_name"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_primary"
+                    android:background="@drawable/bg_segment_item" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Appearance Section Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="@color/editor_card_bg"
+            app:cardCornerRadius="20dp"
             app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="@dimen/spacing_md">
+                android:padding="20dp">
 
+                <!-- Section Title -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/appearance"
-                    android:textAppearance="@style/TextAppearance.DotMatrix.Title"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginBottom="@dimen/spacing_md" />
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/editor_accent"
+                    android:layout_marginBottom="16dp" />
 
-                <!-- Theme Selector -->
-                <LinearLayout
+                <!-- Theme Selector Label -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/theme"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Theme Chips RecyclerView (Dynamic) -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/themes_recycler"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="@dimen/spacing_md">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/theme"
-                        android:textAppearance="@style/TextAppearance.DotMatrix.Body"
-                        android:textColor="@color/text_primary" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_theme"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Classic Light"
-                        style="@style/Widget.DotMatrix.Button.Secondary" />
-
-                </LinearLayout>
+                    android:clipToPadding="false"
+                    android:layout_marginBottom="20dp" />
 
                 <!-- Dot Size Slider -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/dot_size"
-                    android:textAppearance="@style/TextAppearance.DotMatrix.Label"
-                    android:textColor="@color/text_secondary" />
+                    android:textSize="13sp"
+                    android:textColor="@color/editor_text_muted"
+                    android:layout_marginBottom="4dp" />
 
                 <com.google.android.material.slider.Slider
                     android:id="@+id/slider_dot_size"
@@ -172,15 +197,21 @@
                     android:valueTo="8"
                     android:value="4"
                     android:stepSize="0.5"
-                    style="@style/Widget.DotMatrix.Slider" />
+                    app:thumbColor="@color/editor_slider_thumb"
+                    app:trackColorActive="@color/editor_slider_active"
+                    app:trackColorInactive="@color/editor_slider_inactive"
+                    app:haloColor="@color/editor_slider_halo"
+                    app:thumbRadius="12dp"
+                    app:trackHeight="6dp" />
 
                 <!-- Dot Spacing Slider -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/dot_spacing"
-                    android:textAppearance="@style/TextAppearance.DotMatrix.Label"
-                    android:textColor="@color/text_secondary" />
+                    android:textSize="13sp"
+                    android:textColor="@color/editor_text_muted"
+                    android:layout_marginBottom="4dp" />
 
                 <com.google.android.material.slider.Slider
                     android:id="@+id/slider_dot_spacing"
@@ -190,15 +221,21 @@
                     android:valueTo="6"
                     android:value="2"
                     android:stepSize="0.5"
-                    style="@style/Widget.DotMatrix.Slider" />
+                    app:thumbColor="@color/editor_slider_thumb"
+                    app:trackColorActive="@color/editor_slider_active"
+                    app:trackColorInactive="@color/editor_slider_inactive"
+                    app:haloColor="@color/editor_slider_halo"
+                    app:thumbRadius="12dp"
+                    app:trackHeight="6dp" />
 
                 <!-- Opacity Slider -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/opacity"
-                    android:textAppearance="@style/TextAppearance.DotMatrix.Label"
-                    android:textColor="@color/text_secondary" />
+                    android:textSize="13sp"
+                    android:textColor="@color/editor_text_muted"
+                    android:layout_marginBottom="4dp" />
 
                 <com.google.android.material.slider.Slider
                     android:id="@+id/slider_opacity"
@@ -208,69 +245,71 @@
                     android:valueTo="1.0"
                     android:value="0.8"
                     android:stepSize="0.1"
-                    style="@style/Widget.DotMatrix.Slider" />
+                    app:thumbColor="@color/editor_slider_thumb"
+                    app:trackColorActive="@color/editor_slider_active"
+                    app:trackColorInactive="@color/editor_slider_inactive"
+                    app:haloColor="@color/editor_slider_halo"
+                    app:thumbRadius="12dp"
+                    app:trackHeight="6dp" />
 
                 <!-- Shape Selector -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/shape"
-                    android:textAppearance="@style/TextAppearance.DotMatrix.Label"
-                    android:textColor="@color/text_secondary"
-                    android:layout_marginTop="@dimen/spacing_sm" />
+                    android:textSize="13sp"
+                    android:textColor="@color/editor_text_muted"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="12dp" />
 
                 <RadioGroup
                     android:id="@+id/shape_group"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="@dimen/spacing_sm">
+                    android:orientation="horizontal">
 
-                    <com.google.android.material.radiobutton.MaterialRadioButton
+                    <RadioButton
                         android:id="@+id/radio_circle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/circle"
                         android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        android:buttonTint="@color/editor_radio_tint"
                         android:checked="true" />
 
-                    <com.google.android.material.radiobutton.MaterialRadioButton
+                    <RadioButton
                         android:id="@+id/radio_square"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/square"
-                        android:textColor="@color/text_primary" />
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        android:buttonTint="@color/editor_radio_tint" />
 
-                    <com.google.android.material.radiobutton.MaterialRadioButton
+                    <RadioButton
                         android:id="@+id/radio_rounded"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/rounded_square"
-                        android:textColor="@color/text_primary" />
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        android:buttonTint="@color/editor_radio_tint" />
 
                 </RadioGroup>
 
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Emoji Rules Section -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing_md"
-            app:cardBackgroundColor="@color/card_background"
-            app:cardCornerRadius="@dimen/radius_lg"
-            app:cardElevation="0dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="@dimen/spacing_md">
+                <!-- Colors Section -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/colors"
+                    android:textSize="13sp"
+                    android:textColor="@color/editor_text_muted"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="12dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -278,37 +317,146 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
 
+                    <!-- Dot Color Picker -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/dot_color"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginBottom="8dp" />
+
+                        <View
+                            android:id="@+id/color_dot_preview"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@drawable/bg_color_circle" />
+
+                    </LinearLayout>
+
+                    <!-- Accent Color Picker -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/accent_color"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginBottom="8dp" />
+
+                        <View
+                            android:id="@+id/color_accent_preview"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@drawable/bg_color_circle" />
+
+                    </LinearLayout>
+
+                    <!-- Background Color Picker -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/background_color"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginBottom="8dp" />
+
+                        <View
+                            android:id="@+id/color_bg_preview"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@drawable/bg_color_circle" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Emoji Rules Section Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="@color/editor_card_bg"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- Header Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/emoji_rules"
-                        android:textAppearance="@style/TextAppearance.DotMatrix.Title"
-                        android:textColor="@color/text_primary" />
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/editor_accent" />
 
                     <TextView
                         android:id="@+id/rules_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0 / 3"
-                        android:textAppearance="@style/TextAppearance.DotMatrix.Label"
-                        android:textColor="@color/text_secondary" />
+                        android:text="0 / ∞"
+                        android:textSize="14sp"
+                        android:textColor="@color/editor_text_muted" />
 
                 </LinearLayout>
 
+                <!-- Add Rule Button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_add_rule"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_md"
+                    android:layout_height="48dp"
                     android:text="@string/add_rule"
-                    style="@style/Widget.DotMatrix.Button.Secondary" />
+                    android:textSize="14sp"
+                    android:textColor="@color/editor_accent"
+                    app:backgroundTint="@android:color/transparent"
+                    app:strokeColor="@color/editor_button_stroke"
+                    app:strokeWidth="1.5dp"
+                    app:cornerRadius="24dp"
+                    app:rippleColor="@color/editor_ripple" />
 
+                <!-- Rules List -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rules_recycler"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_sm"
+                    android:layout_marginTop="8dp"
                     android:nestedScrollingEnabled="false" />
 
             </LinearLayout>

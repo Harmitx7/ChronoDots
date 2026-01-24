@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Backgrounds (Inverted for Dark Mode default, though app uses explicit colors often) -->
+    <color name="primary_background">#050510</color> <!-- Deep Space -->
+    <color name="secondary_surface">#2D2640</color>
+    
+    <!-- Accent -->
+    <color name="accent">#D4A574</color>
+    
+    <!-- Text -->
+    <color name="text_primary">#FAFAFA</color>
+    <color name="text_secondary">#B0A8C0</color>
+    
+    <!-- Cards -->
+    <color name="card_background">#1A1B26</color>
+    
+    <!-- Dots -->
+    <color name="dot_default">#4A4560</color>
+    <color name="dot_today">#D4A574</color>
+</resources>

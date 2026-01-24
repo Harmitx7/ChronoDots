@@ -81,6 +81,11 @@
     <color name="theme_tokyo_dot">#C0CAF5</color>
     <color name="theme_tokyo_accent">#7AA2F7</color>
     
+    <!-- Theme: Liquid Glass (New) -->
+    <color name="theme_liquid_bg">#050510</color>
+    <color name="theme_liquid_dot">#E0FFFF</color>
+    <color name="theme_liquid_accent">#FF0055</color>
+    
     <!-- Theme: Dracula -->
     <color name="theme_dracula_bg">#282A36</color>
     <color name="theme_dracula_dot">#F8F8F2</color>
@@ -100,4 +105,73 @@
     <color name="success">#4CAF50</color>
     <color name="warning">#FF9800</color>
     <color name="error">#F44336</color>
+    
+    <!-- Gradients -->
+    <color name="gradient_start">#1A1625</color>
+    <color name="gradient_end">#0D0F1A</color>
+    <color name="gradient_start_light">#F5F3F7</color>
+    <color name="gradient_end_light">#E8E5ED</color>
+    
+    <!-- Heat Map Intensity Scale (Dark to Bright) -->
+    <color name="intensity_none">#2D2640</color>
+    <color name="intensity_low">#4A4560</color>
+    <color name="intensity_medium">#7A7490</color>
+    <color name="intensity_high">#B0A8C0</color>
+    <color name="intensity_max">#D4A574</color>
+    
+    <!-- Card Overlays -->
+    <color name="card_overlay_subtle">#10FFFFFF</color>
+    <color name="card_overlay_medium">#20FFFFFF</color>
+    
+    <!-- Premium Glass + Dark Palette -->
+    <color name="surface_deep">#0A0C14</color>           <!-- Rich void base -->
+    <color name="surface_elevated">#151822</color>       <!-- Layered depth -->
+    <color name="surface_glass">#1A1D2E</color>          <!-- Glass base tint -->
+    <color name="surface_glass_overlay">#40151822</color><!-- 25% glass overlay - more visible -->
+    
+    <!-- Refined gradients -->
+    <color name="gradient_deep_start">#0D0F1A</color>
+    <color name="gradient_deep_end">#050510</color>
+    
+    <!-- Refined accent (muted gold) -->
+    <color name="accent_refined">#C9A05F</color>
+    <color name="accent_glow">#40C9A05F</color>
+    
+    <!-- Dashboard Palette -->
+    <color name="dashboard_background">#000000</color>
+    <color name="dashboard_card_bg">#1C1C1E</color>
+    <color name="dashboard_stat_card_bg">#1C1C1E</color>
+    <color name="dashboard_accent">#FFFFFF</color>
+    <color name="dashboard_text_secondary">#8E8E93</color>
+    <color name="dashboard_icon_bg">#2C2C2E</color>
+    
+    <!-- Glass strokes and highlights -->
+    <color name="glass_stroke">#30FFFFFF</color>
+    <color name="glass_highlight">#25FFFFFF</color>
+    
+    <!-- Widget Editor UI Colors -->
+    <color name="editor_background">#0D0D0D</color>
+    <color name="editor_card_bg">#1C1C1E</color>
+    <color name="editor_text_muted">#8E8E93</color>
+    <color name="editor_accent">#D4A574</color>
+    
+    <!-- Editor Slider Colors (Orange/Gold) -->
+    <color name="editor_slider_thumb">#D4A574</color>
+    <color name="editor_slider_active">#D4A574</color>
+    <color name="editor_slider_inactive">#3A3A3C</color>
+    <color name="editor_slider_halo">#40D4A574</color>
+    
+    <!-- Editor Chip Colors -->
+    <color name="editor_chip_bg">#2C2C2E</color>
+    <color name="editor_chip_bg_selected">#3A3A3C</color>
+    <color name="editor_chip_stroke">#48484A</color>
+    
+    <!-- Editor Button Colors -->
+    <color name="editor_button_stroke">#48484A</color>
+    <color name="editor_ripple">#20D4A574</color>
+    <color name="editor_radio_tint">#D4A574</color>
+    
+    <!-- Segment Control Colors -->
+    <color name="editor_segment_bg">#1C1C1E</color>
+    <color name="editor_segment_selected">#2C2C2E</color>
 </resources>

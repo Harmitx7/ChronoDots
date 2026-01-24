@@ -1,318 +1,1183 @@
-1. Design Philosophy
-1.1 Core Design Goals
-
-Premium, modern, and calm
-
-Minimal visual noise
-
-Strong depth through soft layers
-
-Designed for glanceability, not interaction overload
-
-Widget-first thinking (UI must work at small sizes)
-
-1.2 Visual Inspiration (From Reference Image)
-
-The reference UI demonstrates:
-
-Soft rounded containers
-
-Layered card system
-
-Muted color palette with high contrast text
-
-Friendly visual language (avatars → emojis in our case)
-
-Clear hierarchy using elevation, not borders
-
-We translate this language into:
-
-Calendar dots instead of avatars
-
-Emojis instead of profile pictures
-
-Time-based data instead of monetary data
-
-2. Color System
-2.1 Base Palette (Inspired, Not Copied)
-Primary Background
-
-Deep muted indigo / charcoal purple
-Used as main canvas for app screens
-
-Secondary Surface
-
-Warm beige / sand tone
-Used for cards, widget foregrounds
-
-Accent
-
-Soft gold / amber
-Used for:
-
-Today indicator
-
-Active dot
-
-Emoji highlight
-
-Text
-
-Primary: Near-white
-
-Secondary: Muted lavender-gray
-
-Disabled: Low-opacity gray
-
-3. Theme Variants (Mandatory)
-3.1 Light Mode
-
-Background: Soft off-white
-
-Cards: Warm beige
-
-Dots: Neutral gray / muted color
-
-Emoji: Full color
-
-3.2 Dark Mode (OLED Optimized)
-
-Background: Near-black / deep indigo
-
-Cards: Dark muted purple
-
-Dots: Soft glow
-
-Reduced contrast strain
-
-3.3 Glassmorphism Mode (Premium)
-
-Semi-transparent frosted surfaces
-
-Blur radius adjustable
-
-Tint color inherits wallpaper hue
-
-Subtle noise texture to avoid banding
-
-4. Typography System
-4.1 Font Style
-
-Sans-serif, rounded geometric
-
-High legibility at small widget sizes
-
-4.2 Hierarchy
-
-Title (Month / Year): Medium weight
-
-Numeric data (dates): Bold
-
-Labels: Regular
-
-Secondary info: Reduced opacity
-
-Typography must never overpower dots.
-
-5. Layout System
-5.1 Grid Rules
-
-8dp base spacing system
-
-Widgets snap to grid internally
-
-Equal dot spacing horizontally and vertically
-
-5.2 Corner Radius
-
-Large cards: 28–32dp
-
-Small widgets: 20–24dp
-
-Dots: Perfect circles
-
-5.3 Elevation
-
-No hard shadows
-
-Soft ambient elevation
-
-Glass mode uses light glow instead of shadow
-
-6. Widget Design Specifications
-6.1 Year View Widget
-
-Structure
-
-Header: Year label (top-left)
-
-Main body: Dot matrix (365 / 366 dots)
-
-Subtle month separators
-
-Today dot slightly larger or glowing
-
-Interaction
-
-Tap opens full editor
-
-No scrolling inside widget
-
-6.2 Month View Widget
-
-Structure
-
-Month name at top
-
-5–6 rows of dots
-
-Optional weekday guide (very subtle)
-
-Customization
-
-Dot → Emoji replacement per date
-
-Highlight today with accent color
-
-Adjustable dot density
-
-6.3 Progress Widget
-
-Structure
-
-Horizontal or circular dot line
-
-Current position highlighted
-
-Emoji at current progress point
-
-Purpose
-
-Aesthetic + motivational
-
-Extremely shareable
-
-7. Emoji Integration Design
-7.1 Emoji as Visual Elements
-
-Emojis replace dots without breaking grid
-
-Emojis scaled to dot size
-
-No animation by default (battery safe)
-
-7.2 Emoji Rules UI
-
-Inspired by the reference “Split With” list:
-
-List-style rules
-
-Emoji on left
-
-Rule description on right
-
-Toggle enabled/disabled
-
-8. App Screens Design
-8.1 Home / Widget Gallery
-
-Vertical card layout
-
-Each card previews a widget
-
-“Add Widget” CTA prominent
-
-8.2 Widget Editor
-
-Live preview at top
-
-Controls below in cards:
-
-Dot size
-
-Spacing
-
-Theme
-
-Emoji rules
-
-8.3 Theme Selector
-
-Large rounded preview tiles
-
-One-tap switch
-
-Glass mode shows blur preview
-
-8.4 Pro Unlock Screen
-
-Clean, minimal
-
-Focus on benefits, not price
-
-No dark patterns
-
-9. Motion & Feedback
-9.1 Animations
-
-Subtle fades
-
-Soft scale on selection
-
-No bouncing or playful motion
-
-9.2 Haptics
-
-Light haptic on:
-
-Widget added
-
-Theme changed
-
-Emoji assigned
-
-10. Accessibility
-
-High contrast mode support
-
-Dot size scalable
-
-Emoji alternatives for colorblind users
-
-Text never embedded in images
-
-11. Design Constraints (Widget-Safe)
-
-No gestures inside widgets
-
-No scrolling
-
-No dynamic video or heavy blur
-
-Must render via RemoteViews
-
-12. Design Success Criteria
-
-Widget readable in 2 seconds
-
-Looks premium even at smallest size
-
-No clutter
-
-Screenshots feel shareable
-
-Feels like “designed”, not “assembled”
-
-13. Design Deliverables Checklist
-
-Color tokens
-
-Theme tokens
-
-Widget layout specs
-
-Emoji sizing rules
-
-Accessibility notes
-
-Dark / Light / Glass previews
+# Design Documentation: Dot Matrix Calendar Widget
+## Based on PRD v1.0
+
+---
+
+## 1. Design System Overview
+
+### 1.1 Visual Identity
+
+**Design Philosophy:** Minimalist • Bold Typography • Dot Matrix Aesthetic • Premium Feel
+
+**Core Principles:**
+- **Simplicity First:** Remove all non-essential elements
+- **Typography as Hero:** Large, bold numbers dominate the layout
+- **Dot Language:** Consistent circular dot representation across all interfaces
+- **Spatial Breathing:** Generous whitespace for visual calm
+- **Tactile Clarity:** Clear visual feedback for all interactions
+
+---
+
+## 2. Widget Design Specifications
+
+### 2.1 Month View Widget (Primary Reference from Image)
+
+#### 2.1.1 Layout Structure
+
+```
+┌─────────────────────────────────────────┐
+│  11                              Tue    │  ← Header Section (96dp height)
+│  FEBRUARY                              │
+│  2025                                  │
+│                                        │
+│  M   T   W   T   F   S   S            │  ← Week Headers (24dp height)
+│                                        │
+│  ●   ●   ●   ●   ●   ●   ●            │  ← Week 1
+│  ●   ●   ●  [●]  ●   ●   ●            │  ← Week 2 (current day highlighted)
+│  ●   ●   ●   ●   ○   ○   ○            │  ← Week 3 (future days lighter)
+│  ○   ○   ○   ○   ○   ○   ○            │  ← Week 4 (future days)
+│                                        │
+└─────────────────────────────────────────┘
+```
+
+#### 2.1.2 Precise Measurements
+
+**Widget Canvas:**
+- Recommended size: 4×4 grid cells (approximately 360dp × 360dp on standard density)
+- Minimum size: 3×3 grid cells (270dp × 270dp)
+- Padding: 16dp all sides
+
+**Header Section:**
+- Date Number ("11"): 72sp, Font: Sans-serif Black/Heavy
+- Month ("FEBRUARY"): 14sp, Font: Sans-serif Medium, Letter-spacing: 0.8sp, All caps
+- Year ("2025"): 12sp, Font: Sans-serif Regular, Opacity: 60%
+- Day Name ("Tue"): 14sp, Font: Sans-serif Medium, Aligned right
+
+**Week Day Headers:**
+- Font Size: 10sp
+- Font: Sans-serif Medium
+- Color: #666666 (40% opacity of primary text)
+- Letter-spacing: 0.5sp
+- Height: 24dp
+- Margin top: 12dp from header
+
+**Dot Grid:**
+- Dot Size: 32dp diameter (default, user-adjustable 24-48dp range)
+- Dot Spacing: 8dp between centers (adjustable 4-16dp)
+- Grid: 7 columns × 5-6 rows
+- Alignment: Center-aligned within widget bounds
+
+#### 2.1.3 Color Specifications (from Image Analysis)
+
+**Light Mode (Classic Light Theme):**
+
+| Element | Color | Usage |
+|---------|-------|-------|
+| Background | #F5F5F5 | Widget canvas |
+| Primary Text (Date) | #1A1A1A | Large date number |
+| Secondary Text | #666666 | Month, year, day name |
+| Completed Days (Past) | #1A1A1A | Filled dots |
+| Current Day | #FF6B35 | Orange accent dot |
+| Future Days | #D9D9D9 | Light gray unfilled dots |
+| Week Headers | #999999 | Day initials |
+
+**Typography Scale:**
+```css
+/* Typographic System */
+--font-display: 72sp;      /* Date number */
+--font-title: 14sp;        /* Month name */
+--font-subtitle: 12sp;     /* Year, metadata */
+--font-label: 10sp;        /* Week headers */
+--font-caption: 8sp;       /* Small labels */
+
+/* Font Weights */
+--weight-black: 900;       /* Date number */
+--weight-bold: 700;        /* Not used in this design */
+--weight-medium: 500;      /* Month, day name */
+--weight-regular: 400;     /* Year, labels */
+```
+
+#### 2.1.4 Dot States & Visual Treatment
+
+**Dot Appearance Matrix:**
+
+| State | Visual Treatment | Color | Opacity | Use Case |
+|-------|------------------|-------|---------|----------|
+| **Past Day** | Solid filled circle | #1A1A1A | 100% | Days already passed |
+| **Current Day** | Solid filled circle | #FF6B35 | 100% | Today (accent color) |
+| **Future Day** | Outlined or filled light | #D9D9D9 | 40% | Upcoming days |
+| **Empty Space** | Invisible/Not rendered | N/A | 0% | Days not in month |
+| **Emoji Day** | Emoji character | Color varies | 100% | User-marked special days |
+
+**Dot Rendering Details:**
+```kotlin
+// Dot drawing specifications
+data class DotStyle(
+    val diameter: Float = 32f.dp,     // Default size
+    val strokeWidth: Float = 2f.dp,   // For outlined dots
+    val cornerRadius: Float = 16f.dp  // Full circle (50% of diameter)
+)
+
+// Visual states
+sealed class DotState {
+    object Past : DotState()          // Filled black
+    object Current : DotState()       // Filled orange
+    object Future : DotState()        // Light gray
+    data class Emoji(val emoji: String) : DotState()  // Emoji overlay
+}
+```
+
+---
+
+### 2.2 Current Day Highlight Treatment
+
+**From Image Analysis:** The current day (11) uses an **orange accent color** (#FF6B35) that stands out clearly from the black past days and light gray future days.
+
+**Highlight Specifications:**
+
+**Option A: Solid Fill (Shown in Image)**
+```
+Current Day Dot:
+- Fill: #FF6B35 (orange)
+- Size: Same as other dots (32dp)
+- No additional visual effects
+- Clean, minimal approach
+```
+
+**Option B: Enhanced Visibility (Alternative)**
+```
+Current Day Dot:
+- Fill: #FF6B35
+- Ring/Stroke: 2dp, #FF6B35 at 30% opacity
+- Subtle glow: 4dp blur radius (optional, Pro feature)
+- Scale: 1.1x size (35.2dp) for emphasis
+```
+
+**Recommended:** Use Option A (solid fill) for MVP to match the clean aesthetic shown in the reference image.
+
+---
+
+### 2.3 Year View Widget Specifications
+
+#### 2.3.1 Layout Structure
+
+```
+┌────────────────────────────────────────────────┐
+│  2025                                          │  ← Year Header (48dp)
+│                                                │
+│  J  ●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●          │  ← January (31 dots)
+│  F  ●●●●●●●●●●●●●●●●●●●●●●●●●●●●              │  ← February (28 dots)
+│  M  ●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●          │  ← March (31 dots)
+│  A  ●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●            │  ← April (30 dots)
+│  M  ●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●          │  ← May (31 dots)
+│  J  ●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●            │  ← June (30 dots)
+│  J  ●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●          │  ← July (31 dots)
+│  A  ●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●          │  ← August (31 dots)
+│  S  ●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●            │  ← September (30 dots)
+│  O  ●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●          │  ← October (31 dots)
+│  N  ●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●            │  ← November (30 dots)
+│  D  ●●●●●●●●●●○○○○○○○○○○○○○○○○○○○○          │  ← December (future days)
+│                                                │
+└────────────────────────────────────────────────┘
+```
+
+#### 2.3.2 Measurements
+
+**Widget Size:**
+- Recommended: 5×4 or 6×5 grid cells
+- Minimum: 4×4 grid cells
+- Padding: 16dp all sides
+
+**Typography:**
+- Year Number: 32sp, Sans-serif Bold
+- Month Letters: 10sp, Sans-serif Medium
+
+**Dot Grid:**
+- Dot Size: 8dp diameter (much smaller than month view)
+- Dot Spacing: 4dp between centers
+- Row Height: 20dp (includes dot + spacing)
+- Month Label Width: 24dp
+- Gap between label and dots: 8dp
+
+**Color Coding:**
+- Past days: #1A1A1A (black)
+- Current day: #FF6B35 (orange)
+- Future days: #D9D9D9 (light gray, 40% opacity)
+
+---
+
+### 2.4 Progress View Widget Specifications
+
+#### 2.4.1 Bar Style (Primary)
+
+```
+┌─────────────────────────────────────────┐
+│                                         │
+│  ●●●●●●●●●●●●●●●○○○○○○○○○○○○○○○○○○    │  ← Progress bar
+│                                         │
+│  42% of 2025                            │  ← Label
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Measurements:**
+- Widget Size: 4×1 or 3×1 grid cells
+- Padding: 12dp horizontal, 8dp vertical
+- Dot Size: 12dp diameter
+- Total Dots: 52 (represents weeks in year)
+- Label: 14sp, Sans-serif Medium, centered below bar
+
+**Alternative: Dense Mode (365 dots for daily precision)**
+- Dot Size: 4dp diameter
+- Spacing: 2dp
+- More granular progress visualization
+
+#### 2.4.2 Ring Style (Alternative)
+
+```
+┌─────────────────┐
+│                 │
+│       ◐         │  ← Circular ring of dots
+│      42%        │  ← Percentage in center
+│                 │
+└─────────────────┘
+```
+
+**Measurements:**
+- Widget Size: 2×2 grid cells
+- Ring Diameter: 120dp
+- Dot Count: 52 dots arranged in circle
+- Center Text: 24sp, Sans-serif Bold
+
+---
+
+## 3. App Interface Design
+
+### 3.1 Design System Foundations
+
+#### 3.1.1 Color Palette
+
+**Primary Colors:**
+```css
+/* Light Mode */
+--color-primary: #1A1A1A;        /* Text, filled dots */
+--color-accent: #FF6B35;         /* Current day, CTAs */
+--color-background: #F5F5F5;     /* Widget background */
+--color-surface: #FFFFFF;        /* App screens */
+
+/* Text Hierarchy */
+--color-text-primary: #1A1A1A;   /* Headings, body */
+--color-text-secondary: #666666; /* Metadata, labels */
+--color-text-tertiary: #999999;  /* Disabled, placeholders */
+
+/* Functional */
+--color-border: #E0E0E0;         /* Dividers, outlines */
+--color-success: #4CAF50;        /* Confirmation states */
+--color-error: #F44336;          /* Error states */
+```
+
+**Dark Mode (OLED):**
+```css
+/* Dark Mode */
+--color-primary: #FFFFFF;        /* Text, filled dots */
+--color-accent: #FF8A5B;         /* Lighter orange for contrast */
+--color-background: #000000;     /* Widget background (true black) */
+--color-surface: #1A1A1A;        /* App screens */
+
+/* Text Hierarchy */
+--color-text-primary: #FFFFFF;   /* Headings, body */
+--color-text-secondary: #B3B3B3; /* Metadata, labels */
+--color-text-tertiary: #666666;  /* Disabled, placeholders */
+
+/* Functional */
+--color-border: #333333;         /* Dividers, outlines */
+```
+
+**Glassmorphism Mode (Pro):**
+```css
+/* Glassmorphism */
+--color-background: rgba(255, 255, 255, 0.15); /* Semi-transparent */
+--backdrop-blur: 20px;                          /* Blur radius */
+--border: 1px solid rgba(255, 255, 255, 0.2);  /* Subtle border */
+```
+
+#### 3.1.2 Typography System
+
+**Font Family:** San Francisco (iOS) / Roboto (Android)
+
+**Type Scale:**
+```css
+/* Display */
+--font-display-large: 72sp / 900 weight;   /* Widget date number */
+--font-display-medium: 48sp / 700 weight;  /* App headings */
+
+/* Headings */
+--font-h1: 32sp / 700 weight;              /* Page titles */
+--font-h2: 24sp / 700 weight;              /* Section titles */
+--font-h3: 20sp / 600 weight;              /* Card titles */
+
+/* Body */
+--font-body-large: 16sp / 400 weight;      /* Primary text */
+--font-body-medium: 14sp / 400 weight;     /* Secondary text */
+--font-body-small: 12sp / 400 weight;      /* Captions */
+
+/* Labels */
+--font-label-large: 14sp / 500 weight;     /* Buttons */
+--font-label-medium: 12sp / 500 weight;    /* Small buttons */
+--font-label-small: 10sp / 500 weight;     /* Tags, badges */
+```
+
+**Line Height:**
+- Display: 1.0 (tight for large numbers)
+- Headings: 1.2
+- Body: 1.5
+- Labels: 1.2
+
+#### 3.1.3 Spacing System (8dp Grid)
+
+```css
+/* Spacing Scale */
+--space-4xs: 2dp;   /* Tight spacing */
+--space-3xs: 4dp;   /* Minimal gap */
+--space-2xs: 8dp;   /* Standard small */
+--space-xs: 12dp;   /* Small */
+--space-sm: 16dp;   /* Medium-small */
+--space-md: 24dp;   /* Medium */
+--space-lg: 32dp;   /* Large */
+--space-xl: 48dp;   /* Extra large */
+--space-2xl: 64dp;  /* Huge */
+--space-3xl: 96dp;  /* Massive */
+```
+
+**Usage Guidelines:**
+- **Component Padding:** 16dp (sm) as default
+- **Section Gaps:** 24dp (md) between major sections
+- **Screen Margins:** 16dp on phone, 24dp on tablet
+- **Card Internal Spacing:** 16dp padding
+- **List Item Height:** 56dp minimum (touch target)
+
+#### 3.1.4 Corner Radius
+
+```css
+/* Border Radius */
+--radius-sm: 8dp;    /* Small cards, buttons */
+--radius-md: 12dp;   /* Default cards */
+--radius-lg: 16dp;   /* Large cards, modals */
+--radius-xl: 24dp;   /* Bottom sheets */
+--radius-full: 999dp; /* Pills, dots */
+```
+
+---
+
+### 3.2 Home Screen (Widget Gallery)
+
+#### 3.2.1 Layout Anatomy
+
+```
+┌─────────────────────────────────────────────────┐
+│  ☰  Dot Matrix Widgets             [+ New]     │  ← 56dp AppBar
+├─────────────────────────────────────────────────┤
+│  [My Widgets] [Templates] [Discover]            │  ← 48dp TabBar
+├─────────────────────────────────────────────────┤
+│  ↑ 16dp padding                                 │
+│  ┌───────────────────────────────────────────┐ │
+│  │ ← 16dp →                                  │ │
+│  │  ┌──────────────────────┐ ← Widget Card  │ │
+│  │  │  ┌────────────────┐  │                 │ │
+│  │  │  │  [Preview]     │  │   ← 160dp       │ │
+│  │  │  │  Year View     │  │     height      │ │
+│  │  │  └────────────────┘  │                 │ │
+│  │  │                      │                 │ │
+│  │  │  Month View          │  ← 14sp title   │ │
+│  │  │  Home Screen         │                 │ │
+│  │  │  Updated 2h ago      │  ← 12sp meta    │ │
+│  │  │                      │                 │ │
+│  │  │  [Edit]      [⋮]     │  ← Action btns  │ │
+│  │  └──────────────────────┘                 │ │
+│  │  ↓ 16dp gap                               │ │
+│  │  ┌──────────────────────┐                 │ │
+│  │  │  [Preview]           │                 │ │
+│  │  │  ...                 │                 │ │
+│  └───────────────────────────────────────────┘ │
+│  ↓ 16dp padding                                 │
+└─────────────────────────────────────────────────┘
+```
+
+#### 3.2.2 Component Specifications
+
+**App Bar:**
+- Height: 56dp
+- Background: Transparent (shows through to screen background)
+- Hamburger Icon: 24dp, left-aligned, 16dp margin
+- Title: 20sp, Sans-serif Medium
+- [+ New] Button: 
+  - Icon: 24dp
+  - Padding: 8dp all sides
+  - Background: Accent color (#FF6B35)
+  - Corner Radius: 8dp
+  - Right margin: 16dp
+
+**Tab Bar:**
+- Height: 48dp
+- Tab Label: 14sp, Sans-serif Medium
+- Indicator: 2dp height, full width, accent color
+- Tab Padding: 12dp horizontal
+
+**Widget Card:**
+- Width: Fill parent (minus 32dp horizontal margin)
+- Height: Auto (min 200dp)
+- Background: #FFFFFF (Light) / #1A1A1A (Dark)
+- Corner Radius: 12dp
+- Elevation: 2dp (subtle shadow)
+- Padding: 16dp all sides
+
+**Widget Preview Thumbnail:**
+- Width: Fill card width
+- Height: 160dp
+- Background: Widget background color
+- Corner Radius: 8dp
+- Actual rendered widget (scaled down)
+
+**Widget Card Text:**
+- Title: 14sp, Sans-serif Medium, color-text-primary
+- Subtitle: 12sp, Sans-serif Regular, color-text-secondary
+- Metadata: 10sp, Sans-serif Regular, color-text-tertiary
+
+**Action Buttons:**
+- [Edit] Button:
+  - Style: Text button
+  - Label: 14sp, color-accent
+  - Padding: 8dp vertical, 12dp horizontal
+- [⋮] Menu Button:
+  - Icon: 24dp
+  - Padding: 8dp
+
+**Empty State:**
+- Illustration: 200dp × 200dp, centered
+- Title: 20sp, Sans-serif Medium
+- Subtitle: 14sp, Sans-serif Regular, color-text-secondary
+- CTA Button: Filled button, accent color, 48dp height
+
+---
+
+### 3.3 Widget Editor Screen
+
+#### 3.3.1 Layout Structure
+
+```
+┌─────────────────────────────────────────────────┐
+│  ← Widget Editor                           [✓]  │  ← 56dp AppBar
+├─────────────────────────────────────────────────┤
+│  ↑ 24dp padding                                 │
+│                                                 │
+│  ┌─────────────────────────────────────────┐   │
+│  │                                         │   │
+│  │        LIVE PREVIEW AREA                │   │  ← 240dp height
+│  │        (Actual size widget)             │   │
+│  │                                         │   │
+│  └─────────────────────────────────────────┘   │
+│  ↓ 32dp gap                                     │
+│  ┌─────────────────────────────────────────┐   │
+│  │  Widget Type  [Month View       ▼]     │   │  ← Dropdown
+│  └─────────────────────────────────────────┘   │
+│  ↓ 24dp gap                                     │
+│  ┌─ Appearance ──────────────────────────── │  ← Section header
+│  │                                          │  │
+│  │  Theme        [Classic Light    ▼] [⚙]  │  │  ← Theme selector
+│  │  ↓ 16dp                                  │  │
+│  │  Dot Size     [====●====] 4dp            │  │  ← Slider
+│  │  ↓ 12dp                                  │  │
+│  │  Dot Spacing  [===●=====] 2dp            │  │
+│  │  ↓ 12dp                                  │  │
+│  │  Opacity      [=======●=] 80%            │  │
+│  │  ↓ 12dp                                  │  │
+│  │  Shape   ●Circle ○Square ○Rounded       │  │  ← Radio group
+│  └──────────────────────────────────────────┘  │
+│  ↓ 24dp                                         │
+│  ┌─ Colors ──────────────────────────────── │  │
+│  │  Dots        [■ #212121] [🎨]            │  │  ← Color picker
+│  │  Background  [■ #FFFFFF] [🎨]            │  │
+│  │  Accent      [■ #FF6B35] [🎨]            │  │
+│  └──────────────────────────────────────────┘  │
+│  ↓ 24dp                                         │
+│  [Scrollable content continues...]              │
+└─────────────────────────────────────────────────┘
+```
+
+#### 3.3.2 Component Details
+
+**Live Preview Container:**
+- Background: Matches widget background color
+- Border: 1dp, #E0E0E0 (light) / #333333 (dark)
+- Corner Radius: 12dp
+- Padding: 16dp
+- Shadow: None (flat design)
+- Content: Actual RemoteViews rendered at scale
+
+**Section Headers:**
+- Font: 16sp, Sans-serif Medium
+- Color: color-text-primary
+- Margin: 24dp top, 16dp bottom
+- Optional: Left border accent (2dp, accent color)
+
+**Dropdowns:**
+- Height: 48dp
+- Background: color-surface
+- Border: 1dp, color-border
+- Corner Radius: 8dp
+- Padding: 12dp horizontal
+- Label: 14sp, Sans-serif Regular
+- Icon: 20dp chevron-down, right-aligned
+
+**Sliders:**
+- Track Height: 4dp
+- Thumb Size: 20dp diameter
+- Active Color: color-accent
+- Inactive Color: color-border
+- Label: 12sp, right-aligned, shows current value
+- Min Width: 200dp
+
+**Radio Buttons:**
+- Size: 20dp
+- Spacing: 16dp between options
+- Label: 14sp, Sans-serif Regular
+- Layout: Horizontal (if space) or Vertical
+
+**Color Pickers:**
+- Color Swatch: 32dp × 32dp, rounded 6dp
+- Border: 1dp, color-border
+- Label: 12sp, left of swatch
+- Tap → Opens color picker dialog
+
+---
+
+### 3.4 Emoji Rule Manager
+
+#### 3.4.1 Rule List Screen
+
+```
+┌─────────────────────────────────────────────────┐
+│  ← Emoji Rules                                  │
+├─────────────────────────────────────────────────┤
+│  Widget: Month View - Home                      │  ← 12sp, secondary
+│  ↓ 8dp                                          │
+│  ┌─────────────────────────────────────────┐   │
+│  │  [+ Add Rule]            Free: 3 / 3    │   │  ← Button + counter
+│  └─────────────────────────────────────────┘   │
+│  ↓ 16dp                                         │
+│  ┌─────────────────────────────────────────┐   │
+│  │  🎂  Birthday                           │   │  ← 56dp height card
+│  │      Every January 15                   │   │
+│  │                           [Edit]  [×]   │   │
+│  └─────────────────────────────────────────┘   │
+│  ↓ 8dp                                          │
+│  ┌─────────────────────────────────────────┐   │
+│  │  💪  Workout Day                        │   │
+│  │      Every Mon, Wed, Fri                │   │
+│  │                           [Edit]  [×]   │   │
+│  └─────────────────────────────────────────┘   │
+│  ↓ 8dp                                          │
+│  ┌─────────────────────────────────────────┐   │
+│  │  ✈️  Vacation                           │   │
+│  │      Jan 20-25, 2026                    │   │
+│  │                           [Edit]  [×]   │   │
+│  └─────────────────────────────────────────┘   │
+│  ↓ 16dp                                         │
+│  ┌─────────────────────────────────────────┐   │
+│  │  🔒 Unlock Pro for Unlimited            │   │  ← Paywall card
+│  │                                         │   │
+│  │  [Upgrade to Pro - $5.99]               │   │
+│  └─────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────┘
+```
+
+#### 3.4.2 Add/Edit Rule Dialog
+
+```
+┌─────────────────────────────────────────────────┐
+│  Add Emoji Rule                            [×]  │  ← Dialog header
+├─────────────────────────────────────────────────┤
+│  ↑ 24dp                                         │
+│  Emoji:  [😊]  [Choose Emoji]                   │  ← Emoji button
+│  ↓ 20dp                                         │
+│  Rule Type:                                     │
+│  ○ Specific Date                                │  ← Radio buttons
+│  ● Recurring Day of Week                        │
+│  ○ Recurring Date (e.g., 15th monthly)          │
+│  ○ Date Range                                   │
+│  ↓ 20dp                                         │
+│  ┌─ When (Recurring Day) ─────────────────┐    │
+│  │  ☑ Monday       ☑ Tuesday              │    │  ← Checkboxes
+│  │  ☐ Wednesday    ☑ Thursday             │    │
+│  │  ☐ Friday       ☐ Saturday             │    │
+│  │  ☐ Sunday                               │    │
+│  └─────────────────────────────────────────┘    │
+│  ↓ 20dp                                         │
+│  Label (optional):  [Workout Day________]       │  ← Text input
+│  ↓ 20dp                                         │
+│  Preview:                                       │
+│  💪 will appear every Mon, Tue, Thu             │  ← Preview text
+│  ↓ 32dp                                         │
+│              [Cancel]  [Save Rule]              │  ← Action buttons
+│  ↓ 24dp                                         │
+└─────────────────────────────────────────────────┘
+```
+
+---
+
+### 3.5 Theme Gallery
+
+#### 3.5.1 Grid Layout
+
+```
+┌─────────────────────────────────────────────────┐
+│  ← Themes                                       │
+├─────────────────────────────────────────────────┤
+│  [Preset Themes] [My Themes] [Custom]           │  ← Tabs
+├─────────────────────────────────────────────────┤
+│  ↑ 16dp                                         │
+│  ┌──────┐  ┌──────┐  ┌──────┐                  │
+│  │      │  │      │  │      │                  │  ← 100dp × 140dp
+│  │ [  ] │  │ [  ] │  │ [  ] │                  │    theme cards
+│  │      │  │      │  │      │                  │
+│  │Light │  │OLED  │  │Nord  │                  │
+│  │  ✓   │  │      │  │ 🔒   │                  │
+│  └──────┘  └──────┘  └──────┘                  │
+│  ↓ 12dp                                         │
+│  ┌──────┐  ┌──────┐  ┌──────┐                  │
+│  │      │  │      │  │      │                  │
+│  └──────┘  └──────┘  └──────┘                  │
+└─────────────────────────────────────────────────┘
+```
+
+**Theme Card:**
+- Size: 100dp × 140dp
+- Corner Radius: 12dp
+- Border: 2dp when selected (accent color)
+- Preview: Miniature widget rendered inside
+- Label: 12sp, centered below preview
+- Status Icon: ✓ (applied), 🔒 (Pro only)
+
+---
+
+### 3.6 Pro Upgrade Screen
+
+```
+┌─────────────────────────────────────────────────┐
+│  ×                                              │  ← Close button
+├─────────────────────────────────────────────────┤
+│  ↑ 48dp                                         │
+│              🎨 Unlock Pro                      │  ← 32sp title
+│  ↓ 32dp                                         │
+│  ┌─────────────────────────────────────────┐   │
+│  │  ✓ Unlimited Widgets                    │   │  ← Feature list
+│  │    Create as many widgets as you want   │   │    48dp per item
+│  └─────────────────────────────────────────┘   │
+│  ↓ 16dp                                         │
+│  ┌─────────────────────────────────────────┐│
+│  │  ✓ Unlimited Emoji Rules                │   │
+│  │    Mark every special day               │   │
+│  └─────────────────────────────────────────┘   │
+│  ↓ 16dp                                         │
+│  ┌─────────────────────────────────────────┐   │
+│  │  ✓ Glassmorphism Mode                   │   │
+│  │    Beautiful frosted glass effect       │   │
+│  └─────────────────────────────────────────┘   │
+│  ↓ 16dp                                         │
+│  [... more features ...]                        │
+│  ↓ 32dp                                         │
+│  ────────────────────────────────────────       │  ← Divider
+│  ↓ 24dp                                         │
+│         One-time purchase                       │  ← 14sp, secondary
+│             $5.99                                │  ← 48sp, bold
+│         No subscription                         │  ← 14sp, secondary
+│  ↓ 24dp                                         │
+│  ┌─────────────────────────────────────────┐   │
+│  │      [Unlock Pro Features]              │   │  ← Primary CTA
+│  └─────────────────────────────────────────┘   │    56dp height
+│  ↓ 16dp                                         │
+│  [Restore Purchase]                             │  ← Text button
+│  ↓ 48dp                                         │
+└─────────────────────────────────────────────────┘
+```
+
+**Primary CTA Button:**
+- Height: 56dp
+- Width: Fill parent (minus 32dp margin)
+- Background: Accent color (#FF6B35)
+- Text: 16sp, Sans-serif Medium, white
+- Corner Radius: 12dp
+- Elevation: 4dp
+
+---
+
+## 4. Interaction Design
+
+### 4.1 Touch Targets & Gestures
+
+**Minimum Touch Targets:**
+- Buttons: 48dp × 48dp (Material Design standard)
+- List Items: 56dp height
+- Cards: Full card tappable (min 48dp height)
+
+**Gesture Support:**
+- **Tap:** Primary action (select, open, toggle)
+- **Long Press:** Secondary actions (context menu, reorder)
+- **Swipe:** Delete (in lists), navigate (between months)
+- **Pinch/Zoom:** Not supported (static widget sizes)
+- **Drag:** Reorder emoji rules (with haptic feedback)
+
+### 4.2 Animations & Transitions
+
+**Principles:**
+- **Duration:** 200-300ms (Material Design standard)
+- **Easing:** Cubic-bezier(0.4, 0.0, 0.2, 1) for most transitions
+- **Purpose:** Provide feedback, show relationships, maintain context
+
+**Specific Animations:**
+
+1. **Widget Preview Updates:**
+   - Type: Cross-fade
+   - Duration: 200ms
+   - Trigger: Any config change
+
+2. **Screen Transitions:**
+   - Type: Shared element transition (preview thumbnail → full editor)
+   - Duration: 300ms
+   - Easing: Deceleration
+
+3. **Button Press:**
+   - Type: Scale down (0.95x) + ripple effect
+   - Duration: 100ms press, 200ms release
+   - Color: Accent color at 20% opacity
+
+4. **Dialog Appearance:**
+   - Type: Fade + scale (from 0.9x to 1.0x)
+   - Duration: 250ms
+   - Background dim: Fade to 40% black
+
+5. **Slider Movement:**
+   - Type: Immediate (no animation)
+   - Haptic: Light impact every 10% (iOS) / tick (Android)
+
+6. **Widget Add to Home:**
+   - Type: Scale up from touch point
+   - Duration: 300ms
+   - Haptic: Success feedback
+
+---
+
+## 5. Responsive Design
+
+### 5.1 Screen Size Adaptation
+
+**Phone (Portrait - Primary Target):**
+- Screen Width: 360-414dp
+- Widget Gallery: 1 column
+- Theme Gallery: 3 columns
+- Widget Editor: Full-width preview
+
+**Phone (Landscape):**
+- Widget Gallery: 2 columns (if width > 600dp)
+- Widget Editor: Preview left, controls right (split view)
+
+**Tablet (7-10 inches):**
+- Screen Width: 600-840dp
+- Widget Gallery: 2 columns
+- Theme Gallery: 4-5 columns
+- Increased margins: 24dp
+
+**Tablet (10+ inches):**
+- Screen Width: 840dp+
+- Master-Detail layout (gallery + editor side-by-side)
+- Theme Gallery: 6+ columns
+
+### 5.2 Widget Size Variants
+
+**Year View:**
+- 4×3: Minimal (compressed dots)
+- 4×4: Comfortable
+- 5×4: Spacious
+- 6×5: Luxurious (recommended)
+
+**Month View:**
+- 3×3: Tight (minimal spacing)
+- 4×3: Comfortable
+- 4×4: Spacious (recommended)
+- 5×4: Luxurious
+
+**Progress:**
+- 2×1: Minimal (bar only)
+- 3×1: Comfortable (bar + small label)
+- 4×1: Spacious (recommended)
+- 2×2: Ring style
+
+---
+
+## 6. Accessibility Specifications
+
+### 6.1 Color Contrast
+
+**WCAG AA Compliance (4.5:1 ratio minimum for text):**
+
+| Element | Foreground | Background | Contrast Ratio |
+|---------|-----------|------------|----------------|
+| Primary Text | #1A1A1A | #F5F5F5 | 14.1:1 ✓ |
+| Secondary Text | #666666 | #F5F5F5 | 5.2:1 ✓ |
+| Accent on White | #FF6B35 | #FFFFFF | 3.5:1 ⚠️ |
+| Dark Mode Text | #FFFFFF | #1A1A1A | 14.1:1 ✓ |
+
+**Fixes for Low Contrast:**
+- Accent color on white fails AA for small text
+- Solution: Darken to #D95225 for text (contrast: 4.7:1 ✓)
+- Keep #FF6B35 for large elements (dots, buttons)
+
+### 6.2 Screen Reader Support
+
+**Content Descriptions:**
+
+```kotlin
+// Widget dots
+"January 15, 2026 - Birthday - marked with cake emoji"
+"January 11, 2026 - Today"
+"January 10, 2026 - Past date"
+"January 12, 2026 - Future date"
+
+// Sliders
+"Dot size: 4 density-independent pixels, adjustable from 2 to 8"
+"Dot spacing: 2 density-independent pixels, adjustable from 1 to 6"
+
+// Buttons
+"Add new widget"
+"Edit widget configuration"
+"Delete emoji rule"
+"Unlock Pro features for $5.99"
+```
+
+**Focus Order:**
+- Logical top-to-bottom, left-to-right
+- Grouped related elements (emoji + label + actions)
+- Skip decorative elements
+
+### 6.3 Large Text Support
+
+**Dynamic Type Scaling:**
+- Support up to 200% text scaling (Android Accessibility Settings)
+- Minimum font sizes remain readable at max scale:
+  - 72sp display → 144sp (still fits on screen)
+  - 14sp body → 28sp
+  - 10sp caption → 20sp
+
+**Layout Adjustments:**
+- Switch to vertical layouts when text wraps
+- Increase touch targets proportionally
+- Allow horizontal scrolling if needed
+
+### 6.4 Motion Sensitivity
+
+**Reduced Motion Mode:**
+- Disable all non-essential animations
+- Keep critical feedback (button press ripple)
+- Replace fades with instant transitions
+- Respect system `prefers-reduced-motion` setting
+
+---
+
+## 7. Design Assets & Deliverables
+
+### 7.1 Asset Requirements
+
+**Widget Preview Renders (for Play Store):**
+- Year View: 1200×800px @2x
+- Month View: 1200×800px @2x
+- Progress View: 1200×400px @2x
+- All themes (Light, Dark, Glassmorphism)
+
+**App Icon:**
+- Adaptive Icon:
+  - Foreground: 108×108dp, transparent background
+  - Background: 108×108dp, solid color
+- Legacy Icon: 512×512px PNG
+- Design: Minimalist dot matrix calendar representation
+
+**Screenshots (Play Store):**
+- Phone: 1080×1920px (5 required)
+  1. Hero shot (phone with widget on home screen)
+  2. Widget editor with live preview
+  3. Theme gallery
+  4. Emoji rule manager
+  5. Year view widget showcase
+- Tablet: 1200×1920px (2 optional)
+
+**Feature Graphic (Play Store):**
+- Size: 1024×500px
+- Content: Brand name + tagline + key visual
+
+### 7.2 Figma/Design File Organization
+
+**File Structure:**
+```
+Dot Matrix Widgets - Design System
+├── 00 - Cover & Overview
+├── 01 - Design Tokens
+│   ├── Colors
+│   ├── Typography
+│   ├── Spacing
+│   └── Components
+├── 02 - Widget Designs
+│   ├── Year View
+│   ├── Month View
+│   └── Progress View
+├── 03 - App Screens
+│   ├── Onboarding
+│   ├── Home (Gallery)
+│   ├── Widget Editor
+│   ├── Emoji Rules
+│   ├── Theme Gallery
+│   └── Pro Upgrade
+├── 04 - Components Library
+│   ├── Buttons
+│   ├── Cards
+│   ├── Dialogs
+│   ├── Inputs
+│   └── Navigation
+├── 05 - Prototypes
+│   ├── Onboarding Flow
+│   ├── Create Widget Flow
+│   └── Add Emoji Rule Flow
+└── 06 - Marketing Assets
+    ├── App Icon
+    ├── Screenshots
+    └── Feature Graphics
+```
+
+---
+
+## 8. Design Checklist (Before Handoff to Development)
+
+### 8.1 Completeness
+
+- [ ] All screens designed (Light + Dark modes)
+- [ ] All widget types rendered at 3+ sizes
+- [ ] All 12 preset themes visualized
+- [ ] Empty states designed
+- [ ] Error states designed
+- [ ] Loading states designed
+- [ ] Success/confirmation states designed
+
+### 8.2 Specifications
+
+- [ ] All measurements documented (dp/sp)
+- [ ] All colors defined (hex codes)
+- [ ] All fonts specified (family, weight, size)
+- [ ] All spacing values marked
+- [ ] All corner radius values noted
+- [ ] All elevation/shadow specs listed
+
+### 8.3 Assets
+
+- [ ] App icon exported (all sizes)
+- [ ] Splash screen designed
+- [ ] Empty state illustrations created
+- [ ] Icon set exported (if custom icons used)
+- [ ] Play Store assets ready (screenshots, feature graphic)
+
+### 8.4 Accessibility
+
+- [ ] Contrast ratios verified (WCAG AA)
+- [ ] Content descriptions written for key elements
+- [ ] Touch targets meet 48dp minimum
+- [ ] Focus order logical
+- [ ] Color not sole indicator (use icons/labels too)
+
+### 8.5 Interactivity
+
+- [ ] All button states defined (default, pressed, disabled)
+- [ ] All transitions specified (duration, easing)
+- [ ] All gestures documented (tap, long-press, swipe)
+- [ ] Haptic feedback points noted
+
+---
+
+## 9. Development Handoff Notes
+
+### 9.1 Priority Order
+
+**Phase 1 (MVP - Must Have):**
+1. Month View Widget (reference design from image)
+2. Widget Editor (with live preview)
+3. Basic themes (Light, Dark)
+4. Emoji Rule Manager (3 rules for free)
+5. Pro Upgrade Screen
+
+**Phase 2 (Post-Launch):**
+1. Year View Widget
+2. Progress View Widget
+3. Theme Gallery (12 presets)
+4. Glassmorphism Mode
+
+**Phase 3 (Future):**
+1. Lock Screen Widgets
+2. Wear OS Glance
+3. Preset Marketplace
+
+### 9.2 Design QA Checkpoints
+
+**After UI Implementation:**
+- [ ] Widget renders match design pixel-perfect
+- [ ] Live preview updates smoothly (<200ms)
+- [ ] Colors match hex codes exactly
+- [ ] Fonts render at correct sizes
+- [ ] Spacing matches 8dp grid
+- [ ] Touch targets feel comfortable
+- [ ] Animations feel natural (not janky)
+- [ ] Dark mode switches cleanly
+- [ ] Emoji renders correctly on all Android versions
+
+---
+
+## 10. Design Rationale (Why These Choices?)
+
+### 10.1 Dot Matrix Aesthetic
+
+**Why dots instead of traditional calendar grids?**
+- **Distinctiveness:** Stands out in crowded widget market
+- **Minimalism:** Reduces visual clutter (no date numbers except current day)
+- **Scalability:** Works at tiny sizes (year view) and large sizes (month view)
+- **Aesthetic Appeal:** Evokes digital art, retro displays, data visualization
+- **Flexibility:** Easy to replace with emojis (still grid-based)
+
+### 10.2 Large Bold Date Number
+
+**Why 72sp font size for current date?**
+- **Hierarchy:** Instantly communicates "today is the focus"
+- **Glanceable:** Readable from across the room (home screen widgets are viewed from distance)
+- **Confidence:** Bold typography signals premium, intentional design
+- **Contrast:** Creates visual drama against small dots
+
+### 10.3 Orange Accent Color
+
+**Why orange (#FF6B35) instead of blue/green?**
+- **Energy:** Orange conveys warmth, optimism, action
+- **Differentiation:** Most productivity apps use blue (Notion, Trello, etc.)
+- **Visibility:** High contrast against both light and dark backgrounds
+- **Timelessness:** Not tied to specific brand trends
+
+### 10.4 Glassmorphism as Pro Feature
+
+**Why lock blur effects behind paywall?**
+- **Technical Justification:** Blur is expensive (performance impact)
+- **Visual Value:** Most "wow factor" feature (justifies Pro upgrade)
+- **Graceful Degradation:** Free users still get beautiful solid backgrounds
+- **Platform Limitation:** Only works well on Android 12+, limiting audience
+
+---
+
+## 11. Future Design Considerations
+
+### 11.1 Potential Feature Additions
+
+**Widget Templates (Phase 2):**
+- Pre-configured widgets for specific use cases:
+  - "Minimalist Year Progress"
+  - "Birthday Tracker"
+  - "Workout Streak Calendar"
+  - "Project Milestone Tracker"
+- Each template is a saved configuration (theme + emoji rules + widget type)
+
+**Collaboration (Phase 3):**
+- Share widget configs via deep links
+- "Install this widget" button in shared links
+- Community voting on best designs
+
+### 11.2 Design System Evolution
+
+**As app grows, maintain:**
+- Consistent dot motif across all features
+- Generous whitespace (avoid clutter)
+- Bold typography hierarchy
+- Limited color palette (don't add random colors)
+- Performance-first mindset (beautiful but fast)
+
+---
+
+## 12. Appendix: Design Tokens Export
+
+### 12.1 JSON Format (for developers)
+
+```json
+{
+  "colors": {
+    "light": {
+      "primary": "#1A1A1A",
+      "accent": "#FF6B35",
+      "background": "#F5F5F5",
+      "surface": "#FFFFFF",
+      "textPrimary": "#1A1A1A",
+      "textSecondary": "#666666",
+      "textTertiary": "#999999",
+      "border": "#E0E0E0"
+    },
+    "dark": {
+      "primary": "#FFFFFF",
+      "accent": "#FF8A5B",
+      "background": "#000000",
+      "surface": "#1A1A1A",
+      "textPrimary": "#FFFFFF",
+      "textSecondary": "#B3B3B3",
+      "textTertiary": "#666666",
+      "border": "#333333"
+    }
+  },
+  "typography": {
+    "displayLarge": { "size": 72, "weight": 900 },
+    "h1": { "size": 32, "weight": 700 },
+    "h2": { "size": 24, "weight": 700 },
+    "bodyLarge": { "size": 16, "weight": 400 },
+    "bodyMedium": { "size": 14, "weight": 400 },
+    "labelLarge": { "size": 14, "weight": 500 }
+  },
+  "spacing": {
+    "xs": 12,
+    "sm": 16,
+    "md": 24,
+    "lg": 32,
+    "xl": 48
+  },
+  "radius": {
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "full": 999
+  }
+}
+```
+
+---
+
+**END OF DESIGN DOCUMENTATION**
+
+---
+
+## Summary
+
+This design documentation provides:
+1. **Precise measurements** for every UI element
+2. **Color specifications** matching the reference image
+3. **Complete design system** (colors, typography, spacing)
+4. **Screen-by-screen layouts** for all app interfaces
+5. **Widget specifications** for all three widget types
+6. **Accessibility guidelines** (contrast, touch targets, screen readers)
+7. **Interaction patterns** (gestures, animations, transitions)
+8. **Asset requirements** for development handoff
+9. **Design rationale** explaining key choices
+
+The reference image shows a **beautifully minimal month view calendar widget** with:
+- Large bold date number (11)
+- Clean typography (FEBRUARY 2025)
+- Dot matrix grid for calendar days
+- Orange accent for current day
+- Light gray for future days
+- Black for past days
+
+This documentation expands that aesthetic across the entire app while maintaining the same premium, minimal, glanceable design language.

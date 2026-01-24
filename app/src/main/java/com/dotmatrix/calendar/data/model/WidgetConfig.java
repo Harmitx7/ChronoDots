@@ -24,6 +24,7 @@ public class WidgetConfig {
     private float dotSpacing;     // 1.0 - 6.0 dp
     private float dotOpacity;     // 0.3 - 1.0
     private DotShape dotShape;
+    private DotStyle dotStyle;    // FILLED, OUTLINE, etc.
 
     // Colors
     private int dotColor;
@@ -57,8 +58,10 @@ public class WidgetConfig {
         this.themeId = "classic_light";
         this.dotSize = 5.0f;
         this.dotSpacing = 3.0f;
+        this.dotSpacing = 3.0f;
         this.dotOpacity = 0.9f;
         this.dotShape = DotShape.CIRCLE;
+        this.dotStyle = DotStyle.FILLED;
         this.dotColor = 0xFFE0E0E0; // Off-white/Light Grey
         this.backgroundColor = 0xFF1A1625; // Deep Indigo
         this.accentColor = 0xFFD4A574; // Soft Gold
@@ -89,6 +92,8 @@ public class WidgetConfig {
                 return "Year View";
             case MONTH:
                 return "Month View";
+            case WEEK:
+                return "Week View";
             case PROGRESS:
                 return "Progress";
             default:
@@ -151,6 +156,14 @@ public class WidgetConfig {
 
     public void setDotShape(DotShape dotShape) {
         this.dotShape = dotShape;
+    }
+
+    public DotStyle getDotStyle() {
+        return dotStyle;
+    }
+
+    public void setDotStyle(DotStyle dotStyle) {
+        this.dotStyle = dotStyle;
     }
 
     public int getDotColor() {

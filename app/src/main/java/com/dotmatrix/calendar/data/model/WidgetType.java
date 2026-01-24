@@ -6,5 +6,6 @@ package com.dotmatrix.calendar.data.model;
 public enum WidgetType {
     YEAR,
     MONTH,
+    WEEK,
     PROGRESS
 }

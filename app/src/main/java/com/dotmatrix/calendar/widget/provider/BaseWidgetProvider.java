@@ -16,6 +16,7 @@ import com.dotmatrix.calendar.data.model.WidgetConfig;
 import com.dotmatrix.calendar.data.model.WidgetType;
 import com.dotmatrix.calendar.data.repository.WidgetRepository;
 import com.dotmatrix.calendar.ui.editor.WidgetEditorActivity;
+import com.dotmatrix.calendar.util.DynamicColorHelper;
 import com.dotmatrix.calendar.widget.cache.WidgetBitmapCache;
 import com.dotmatrix.calendar.widget.renderer.DotRenderer;
 
@@ -86,18 +87,32 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
         executor.execute(() -> {
             try {
                 // Get widget options (size)
+                // Get widget options (size)
                 Bundle options = appWidgetManager.getAppWidgetOptions(widgetId);
-                int minWidth = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH);
-                int minHeight = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT);
+                int width = 200; // default
+                int height = 200; // default
+
+                if (options != null) {
+                    int minWidth = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH);
+                    int minHeight = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT);
+                    
+                    if (minWidth > 0 && minHeight > 0) {
+                        float density = context.getResources().getDisplayMetrics().density;
+                        width = (int) (minWidth * density);
+                        height = (int) (minHeight * density);
+                    }
+                }
                 
-                // Convert dp to pixels
-                float density = context.getResources().getDisplayMetrics().density;
-                int width = Math.max((int) (minWidth * density), 200);
-                int height = Math.max((int) (minHeight * density), 200);
+                // Ensure reasonable texture limits
+                width = Math.max(100, Math.min(width, 2048));
+                height = Math.max(100, Math.min(height, 2048));
                 
                 // Get or create config
                 WidgetRepository repository = WidgetRepository.getInstance(context);
                 WidgetConfig config = repository.getOrCreateConfig(widgetId, getWidgetType());
+                
+                // Resolve dynamic theme colors if needed
+                resolveDynamicColors(context, config);
                 
                 // Get emoji rules
                 List<EmojiRule> rules = repository.getEmojiRules(widgetId);
@@ -149,6 +164,28 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
             intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds);
             context.sendBroadcast(intent);
+        }
+    }
+
+    /**
+     * Resolve dynamic theme colors (Material You) for dynamic_harmony and chameleon_pro themes.
+     * This replaces the 0x00000000 placeholder colors with actual system colors.
+     */
+    private void resolveDynamicColors(Context context, WidgetConfig config) {
+        String themeId = config.getThemeId();
+        
+        if ("dynamic_harmony".equals(themeId)) {
+            DynamicColorHelper helper = new DynamicColorHelper(context);
+            int[] colors = helper.getDynamicHarmonyColors();
+            config.setBackgroundColor(colors[0]);
+            config.setDotColor(colors[1]);
+            config.setAccentColor(colors[2]);
+        } else if ("chameleon_pro".equals(themeId)) {
+            DynamicColorHelper helper = new DynamicColorHelper(context);
+            int[] colors = helper.getChameleonProColors();
+            config.setBackgroundColor(colors[0]);
+            config.setDotColor(colors[1]);
+            config.setAccentColor(colors[2]);
         }
     }
 }

@@ -8,6 +8,7 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 
 import com.dotmatrix.calendar.data.model.DotShape;
+import com.dotmatrix.calendar.data.model.DotStyle;
 import com.dotmatrix.calendar.data.model.EmojiRule;
 import com.dotmatrix.calendar.data.model.ProgressMode;
 import com.dotmatrix.calendar.data.model.RuleType;
@@ -53,7 +54,7 @@ public class DotRenderer {
      * Draw background with support for glassmorphism.
      */
     private void drawBackground(Canvas canvas, int width, int height, WidgetConfig config) {
-        float cornerRadius = 32f; // Matches design doc 20-32dp, using pixels here (approx for now)
+        float cornerRadius = 48f; // Larger corners for minimal aesthetic
         rectF.set(0, 0, width, height);
 
         if (config.isHasBlur()) {
@@ -96,7 +97,7 @@ public class DotRenderer {
             // But usually nice to have the bitmap itself rounded or fill the rect.
             // Let's assume the ImageView/Layout handles clipping or we draw a rect.
             // For now, draw full rect for solid bg
-             canvas.drawRect(rectF, bgPaint);
+             canvas.drawRoundRect(rectF, cornerRadius, cornerRadius, bgPaint);
         }
     }
 
@@ -115,8 +116,8 @@ public class DotRenderer {
         setupPaints(config);
         
         // Calculate layout with margins for the glass container
-        // Glass effect needs some padding inside the container
-        float padding = config.isHasBlur() ? 24f : 8f;
+        // Reduce padding for cleaner minimal look
+        float padding = config.isHasBlur() ? 20f : 12f;
         
         float density = 2.5f; // Approximate density
         float dotSizePx = config.getDotSize() * density;
@@ -150,12 +151,12 @@ public class DotRenderer {
         float offsetX = padding + layout.getStartX();
         float offsetY = padding + layout.getStartY(); // Dots centered in availableHeight (top portion)
         
-        // Draw Footer Text
-        float footerY = height - padding; // Bottom aligned
-        canvas.drawText(yearText, padding + 8f, footerY, textPaint);
+        // Draw Footer Text (bottom aligned like reference)
+        float footerY = height - padding - 8f; // Closer to bottom
+        canvas.drawText(yearText, padding + 12f, footerY, textPaint);
         
         textPaint.setTextAlign(Paint.Align.RIGHT);
-        canvas.drawText(daysLeftText, width - padding - 8f, footerY, textPaint);
+        canvas.drawText(daysLeftText, width - padding - 12f, footerY, textPaint);
 
         int yearVal = currentDate.getYear();
         int currentDayOfYear = currentDate.getDayOfYear();
@@ -176,7 +177,8 @@ public class DotRenderer {
                 
                 if (day > daysInMonth) {
                     futureDotPaint.setAlpha(30);
-                    drawDot(canvas, cx, cy, radius, config.getDotShape(), futureDotPaint);
+                    // Force FILLED for background/future dots to keep noise low
+                    drawDot(canvas, cx, cy, radius, config.getDotShape(), futureDotPaint, DotStyle.FILLED);
                     continue;
                 }
                 
@@ -190,16 +192,20 @@ public class DotRenderer {
                 }
                 
                 Paint paint;
+                DotStyle style = config.getDotStyle(); // Default to user config
+                
                 if (dayOfYear == currentDayOfYear) {
                     paint = accentPaint;
                     radius *= 1.2f;
+                    style = DotStyle.GLOW; // Always glow/highlight today
                 } else if (dayOfYear < currentDayOfYear) {
                     paint = dotPaint;
                 } else {
                     paint = futureDotPaint;
+                    // Future dots often look good as Outline if user chose Outline, or Filled otherwise
                 }
                 
-                drawDot(canvas, cx, cy, radius, config.getDotShape(), paint);
+                drawDot(canvas, cx, cy, radius, config.getDotShape(), paint, style);
             }
         }
         
@@ -227,9 +233,11 @@ public class DotRenderer {
         // Setup paints
         setupPaints(config);
         
-        float padding = config.isHasBlur() ? 24f : 8f;
+        float padding = config.isHasBlur() ? 20f : 12f;
         
-        float density = 2.5f;
+        // Scale up for Month View (fewer dots, so they should be bigger)
+        float baseScale = 7.0f; 
+        float density = 2.5f * baseScale;
         float dotSizePx = config.getDotSize() * density;
         float spacingPx = config.getDotSpacing() * density;
         
@@ -287,17 +295,20 @@ public class DotRenderer {
                 drawEmoji(canvas, cx, cy, radius, emoji);
             } else {
                 Paint paint;
+                DotStyle style = config.getDotStyle();
+
                 if (currentDay == currentDate.getDayOfMonth() && 
                     currentDate.getMonthValue() == ym.getMonthValue()) {
                     paint = accentPaint;
                     radius *= 1.2f;
+                    style = DotStyle.GLOW;
                 } else if (date.isBefore(currentDate)) {
                     paint = dotPaint;
                 } else {
                     paint = futureDotPaint;
                 }
                 
-                drawDot(canvas, cx, cy, radius, config.getDotShape(), paint);
+                drawDot(canvas, cx, cy, radius, config.getDotShape(), paint, style);
             }
             
             col++;
@@ -375,12 +386,14 @@ public class DotRenderer {
             float radius = layout.getDotSize() / 2;
             
             Paint paint = (i < filledDots) ? dotPaint : futureDotPaint;
+            DotStyle style = config.getDotStyle();
             
             if (i == filledDots - 1 || i == filledDots) {
                 paint = accentPaint;
+                style = DotStyle.GLOW;
             }
             
-            drawDot(canvas, cx, cy, radius, config.getDotShape(), paint);
+            drawDot(canvas, cx, cy, radius, config.getDotShape(), paint, style);
         }
         
         if (width > height * 2) {
@@ -399,8 +412,96 @@ public class DotRenderer {
     }
 
     /**
-     * Setup paints with colors from config.
+     * Render Week View widget.
      */
+    public Bitmap renderWeekView(int width, int height, WidgetConfig config,
+                                  List<EmojiRule> rules, LocalDate currentDate) {
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        
+        // Draw background
+        drawBackground(canvas, width, height, config);
+        
+        // Setup paints
+        setupPaints(config);
+        
+        float padding = config.isHasBlur() ? 16f : 8f;
+        
+        // Scale up for Week View (fewer dots/cols)
+        float baseScale = 7.0f;
+         float density = 2.5f * baseScale;
+        float dotSizePx = config.getDotSize() * density;
+        float spacingPx = config.getDotSpacing() * density;
+        
+        int availableWidth = (int) (width - padding * 2);
+        int availableHeight = (int) (height - padding * 2);
+        
+        boolean hasHeader = config.isShowWeekHeaders();
+        // Use WeekView layout
+        DotLayout layout = DotLayout.forWeekView(availableWidth, availableHeight, dotSizePx, spacingPx, hasHeader);
+        
+        // Calculate start of week
+        LocalDate startOfWeek = currentDate;
+        int currentDoW = currentDate.getDayOfWeek().getValue(); // 1=Mon...7=Sun
+        int offset = 0;
+        
+        if (config.getWeekStartDay() == 0) { // Sunday Start
+            offset = currentDoW % 7;
+        } else { // Monday Start
+            offset = currentDoW - 1;
+        }
+        startOfWeek = currentDate.minusDays(offset);
+        
+        // Draw Headers if enabled
+        if (hasHeader) {
+            String[] headers;
+            if (config.getWeekStartDay() == 0) {
+                 headers = new String[]{"S", "M", "T", "W", "T", "F", "S"};
+            } else {
+                 headers = new String[]{"M", "T", "W", "T", "F", "S", "S"};
+            }
+            
+            textPaint.setTextSize(layout.getDotSize() * 0.6f);
+            textPaint.setColor(applyOpacity(config.getDotColor(), 0.7f));
+            
+            for (int col = 0; col < 7; col++) {
+                float cx = layout.getDotCenterX(col) + padding;
+                float cy = layout.getDotCenterY(0) + padding;
+                canvas.drawText(headers[col], cx, cy + layout.getDotSize() / 4, textPaint);
+            }
+        }
+        
+        // Draw Dots
+        int row = hasHeader ? 1 : 0;
+        for (int col = 0; col < 7; col++) {
+             LocalDate date = startOfWeek.plusDays(col);
+             
+             float cx = layout.getDotCenterX(col) + padding;
+             float cy = layout.getDotCenterY(row) + padding;
+             float radius = layout.getDotSize() / 2;
+             
+             String emoji = findEmoji(date, rules);
+             if (emoji != null) {
+                 drawEmoji(canvas, cx, cy, radius, emoji);
+             } else {
+                 Paint paint;
+                 DotStyle style = config.getDotStyle();
+                 
+                 if (date.isEqual(currentDate)) {
+                     paint = accentPaint;
+                     radius *= 1.2f;
+                     style = DotStyle.GLOW;
+                 } else if (date.isBefore(currentDate)) {
+                     paint = dotPaint;
+                 } else {
+                     paint = futureDotPaint;
+                 }
+                 drawDot(canvas, cx, cy, radius, config.getDotShape(), paint, style);
+             }
+        }
+        
+        return bitmap;
+    }
     private void setupPaints(WidgetConfig config) {
         int dotColor = config.getDotColor();
         int accentColor = config.getAccentColor();
@@ -413,10 +514,14 @@ public class DotRenderer {
     }
 
     /**
-     * Draw a single dot with the specified shape.
+     * Draw a single dot with the specified shape and style.
      */
     private void drawDot(Canvas canvas, float cx, float cy, float radius, 
-                         DotShape shape, Paint paint) {
+                         DotShape shape, Paint paint, DotStyle style) {
+        
+        // Prepare paint for style
+        configurePaintForStyle(paint, style, radius);
+
         switch (shape) {
             case SQUARE:
                 rectF.set(cx - radius, cy - radius, cx + radius, cy + radius);
@@ -429,6 +534,38 @@ public class DotRenderer {
             case CIRCLE:
             default:
                 canvas.drawCircle(cx, cy, radius, paint);
+                break;
+        }
+        
+        // Restore paint style for next usage
+        paint.setStyle(Paint.Style.FILL);
+        paint.setStrokeWidth(0);
+        paint.setShadowLayer(0, 0, 0, 0);
+    }
+    
+    private void configurePaintForStyle(Paint paint, DotStyle style, float radius) {
+        switch (style) {
+            case OUTLINE:
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setStrokeWidth(Math.max(2f, radius * 0.2f)); // Proportional stroke
+                break;
+            case RING:
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setStrokeWidth(Math.max(1f, radius * 0.15f)); 
+                // Draw logic might need to be inside drawDot for multi-ring, 
+                // but simpler Ring style is just a thin stroke circle.
+                break;
+            case GLOW:
+                paint.setStyle(Paint.Style.FILL);
+                // paint.setShadowLayer(radius, 0, 0, paint.getColor()); // Glow effect
+                // Note: setShadowLayer is expensive on hardware acceleration, 
+                // but bitmaps are software rendered so it's fine.
+                // However, shadow color usually needs separate alpha.
+                paint.setShadowLayer(radius * 0.8f, 0, 0, paint.getColor());
+                break;
+            case FILLED:
+            default:
+                paint.setStyle(Paint.Style.FILL);
                 break;
         }
     }
