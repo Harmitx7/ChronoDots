@@ -20,6 +20,7 @@ import com.dotmatrix.calendar.ui.theme.ThemeGalleryActivity;
 import com.dotmatrix.calendar.widget.provider.MonthViewWidgetProvider;
 import com.dotmatrix.calendar.widget.provider.ProgressWidgetProvider;
 import com.dotmatrix.calendar.widget.provider.YearViewWidgetProvider;
+import com.dotmatrix.calendar.widget.provider.BaseWidgetProvider;
 import com.dotmatrix.calendar.widget.renderer.DotRenderer;
 import android.widget.TextView;
 import android.view.View;
@@ -579,11 +580,12 @@ public class WidgetEditorActivity extends AppCompatActivity {
                         break;
                 }
                 
-                // Directly trigger update for this specific widget ID
-                Intent updateIntent = new Intent(this, providerClass);
-                updateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, new int[]{realWidgetId});
-                sendBroadcast(updateIntent);
+                // DIRECTLY trigger update by instantiating the provider
+                // This bypasses potential broadcast delays or drops
+                // DIRECTLY trigger update using the robust static helper
+                // This ensures compatibility across all Android versions and bypasses broadcast delays
+                // We pass the config directly to avoid race conditions with database reads
+                BaseWidgetProvider.forceUpdate(this, realWidgetId, config);
 
                 // Return result for widget configuration
                 Intent resultIntent = new Intent();
