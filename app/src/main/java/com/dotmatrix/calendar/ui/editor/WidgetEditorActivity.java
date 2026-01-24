@@ -2,6 +2,7 @@ package com.dotmatrix.calendar.ui.editor;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Intent;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.widget.RadioGroup;
@@ -552,40 +553,103 @@ public class WidgetEditorActivity extends AppCompatActivity {
                     AppWidgetManager.INVALID_APPWIDGET_ID);
 
             if (realWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
-                // Determine the correct provider class based on the ORIGINAL Intent
-                // This ensures we update the actual pinned widget, even if config type changed
-                String originalTypeStr = intent.getStringExtra("widget_type");
-                WidgetType originalType = WidgetType.YEAR; // Default
+                // CRITICAL: Use application context since Activity may be destroyed
+                Context appContext = getApplicationContext();
                 
-                if (originalTypeStr != null) {
-                    try {
-                        originalType = WidgetType.valueOf(originalTypeStr);
-                    } catch (Exception e) { /* ignore */ }
-                } else {
-                    // Fallback: try to guess or use config type if original missing
-                    originalType = config.getWidgetType();
-                }
-
-                Class<?> providerClass = YearViewWidgetProvider.class;
-                switch (originalType) {
+                // Get layout resource based on widget type
+                int layoutId;
+                switch (config.getWidgetType()) {
                     case MONTH:
-                        providerClass = MonthViewWidgetProvider.class;
+                        layoutId = R.layout.widget_month;
                         break;
                     case WEEK:
-                        providerClass = com.dotmatrix.calendar.widget.provider.WeekViewWidgetProvider.class;
+                        layoutId = R.layout.widget_week;
+                        break;
+                    case PROGRESS:
+                        layoutId = R.layout.widget_progress;
                         break;
                     case YEAR:
                     default:
-                        providerClass = YearViewWidgetProvider.class;
+                        layoutId = R.layout.widget_year;
                         break;
                 }
                 
-                // DIRECTLY trigger update by instantiating the provider
-                // This bypasses potential broadcast delays or drops
-                // DIRECTLY trigger update using the robust static helper
-                // This ensures compatibility across all Android versions and bypasses broadcast delays
-                // We pass the config directly to avoid race conditions with database reads
-                BaseWidgetProvider.forceUpdate(this, realWidgetId, config);
+                // Get widget dimensions
+                AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(appContext);
+                Bundle options = appWidgetManager.getAppWidgetOptions(realWidgetId);
+                int width = 200;
+                int height = 200;
+                
+                if (options != null) {
+                    int minWidth = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH);
+                    int minHeight = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT);
+                    
+                    if (minWidth > 0 && minHeight > 0) {
+                        float density = getResources().getDisplayMetrics().density;
+                        width = (int) (minWidth * density);
+                        height = (int) (minHeight * density);
+                    }
+                }
+                
+                width = Math.max(100, Math.min(width, 2048));
+                height = Math.max(100, Math.min(height, 2048));
+                
+                // Resolve dynamic colors if needed
+                if ("dynamic_harmony".equals(config.getThemeId()) || "chameleon_pro".equals(config.getThemeId())) {
+                    DynamicColorHelper helper = new DynamicColorHelper(appContext);
+                    if ("dynamic_harmony".equals(config.getThemeId())) {
+                        int[] colors = helper.getDynamicHarmonyColors();
+                        config.setBackgroundColor(colors[0]);
+                        config.setDotColor(colors[1]);
+                        config.setAccentColor(colors[2]);
+                    } else {
+                        int[] colors = helper.getChameleonProColors();
+                        config.setBackgroundColor(colors[0]);
+                        config.setDotColor(colors[1]);
+                        config.setAccentColor(colors[2]);
+                    }
+                }
+                
+                // Render widget bitmap SYNCHRONOUSLY
+                List<EmojiRule> widgetRules = repository.getEmojiRules(realWidgetId);
+                java.time.LocalDate today = java.time.LocalDate.now();
+                Bitmap bitmap = null;
+                
+                switch (config.getWidgetType()) {
+                    case YEAR:
+                        bitmap = renderer.renderYearView(width, height, config, widgetRules, today);
+                        break;
+                    case MONTH:
+                        bitmap = renderer.renderMonthView(width, height, config, widgetRules, today);
+                        break;
+                    case WEEK:
+                        bitmap = renderer.renderWeekView(width, height, config, widgetRules, today);
+                        break;
+                    case PROGRESS:
+                        bitmap = renderer.renderProgressView(width, height, config, today);
+                        break;
+                }
+                
+                if (bitmap != null) {
+                    android.widget.RemoteViews views = new android.widget.RemoteViews(appContext.getPackageName(), layoutId);
+                    views.setImageViewBitmap(R.id.widget_image, bitmap);
+                    
+                    // Set click handler
+                    Intent clickIntent = new Intent(appContext, WidgetEditorActivity.class);
+                    clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, realWidgetId);
+                    clickIntent.putExtra("widget_type", config.getWidgetType().name());
+                    clickIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    
+                    android.app.PendingIntent pendingIntent = android.app.PendingIntent.getActivity(
+                            appContext, realWidgetId, clickIntent,
+                            android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE);
+                    views.setOnClickPendingIntent(R.id.widget_container, pendingIntent);
+                    
+                    // UPDATE THE WIDGET
+                    appWidgetManager.updateAppWidget(realWidgetId, views);
+                    
+                    android.util.Log.d("WidgetEditor", "Widget updated successfully - realWidgetId=" + realWidgetId);
+                }
 
                 // Return result for widget configuration
                 Intent resultIntent = new Intent();
