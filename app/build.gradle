@@ -80,6 +80,9 @@ dependencies {
     implementation 'androidx.room:room-runtime:2.6.1'
     annotationProcessor 'androidx.room:room-compiler:2.6.1'
     
+    // Palette API (for Chameleon Mode)
+    implementation 'androidx.palette:palette-ktx:1.0.0'
+    
     // Lifecycle
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.7.0'
     implementation 'androidx.lifecycle:lifecycle-livedata:2.7.0'

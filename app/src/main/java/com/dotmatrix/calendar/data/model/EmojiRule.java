@@ -216,16 +216,22 @@ public class EmojiRule {
      * Get a human-readable description of the rule.
      */
     public String getDescription() {
+        if (ruleType == null) {
+            return "Custom rule";
+        }
         switch (ruleType) {
             case SPECIFIC_DATE:
                 return "Specific date";
             case RECURRING_DAY:
                 return "Every " + formatDaysOfWeek();
             case RECURRING_DATE:
-                if (monthOfYear != null) {
-                    return "Every " + getMonthName(monthOfYear) + " " + dayOfMonth;
+                if (dayOfMonth != null) {
+                    if (monthOfYear != null) {
+                        return "Every " + getMonthName(monthOfYear) + " " + dayOfMonth;
+                    }
+                    return "Every " + ordinal(dayOfMonth) + " of the month";
                 }
-                return "Every " + ordinal(dayOfMonth) + " of the month";
+                return "Recurring date";
             case DATE_RANGE:
                 return "Date range";
             default:
@@ -237,19 +243,23 @@ public class EmojiRule {
         if (daysOfWeek == null || daysOfWeek.isEmpty()) {
             return "";
         }
-        String[] days = daysOfWeek.split(",");
-        StringBuilder sb = new StringBuilder();
-        String[] dayNames = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-        for (int i = 0; i < days.length; i++) {
-            int dayNum = Integer.parseInt(days[i].trim());
-            if (dayNum >= 0 && dayNum < 7) {
-                if (sb.length() > 0) {
-                    sb.append(", ");
+        try {
+            String[] days = daysOfWeek.split(",");
+            StringBuilder sb = new StringBuilder();
+            String[] dayNames = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+            for (int i = 0; i < days.length; i++) {
+                int dayNum = Integer.parseInt(days[i].trim());
+                if (dayNum >= 0 && dayNum < 7) {
+                    if (sb.length() > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(dayNames[dayNum]);
                 }
-                sb.append(dayNames[dayNum]);
             }
+            return sb.toString();
+        } catch (NumberFormatException e) {
+            return "Invalid days";
         }
-        return sb.toString();
     }
 
     private String getMonthName(int month) {

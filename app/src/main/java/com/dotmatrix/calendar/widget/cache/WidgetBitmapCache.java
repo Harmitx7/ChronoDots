@@ -9,7 +9,7 @@ import android.util.LruCache;
  */
 public class WidgetBitmapCache {
 
-    private static final int MAX_CACHE_SIZE = 20 * 1024 * 1024; // 20MB
+    private static final int MAX_CACHE_SIZE = 10 * 1024 * 1024; // 10MB (optimized)
     private static volatile WidgetBitmapCache INSTANCE;
 
     private final LruCache<String, Bitmap> cache;

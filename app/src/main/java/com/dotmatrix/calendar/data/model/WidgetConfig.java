@@ -45,6 +45,14 @@ public class WidgetConfig {
     private ProgressMode progressMode;
     private ProgressStyle progressStyle;
 
+    // Chameleon Mode (V1)
+    private boolean chameleonModeEnabled;
+    private float chameleonIntensity;     // 0.0 - 1.0
+    private boolean chameleonAnimationEnabled;
+    private String lastWallpaperHash;     // To detect wallpaper changes
+    private boolean isChameleonGenerated; // Flag for adaptive themes
+    private String sourceWallpaperHash;   // Track which wallpaper generated this
+
     // Metadata
     private long createdAt;
     private long lastUpdated;
@@ -73,6 +81,13 @@ public class WidgetConfig {
         this.weekStartDay = 0;
         this.progressMode = ProgressMode.YEAR;
         this.progressStyle = ProgressStyle.BAR;
+        
+        // Chameleon Defaults
+        this.chameleonModeEnabled = false;
+        this.chameleonIntensity = 0.7f;
+        this.chameleonAnimationEnabled = true;
+        this.isChameleonGenerated = false;
+        
         this.createdAt = System.currentTimeMillis();
         this.lastUpdated = System.currentTimeMillis();
     }
@@ -253,6 +268,25 @@ public class WidgetConfig {
     public void setProgressStyle(ProgressStyle progressStyle) {
         this.progressStyle = progressStyle;
     }
+
+    // Chameleon Mode Getters/Setters
+    public boolean isChameleonModeEnabled() { return chameleonModeEnabled; }
+    public void setChameleonModeEnabled(boolean enabled) { this.chameleonModeEnabled = enabled; }
+
+    public float getChameleonIntensity() { return chameleonIntensity; }
+    public void setChameleonIntensity(float intensity) { this.chameleonIntensity = intensity; }
+
+    public boolean isChameleonAnimationEnabled() { return chameleonAnimationEnabled; }
+    public void setChameleonAnimationEnabled(boolean enabled) { this.chameleonAnimationEnabled = enabled; }
+
+    public String getLastWallpaperHash() { return lastWallpaperHash; }
+    public void setLastWallpaperHash(String hash) { this.lastWallpaperHash = hash; }
+
+    public boolean isChameleonGenerated() { return isChameleonGenerated; }
+    public void setChameleonGenerated(boolean generated) { this.isChameleonGenerated = generated; }
+
+    public String getSourceWallpaperHash() { return sourceWallpaperHash; }
+    public void setSourceWallpaperHash(String hash) { this.sourceWallpaperHash = hash; }
 
     public long getCreatedAt() {
         return createdAt;

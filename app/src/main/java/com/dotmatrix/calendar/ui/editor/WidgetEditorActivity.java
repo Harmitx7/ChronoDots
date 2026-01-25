@@ -19,7 +19,6 @@ import com.dotmatrix.calendar.data.repository.WidgetRepository;
 import com.dotmatrix.calendar.databinding.ActivityWidgetEditorBinding;
 import com.dotmatrix.calendar.ui.theme.ThemeGalleryActivity;
 import com.dotmatrix.calendar.widget.provider.MonthViewWidgetProvider;
-import com.dotmatrix.calendar.widget.provider.ProgressWidgetProvider;
 import com.dotmatrix.calendar.widget.provider.YearViewWidgetProvider;
 import com.dotmatrix.calendar.widget.provider.BaseWidgetProvider;
 import com.dotmatrix.calendar.widget.renderer.DotRenderer;
@@ -27,8 +26,14 @@ import android.widget.TextView;
 import android.view.View;
 import com.google.android.material.slider.Slider;
 import com.dotmatrix.calendar.util.DynamicColorHelper;
+import com.dotmatrix.calendar.util.DynamicColorHelper;
 import com.dotmatrix.calendar.ui.emoji.AddRuleSheet;
 import com.dotmatrix.calendar.ui.emoji.EmojiRuleAdapter;
+import com.dotmatrix.calendar.chameleon.WallpaperColorExtractor;
+import com.dotmatrix.calendar.chameleon.AdaptiveThemeGenerator;
+import com.dotmatrix.calendar.chameleon.WallpaperThemeColors;
+import com.dotmatrix.calendar.data.model.WidgetTheme;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import java.util.ArrayList;
 
 import java.time.LocalDate;
@@ -222,6 +227,31 @@ public class WidgetEditorActivity extends AppCompatActivity {
             sheet.setListener(this::onRuleCreated);
             sheet.show(getSupportFragmentManager(), "AddRuleSheet");
         });
+
+        // Chameleon Mode
+        binding.switchChameleon.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (config != null) {
+                config.setChameleonModeEnabled(isChecked);
+                updateUI(); // Show/hide slider
+                
+                if (isChecked) {
+                   generateChameleonTheme();
+                } else {
+                    // Revert to manual colors logic if needed, or just let user pick new ones
+                    // For now, we keep the last generated colors but allow editing
+                }
+            }
+        });
+
+        binding.sliderIntensity.addOnChangeListener((slider, value, fromUser) -> {
+            if (fromUser && config != null) {
+                config.setChameleonIntensity(value);
+                binding.textIntensityValue.setText(String.format("%d%%", (int)(value * 100)));
+                // Debounce generation? or just generate
+                // For intensity, we can probably generate immediately as it's just math, no bitmap extraction
+                generateChameleonTheme();
+            }
+        });
     }
 
     private void onRuleCreated(EmojiRule rule) {
@@ -348,6 +378,13 @@ public class WidgetEditorActivity extends AppCompatActivity {
     private void applySelectedColor(String colorType, int color) {
         if (config == null) return;
         
+        // If Chameleon is on, turn it off when user manually picks a color
+        if (config.isChameleonModeEnabled()) {
+            config.setChameleonModeEnabled(false);
+            binding.switchChameleon.setChecked(false);
+            updateUI();
+        }
+        
         switch (colorType) {
             case "dot":
                 config.setDotColor(color);
@@ -362,6 +399,31 @@ public class WidgetEditorActivity extends AppCompatActivity {
         
         updateColorPreviews();
         updatePreview();
+    }
+    
+    private void generateChameleonTheme() {
+        if (config == null) return;
+        
+        executor.execute(() -> {
+            // 1. Extract Colors (Heavy operation)
+            WallpaperColorExtractor extractor = new WallpaperColorExtractor(this);
+            WallpaperThemeColors colors = extractor.extractColors();
+            
+            // 2. Generate Theme
+            AdaptiveThemeGenerator generator = new AdaptiveThemeGenerator();
+            WidgetTheme theme = generator.generateTheme(colors, config.getChameleonIntensity());
+            
+            // 3. Apply to Config
+            config.setBackgroundColor(theme.getBackgroundColor());
+            config.setDotColor(theme.getDotColor());
+            config.setAccentColor(theme.getAccentColor());
+            config.setChameleonGenerated(true);
+            
+            runOnUiThread(() -> {
+                updateColorPreviews();
+                updatePreview();
+            });
+        });
     }
 
     private void updateUI() {
@@ -410,95 +472,117 @@ public class WidgetEditorActivity extends AppCompatActivity {
         String limitText = repository.isProUnlocked() ? "∞" : String.valueOf(limit);
         binding.rulesCount.setText(ruleCount + " / " + limitText);
         
+        // Chameleon UI State
+        boolean isChameleon = config.isChameleonModeEnabled();
+        binding.switchChameleon.setChecked(isChameleon);
+        binding.containerIntensity.setVisibility(isChameleon ? android.view.View.VISIBLE : android.view.View.GONE);
+        binding.textChameleonDesc.setVisibility(isChameleon ? android.view.View.GONE : android.view.View.VISIBLE);
+        
+        binding.sliderIntensity.setValue(config.getChameleonIntensity());
+        binding.textIntensityValue.setText(String.format("%d%%", (int)(config.getChameleonIntensity() * 100)));
+        
+        // Disable manual colors if Chameleon is on (optional, or just visual indication)
+        // For now we just let them work but they turn off Chameleon mode (handled in applySelectedColor)
+        
         // Update color previews
         updateColorPreviews();
     }
 
+    // Preview Debouncing
+    private final android.os.Handler debounceHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private Runnable previewRunnable;
+
     private void updatePreview() {
         if (config == null) return;
 
-        executor.execute(() -> {
-            // Determine dimensions based on widget type
-            float aspectRatio; // width / height
-            int displayHeightDp;
-            
-            switch (config.getWidgetType()) {
-                case MONTH:
-                    aspectRatio = 1.0f; // Square
-                    displayHeightDp = 280;
-                    break;
-                case WEEK:
-                    aspectRatio = 4.0f; // Wide strip
-                    displayHeightDp = 100;
-                    break;
-                case PROGRESS:
-                    aspectRatio = 2.5f; // Wide rectangle
-                    displayHeightDp = 120;
-                    break;
-                case YEAR:
-                default:
-                    aspectRatio = 2.0f; // Rectangle (2:1 scale)
-                    displayHeightDp = 200;
-                    break;
-            }
-            
-            // Use device density to calculate render dimensions that match
-            // what a typical 4x2 home screen widget would be (~400dp x 200dp)
-            float density = getResources().getDisplayMetrics().density;
-            int renderHeight = (int) (displayHeightDp * density);
-            int renderWidth = (int) (renderHeight * aspectRatio);
-            
-            LocalDate today = LocalDate.now();
-            Bitmap preview;
-            
-            // Resolve dynamic colors if needed
-            if ("dynamic_harmony".equals(config.getThemeId()) || "chameleon_pro".equals(config.getThemeId())) {
-                DynamicColorHelper helper = new DynamicColorHelper(this);
-                if ("dynamic_harmony".equals(config.getThemeId())) {
-                    int[] colors = helper.getDynamicHarmonyColors();
-                    config.setBackgroundColor(colors[0]);
-                    config.setDotColor(colors[1]);
-                    config.setAccentColor(colors[2]);
-                } else if ("chameleon_pro".equals(config.getThemeId())) {
-                    int[] colors = helper.getChameleonProColors();
-                    config.setBackgroundColor(colors[0]);
-                    config.setDotColor(colors[1]);
-                    config.setAccentColor(colors[2]);
-                }
-            }
-            
-            try {
+        // Cancel previous pending render
+        if (previewRunnable != null) {
+            debounceHandler.removeCallbacks(previewRunnable);
+        }
+
+        previewRunnable = () -> {
+            executor.execute(() -> {
+                // Determine dimensions based on widget type
+                float aspectRatio; // width / height
+                int displayHeightDp;
+                
                 switch (config.getWidgetType()) {
                     case MONTH:
-                        preview = renderer.renderMonthView(renderWidth, renderHeight, config, rules, today);
+                        aspectRatio = 1.0f; // Square
+                        displayHeightDp = 280;
                         break;
                     case WEEK:
-                        preview = renderer.renderWeekView(renderWidth, renderHeight, config, rules, today);
+                        aspectRatio = 4.0f; // Wide strip
+                        displayHeightDp = 100;
                         break;
                     case YEAR:
                     default:
-                        preview = renderer.renderYearView(renderWidth, renderHeight, config, rules, today);
+                        aspectRatio = 2.0f; // Rectangle (2:1 scale)
+                        displayHeightDp = 200;
                         break;
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                return;
-            }
-
-            runOnUiThread(() -> {
-                // Update CardView height
-                android.view.View card = (android.view.View) binding.previewImage.getParent();
-                if (card != null) {
-                    android.view.ViewGroup.LayoutParams params = card.getLayoutParams();
-                    float cardDensity = getResources().getDisplayMetrics().density;
-                    params.height = (int) (displayHeightDp * cardDensity);
-                    card.setLayoutParams(params);
+                
+                // Use device density to calculate render dimensions that match
+                // what a typical 4x2 home screen widget would be (~400dp x 200dp)
+                float density = getResources().getDisplayMetrics().density;
+                int renderHeight = (int) (displayHeightDp * density);
+                int renderWidth = (int) (renderHeight * aspectRatio);
+                
+                LocalDate today = LocalDate.now();
+                Bitmap preview;
+                
+                // Resolve dynamic colors if needed
+                if ("dynamic_harmony".equals(config.getThemeId()) || "chameleon_pro".equals(config.getThemeId())) {
+                    DynamicColorHelper helper = new DynamicColorHelper(WidgetEditorActivity.this);
+                    if ("dynamic_harmony".equals(config.getThemeId())) {
+                        int[] colors = helper.getDynamicHarmonyColors();
+                        config.setBackgroundColor(colors[0]);
+                        config.setDotColor(colors[1]);
+                        config.setAccentColor(colors[2]);
+                    } else if ("chameleon_pro".equals(config.getThemeId())) {
+                        int[] colors = helper.getChameleonProColors();
+                        config.setBackgroundColor(colors[0]);
+                        config.setDotColor(colors[1]);
+                        config.setAccentColor(colors[2]);
+                    }
                 }
                 
-                // Animate the preview update with crossfade and scale
-                animatePreviewUpdate(preview);
+                try {
+                    switch (config.getWidgetType()) {
+                        case MONTH:
+                            preview = renderer.renderMonthView(renderWidth, renderHeight, config, rules, today);
+                            break;
+                        case WEEK:
+                            preview = renderer.renderWeekView(renderWidth, renderHeight, config, rules, today);
+                            break;
+                        case YEAR:
+                        default:
+                            preview = renderer.renderYearView(renderWidth, renderHeight, config, rules, today);
+                            break;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return;
+                }
+
+                runOnUiThread(() -> {
+                    // Update CardView height
+                    android.view.View card = (android.view.View) binding.previewImage.getParent();
+                    if (card != null) {
+                        android.view.ViewGroup.LayoutParams params = card.getLayoutParams();
+                        float cardDensity = getResources().getDisplayMetrics().density;
+                        params.height = (int) (displayHeightDp * cardDensity);
+                        card.setLayoutParams(params);
+                    }
+                    
+                    // Animate the preview update with crossfade and scale
+                    animatePreviewUpdate(preview);
+                });
             });
-        });
+        };
+
+        // Post with short delay (100ms) to debounce rapid changes
+        debounceHandler.postDelayed(previewRunnable, 100);
     }
 
     /**
@@ -549,6 +633,11 @@ public class WidgetEditorActivity extends AppCompatActivity {
             return;
         }
 
+        // Cancel any pending preview rendering to free up resources/queue
+        if (previewRunnable != null) {
+            debounceHandler.removeCallbacks(previewRunnable);
+        }
+
         executor.execute(() -> {
             // Save to database
             repository.saveWidgetConfigSync(config);
@@ -570,9 +659,6 @@ public class WidgetEditorActivity extends AppCompatActivity {
                         break;
                     case WEEK:
                         layoutId = R.layout.widget_week;
-                        break;
-                    case PROGRESS:
-                        layoutId = R.layout.widget_progress;
                         break;
                     case YEAR:
                     default:
@@ -630,9 +716,6 @@ public class WidgetEditorActivity extends AppCompatActivity {
                         break;
                     case WEEK:
                         bitmap = renderer.renderWeekView(width, height, config, widgetRules, today);
-                        break;
-                    case PROGRESS:
-                        bitmap = renderer.renderProgressView(width, height, config, today);
                         break;
                 }
                 

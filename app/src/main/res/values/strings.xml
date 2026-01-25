@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ChronoDots</string>
+    <string name="app_name">Dot Calendar</string>
+    <string name="chameleon_mode">Chameleon Mode</string>
+    <string name="adapt_to_wallpaper">Adapt to wallpaper</string>
+    <string name="chameleon_desc_off">Widget colors will automatically match your wallpaper.</string>
+    <string name="intensity">Intensity</string>
+    <string name="subtle">Subtle</string>
+    <string name="vibrant">Vibrant</string>
     
     <!-- Widget Names -->
     <string name="widget_year_name">Year View</string>

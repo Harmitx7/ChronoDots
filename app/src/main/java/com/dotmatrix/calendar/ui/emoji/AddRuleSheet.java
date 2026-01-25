@@ -4,13 +4,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.dotmatrix.calendar.R;
 import com.dotmatrix.calendar.data.model.EmojiRule;
+import com.dotmatrix.calendar.data.model.RuleType;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
@@ -44,7 +44,7 @@ public class AddRuleSheet extends BottomSheetDialogFragment {
         TextInputEditText inputEmoji = view.findViewById(R.id.input_emoji);
         TextInputEditText inputLabel = view.findViewById(R.id.input_label);
         TextInputEditText inputDate = view.findViewById(R.id.input_date);
-        Button btnSave = view.findViewById(R.id.btn_save);
+        com.google.android.material.button.MaterialButton btnSave = view.findViewById(R.id.btn_save);
 
         // Date Picker
         SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
@@ -74,6 +74,7 @@ public class AddRuleSheet extends BottomSheetDialogFragment {
                 EmojiRule rule = new EmojiRule();
                 rule.setEmoji(emoji);
                 rule.setLabel(label);
+                rule.setRuleType(RuleType.SPECIFIC_DATE);
                 rule.setStartDate(selectedDate);
                 
                 if (listener != null) {

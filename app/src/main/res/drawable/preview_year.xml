@@ -1,7 +1,39 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Placeholder drawable for year view preview -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="@color/card_background" />
-    <corners android:radius="@dimen/radius_lg" />
-</shape>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="320dp"
+    android:viewportWidth="320"
+    android:viewportHeight="320">
+    
+    <!-- Card Background -->
+    <path
+        android:pathData="M24,0h272c13.255,0 24,10.745 24,24v272c0,13.255 -10.745,24 -24,24h-272c-13.255,0 -24,-10.745 -24,-24v-272c0,-13.255 10.745,-24 24,-24z"
+        android:fillColor="#1A1A2E"/>
+
+    <!-- Header Text Placeholder -->
+    <path
+        android:pathData="M24,32h100v16h-100z"
+        android:fillColor="#33FFFFFF"/>
+
+    <!-- Year Grid Dots (12 columns for months, simplified rows) -->
+    <!-- Creating a clean 10x12 grid patterns -->
+    <path
+        android:fillColor="#E0E0E0"
+        android:pathData="
+        M40,80  h12 v12 h-12 z M64,80  h12 v12 h-12 z M88,80  h12 v12 h-12 z M112,80 h12 v12 h-12 z M136,80 h12 v12 h-12 z M160,80 h12 v12 h-12 z M184,80 h12 v12 h-12 z M208,80 h12 v12 h-12 z M232,80 h12 v12 h-12 z M256,80 h12 v12 h-12 z 
+        M40,104 h12 v12 h-12 z M64,104 h12 v12 h-12 z M88,104 h12 v12 h-12 z M112,104 h12 v12 h-12 z M136,104 h12 v12 h-12 z M160,104 h12 v12 h-12 z M184,104 h12 v12 h-12 z M208,104 h12 v12 h-12 z M232,104 h12 v12 h-12 z M256,104 h12 v12 h-12 z 
+        M40,128 h12 v12 h-12 z M64,128 h12 v12 h-12 z M88,128 h12 v12 h-12 z M112,128 h12 v12 h-12 z M136,128 h12 v12 h-12 z M160,128 h12 v12 h-12 z M184,128 h12 v12 h-12 z M208,128 h12 v12 h-12 z M232,128 h12 v12 h-12 z M256,128 h12 v12 h-12 z 
+        M40,152 h12 v12 h-12 z M64,152 h12 v12 h-12 z M88,152 h12 v12 h-12 z M112,152 h12 v12 h-12 z M136,152 h12 v12 h-12 z M160,152 h12 v12 h-12 z M184,152 h12 v12 h-12 z M208,152 h12 v12 h-12 z M232,152 h12 v12 h-12 z M256,152 h12 v12 h-12 z 
+        M40,176 h12 v12 h-12 z M64,176 h12 v12 h-12 z M88,176 h12 v12 h-12 z M112,176 h12 v12 h-12 z M136,176 h12 v12 h-12 z M160,176 h12 v12 h-12 z M184,176 h12 v12 h-12 z M208,176 h12 v12 h-12 z M232,176 h12 v12 h-12 z M256,176 h12 v12 h-12 z 
+        M40,200 h12 v12 h-12 z M64,200 h12 v12 h-12 z M88,200 h12 v12 h-12 z M112,200 h12 v12 h-12 z M136,200 h12 v12 h-12 z M160,200 h12 v12 h-12 z M184,200 h12 v12 h-12 z M208,200 h12 v12 h-12 z M232,200 h12 v12 h-12 z M256,200 h12 v12 h-12 z 
+        M40,224 h12 v12 h-12 z M64,224 h12 v12 h-12 z M88,224 h12 v12 h-12 z M112,224 h12 v12 h-12 z M136,224 h12 v12 h-12 z M160,224 h12 v12 h-12 z M184,224 h12 v12 h-12 z M208,224 h12 v12 h-12 z M232,224 h12 v12 h-12 z M256,224 h12 v12 h-12 z 
+        M40,248 h12 v12 h-12 z M64,248 h12 v12 h-12 z M88,248 h12 v12 h-12 z M112,248 h12 v12 h-12 z M136,248 h12 v12 h-12 z M160,248 h12 v12 h-12 z M184,248 h12 v12 h-12 z M208,248 h12 v12 h-12 z M232,248 h12 v12 h-12 z M256,248 h12 v12 h-12 z 
+        "/>
+
+    <!-- Accent/Completed Dots (Red) -->
+    <path
+        android:fillColor="#FF6B6B"
+        android:pathData="
+        M112,128 h12 v12 h-12 z M136,128 h12 v12 h-12 z
+        M112,152 h12 v12 h-12 z M136,152 h12 v12 h-12 z M160,152 h12 v12 h-12 z
+        "/>
+</vector>

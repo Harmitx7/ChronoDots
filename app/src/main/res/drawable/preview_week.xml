@@ -1,0 +1,34 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="220dp"
+    android:height="80dp"
+    android:viewportWidth="220"
+    android:viewportHeight="80">
+
+    <!-- Background -->
+    <path
+        android:pathData="M16,0h188c8.8,0 16,7.2 16,16v48c0,8.8 -7.2,16 -16,16h-188c-8.8,0 -16,-7.2 -16,-16v-48c0,-8.8 7.2,-16 16,-16z"
+        android:fillColor="#1A1A2E"/>
+
+    <!-- Headers (S M T W T F S) - simplified dashed line -->
+    <path
+        android:pathData="M24,20 h24 v4 h-24z M52,20 h24 v4 h-24z M80,20 h24 v4 h-24z M108,20 h24 v4 h-24z M136,20 h24 v4 h-24z M164,20 h24 v4 h-24z M192,20 h24 v4 h-24z"
+        android:fillColor="#4DFFFFFF"/>
+
+    <!-- Days (Circles) -->
+    <path
+        android:fillColor="#E0E0E0"
+        android:pathData="
+        M36,56 a8,8 0 1,0 0.1,0 z
+        M64,56 a8,8 0 1,0 0.1,0 z
+        M92,56 a8,8 0 1,0 0.1,0 z
+        M120,56 a8,8 0 1,0 0.1,0 z
+        M148,56 a8,8 0 1,0 0.1,0 z
+        M176,56 a8,8 0 1,0 0.1,0 z
+        M204,56 a8,8 0 1,0 0.1,0 z
+        "/>
+
+    <!-- Today Accent -->
+    <path
+        android:fillColor="#FF6B6B"
+        android:pathData="M120,56 a8,8 0 1,0 0.1,0 z"/>
+</vector>

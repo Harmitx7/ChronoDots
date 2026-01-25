@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.dotmatrix.calendar.widget.provider.MonthViewWidgetProvider;
-import com.dotmatrix.calendar.widget.provider.ProgressWidgetProvider;
+import com.dotmatrix.calendar.widget.provider.WeekViewWidgetProvider;
 import com.dotmatrix.calendar.widget.provider.YearViewWidgetProvider;
 
 /**
@@ -26,7 +26,7 @@ public class BootCompletedReceiver extends BroadcastReceiver {
             // Update all widgets (date may have changed during shutdown)
             YearViewWidgetProvider.updateAllWidgets(context, YearViewWidgetProvider.class);
             MonthViewWidgetProvider.updateAllWidgets(context, MonthViewWidgetProvider.class);
-            ProgressWidgetProvider.updateAllWidgets(context, ProgressWidgetProvider.class);
+            WeekViewWidgetProvider.updateAllWidgets(context, WeekViewWidgetProvider.class);
         }
     }
 }

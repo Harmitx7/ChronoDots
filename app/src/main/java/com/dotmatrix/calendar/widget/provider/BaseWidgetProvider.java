@@ -24,6 +24,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import android.os.Handler;
+import android.os.Looper;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Base class for widget providers with common functionality.
@@ -32,6 +36,11 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
 
     protected static final ExecutorService executor = Executors.newSingleThreadExecutor();
     protected static final DotRenderer renderer = new DotRenderer();
+    
+    // Resize Debouncing
+    private static final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private static final Map<Integer, Runnable> pendingResizeRunnables = new ConcurrentHashMap<>();
+    private static final long RESIZE_DEBOUNCE_DELAY_MS = 300;
 
     /**
      * Get the widget type for this provider.
@@ -50,12 +59,41 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
         }
     }
 
-    @Override
+    // Use a separate map to store the latest options for each widget
+    private static final Map<Integer, Bundle> latestResizeOptions = new ConcurrentHashMap<>();
+    private static final long RESIZE_THROTTLE_MS = 60;   // ~16 FPS updates for fluidity
+
     public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager,
                                           int appWidgetId, Bundle newOptions) {
-        // Widget was resized, invalidate cache and re-render
-        WidgetBitmapCache.getInstance().invalidate(appWidgetId);
-        updateWidget(context, appWidgetManager, appWidgetId);
+        // Update the latest options for this widget
+        if (newOptions != null) {
+            latestResizeOptions.put(appWidgetId, newOptions);
+        }
+
+        // If an update is already scheduled/running for this widget, do nothing.
+        // The existing task will pick up the latest options when it runs.
+        if (pendingResizeRunnables.containsKey(appWidgetId)) {
+            return;
+        }
+        
+        // Capture ApplicationContext to prevent memory leaks or crashes when Receiver context is invalided
+        final Context appContext = context.getApplicationContext();
+
+        // Schedule a new update task
+        Runnable updateTask = () -> {
+            pendingResizeRunnables.remove(appWidgetId);
+            
+            // Get the freshest options
+            Bundle finalOptions = latestResizeOptions.remove(appWidgetId);
+            
+            // Widget was resized, invalidate cache and re-render with NEW options
+            WidgetBitmapCache.getInstance().invalidate(appWidgetId);
+            updateWidget(appContext, appWidgetManager, appWidgetId, finalOptions);
+        };
+        
+        pendingResizeRunnables.put(appWidgetId, updateTask);
+        // Throttle updates: Run at most once every 100ms
+        mainHandler.postDelayed(updateTask, RESIZE_THROTTLE_MS);
     }
 
     @Override
@@ -84,11 +122,21 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
      * Update a single widget.
      */
     protected void updateWidget(Context context, AppWidgetManager appWidgetManager, int widgetId) {
+        updateWidget(context, appWidgetManager, widgetId, null);
+    }
+
+    /**
+     * Update a single widget with specific options.
+     */
+    protected void updateWidget(Context context, AppWidgetManager appWidgetManager, int widgetId, Bundle specificOptions) {
+        final Context appContext = context.getApplicationContext();
         executor.execute(() -> {
             try {
-                // Get widget options (size)
-                // Get widget options (size)
-                Bundle options = appWidgetManager.getAppWidgetOptions(widgetId);
+                // Get widget options (size) - prioritize specific options if provided
+                Bundle options = specificOptions;
+                if (options == null) {
+                    options = appWidgetManager.getAppWidgetOptions(widgetId);
+                }
                 int width = 200; // default
                 int height = 200; // default
 
@@ -97,7 +145,7 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                     int minHeight = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT);
                     
                     if (minWidth > 0 && minHeight > 0) {
-                        float density = context.getResources().getDisplayMetrics().density;
+                        float density = appContext.getResources().getDisplayMetrics().density;
                         width = (int) (minWidth * density);
                         height = (int) (minHeight * density);
                     }
@@ -114,12 +162,25 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                 // Resolve dynamic theme colors if needed
                 resolveDynamicColors(context, config);
                 
-                // Get emoji rules
-                List<EmojiRule> rules = repository.getEmojiRules(widgetId);
-                
-                // Render bitmap
+                // Generate cache key based on date and config
                 LocalDate today = LocalDate.now();
-                Bitmap bitmap = renderWidget(width, height, config, rules, today);
+                String cacheKey = WidgetBitmapCache.generateCacheKey(
+                        widgetId, width, height, 
+                        today.toString(), config.hashCode());
+                
+                // Check cache first to avoid unnecessary rendering
+                Bitmap bitmap = WidgetBitmapCache.getInstance().get(widgetId, cacheKey);
+                
+                if (bitmap == null || bitmap.isRecycled()) {
+                    // Cache miss - render new bitmap
+                    List<EmojiRule> rules = repository.getEmojiRules(widgetId);
+                    bitmap = renderWidget(width, height, config, rules, today);
+                    
+                    // Store in cache for future updates
+                    if (bitmap != null) {
+                        WidgetBitmapCache.getInstance().put(widgetId, cacheKey, bitmap);
+                    }
+                }
                 
                 // Create RemoteViews
                 RemoteViews views = new RemoteViews(context.getPackageName(), getLayoutResource());
@@ -196,10 +257,6 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                         providerClass = WeekViewWidgetProvider.class;
                         layoutId = R.layout.widget_week;
                         break;
-                    case PROGRESS:
-                        providerClass = ProgressWidgetProvider.class;
-                        layoutId = R.layout.widget_progress;
-                        break;
                     case YEAR:
                     default:
                         providerClass = YearViewWidgetProvider.class;
@@ -260,9 +317,6 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                         break;
                     case WEEK:
                         bitmap = updateRenderer.renderWeekView(width, height, config, rules, today);
-                        break;
-                     case PROGRESS:
-                        bitmap = updateRenderer.renderProgressView(width, height, config, today);
                         break;
                 }
                 

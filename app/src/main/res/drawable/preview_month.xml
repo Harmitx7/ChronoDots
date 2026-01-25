@@ -1,7 +1,37 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Placeholder drawable for month view preview -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="@color/card_background" />
-    <corners android:radius="@dimen/radius_lg" />
-</shape>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="240dp"
+    android:viewportWidth="240"
+    android:viewportHeight="240">
+
+    <!-- Card Background -->
+    <path
+        android:pathData="M24,0h192c13.255,0 24,10.745 24,24v192c0,13.255 -10.745,24 -24,24h-192c-13.255,0 -24,-10.745 -24,-24v-192c0,-13.255 10.745,-24 24,-24z"
+        android:fillColor="#1A1A2E"/>
+
+    <!-- Month Header -->
+    <path
+        android:pathData="M32,32h80v12h-80z"
+        android:fillColor="#33FFFFFF"/>
+
+    <!-- Weekday Header (S M T W T F S) simulated by bar -->
+    <path
+        android:pathData="M32,60h176v4h-176z"
+        android:fillColor="#4DFFFFFF"/>
+
+    <!-- Calendar Grid (7 columns x 5 rows) -->
+    <!-- Circles for days -->
+    <path
+        android:fillColor="#E0E0E0"
+        android:pathData="
+        M48,88  a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M80,88  a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M112,88 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M144,88 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M176,88 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0
+        M48,116 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M80,116 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M112,116 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M144,116 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M176,116 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0
+        M48,144 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M80,144 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M112,144 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M144,144 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M176,144 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0
+        M48,172 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M80,172 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M112,172 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M144,172 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M176,172 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0
+        "/>
+
+    <!-- Today Accent (filled circle) -->
+    <path
+        android:fillColor="#FF6B6B"
+        android:pathData="M112,144 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0"/>
+</vector>

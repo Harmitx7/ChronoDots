@@ -301,6 +301,118 @@
 
                 </RadioGroup>
 
+                <!-- Chameleon Mode Section -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/chameleon_mode"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/editor_accent"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Enable/Disable Switch -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/adapt_to_wallpaper"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_primary" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_chameleon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:useMaterialThemeColors="true" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/text_chameleon_desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/chameleon_desc_off"
+                    android:textSize="12sp"
+                    android:textColor="@color/editor_text_muted"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Intensity Slider (Hidden by default) -->
+                <LinearLayout
+                    android:id="@+id/container_intensity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/intensity"
+                            android:textSize="13sp"
+                            android:textColor="@color/editor_text_muted" />
+
+                        <TextView
+                            android:id="@+id/text_intensity_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="70%"
+                            android:textSize="13sp"
+                            android:textColor="@color/editor_text_muted" />
+                    </LinearLayout>
+
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/slider_intensity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:valueFrom="0.0"
+                        android:valueTo="1.0"
+                        android:value="0.7"
+                        android:stepSize="0.1"
+                        app:thumbColor="@color/editor_slider_thumb"
+                        app:trackColorActive="@color/editor_slider_active"
+                        app:trackColorInactive="@color/editor_slider_inactive"
+                        app:haloColor="@color/editor_slider_halo"
+                        app:thumbRadius="12dp"
+                        app:trackHeight="6dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="-8dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/subtle"
+                            android:textSize="10sp"
+                            android:textColor="@color/editor_text_muted" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/vibrant"
+                            android:textSize="10sp"
+                            android:textColor="@color/editor_text_muted" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
                 <!-- Colors Section -->
                 <TextView
                     android:layout_width="wrap_content"
@@ -395,11 +507,12 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Emoji Rules Section Card -->
+        <!-- Emoji Rules Section Card - HIDDEN -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
+            android:visibility="gone"
             app:cardBackgroundColor="@color/editor_card_bg"
             app:cardCornerRadius="20dp"
             app:cardElevation="0dp">

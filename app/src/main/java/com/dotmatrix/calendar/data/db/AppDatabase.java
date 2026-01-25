@@ -16,7 +16,7 @@ import com.dotmatrix.calendar.data.model.WidgetConfig;
  */
 @Database(
     entities = {WidgetConfig.class, EmojiRule.class},
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters.class)

@@ -34,6 +34,10 @@ public class DotRenderer {
     private final Paint emojiPaint;
     private final RectF rectF;
 
+    private final Paint bgPaint;
+    private final Paint borderPaint;
+    private final RectF borderRect;
+
     public DotRenderer() {
         dotPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         accentPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -47,7 +51,14 @@ public class DotRenderer {
         emojiPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         emojiPaint.setTextAlign(Paint.Align.CENTER);
         
+        // Background paints
+        bgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        borderPaint.setStyle(Paint.Style.STROKE);
+        borderPaint.setStrokeWidth(2f);
+        
         rectF = new RectF();
+        borderRect = new RectF();
     }
 
     /**
@@ -61,20 +72,17 @@ public class DotRenderer {
             // Glassmorphism Effect
             
             // 1. Fill (Semi-transparent)
-            Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            fillPaint.setColor(applyOpacity(config.getBackgroundColor(), config.getBackgroundOpacity()));
-            canvas.drawRoundRect(rectF, cornerRadius, cornerRadius, fillPaint);
+            bgPaint.reset();
+            bgPaint.setAntiAlias(true);
+            bgPaint.setColor(applyOpacity(config.getBackgroundColor(), config.getBackgroundOpacity()));
+            canvas.drawRoundRect(rectF, cornerRadius, cornerRadius, bgPaint);
 
             // 2. Border/Stroke (Gradient for Shine)
-            Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            borderPaint.setStyle(Paint.Style.STROKE);
-            borderPaint.setStrokeWidth(2f); // Thin border
-            
             // Create a diagonal gradient for the border (Top-Left White to Bottom-Right Transparent)
-            // Using int[] colors and float[] positions
             int startColor = Color.argb(100, 255, 255, 255); // White with alpha
             int endColor = Color.argb(20, 255, 255, 255);   // Faint white
             
+            // Shader must be recreated as size changes
             android.graphics.Shader gradient = new android.graphics.LinearGradient(
                 0, 0, width, height,
                 new int[]{startColor, endColor},
@@ -84,20 +92,16 @@ public class DotRenderer {
             borderPaint.setShader(gradient);
             
             // Inset rect slightly for border so it doesn't clip
-            RectF borderRect = new RectF(1f, 1f, width - 1f, height - 1f);
+            borderRect.set(1f, 1f, width - 1f, height - 1f);
             canvas.drawRoundRect(borderRect, cornerRadius, cornerRadius, borderPaint);
 
         } else {
             // Standard Solid Background
-            Paint bgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            bgPaint.reset();
+            bgPaint.setAntiAlias(true);
             bgPaint.setColor(applyOpacity(config.getBackgroundColor(), config.getBackgroundOpacity()));
             
-            // If opacity is 1.0 (opaque), we might want to fill the whole bitmap
-            // removing corner radius if the widget container handles clipping.
-            // But usually nice to have the bitmap itself rounded or fill the rect.
-            // Let's assume the ImageView/Layout handles clipping or we draw a rect.
-            // For now, draw full rect for solid bg
-             canvas.drawRoundRect(rectF, cornerRadius, cornerRadius, bgPaint);
+            canvas.drawRoundRect(rectF, cornerRadius, cornerRadius, bgPaint);
         }
     }
 
@@ -115,15 +119,15 @@ public class DotRenderer {
         // Setup paints
         setupPaints(config);
         
-        // Calculate layout with margins for the glass container
-        // Reduce padding for cleaner minimal look
-        float padding = config.isHasBlur() ? 20f : 12f;
-        
         // Scale density proportionally to widget size
         // Base assumption: height of 500px = density 2.5 (standard widget)
         float density = height / 200f;
         float dotSizePx = config.getDotSize() * density;
         float spacingPx = config.getDotSpacing() * density;
+        
+        // Calculate layout with margins for the glass container
+        // iOS Standard Padding is ~16dp. We scale this by our density factor.
+        float padding = 16f * density;
         
         // Adjust available space for dots
         // Initialize year variable first
@@ -235,7 +239,8 @@ public class DotRenderer {
         // Setup paints
         setupPaints(config);
         
-        float padding = config.isHasBlur() ? 20f : 12f;
+        
+
         
         // Scale proportionally to widget size
         // Month view has fewer dots so scale up by 7x to fill space nicely
@@ -243,6 +248,11 @@ public class DotRenderer {
         float density = (height / 200f) * baseScale;
         float dotSizePx = config.getDotSize() * density;
         float spacingPx = config.getDotSpacing() * density;
+
+        // iOS Standard Padding (~16dp) scaled by the *base* density (height/200f), not the multiplied one
+        // We want consistent padding across views, so use the base density factor
+        float baseDensity = height / 200f;
+        float padding = 16f * baseDensity;
         
         int availableWidth = (int) (width - padding * 2);
         int availableHeight = (int) (height - padding * 2);
@@ -339,7 +349,12 @@ public class DotRenderer {
         // Setup paints
         setupPaints(config);
         
-        float padding = config.isHasBlur() ? 16f : 8f;
+        
+        float density = height / 200f;
+        float dotSizePx = config.getDotSize() * density;
+        float spacingPx = config.getDotSpacing() * density;
+        
+        float padding = 16f * density;
         int availableWidth = (int) (width - padding * 2);
         int availableHeight = (int) (height - padding * 2);
 
@@ -377,9 +392,7 @@ public class DotRenderer {
         float ratio = (float) completed / total;
         int filledDots = Math.round(ratio * dotCount);
         
-        float density = height / 200f;
-        float dotSizePx = config.getDotSize() * density;
-        float spacingPx = config.getDotSpacing() * density;
+
         
         DotLayout layout = DotLayout.forProgressView(availableWidth, availableHeight, dotSizePx, spacingPx, dotCount);
         
@@ -428,13 +441,17 @@ public class DotRenderer {
         // Setup paints
         setupPaints(config);
         
-        float padding = config.isHasBlur() ? 16f : 8f;
+        
+
         
         // Scale proportionally to widget size (Week view uses 7x scale for fewer dots)
         float baseScale = 7.0f;
         float density = (height / 200f) * baseScale;
         float dotSizePx = config.getDotSize() * density;
         float spacingPx = config.getDotSpacing() * density;
+        
+        float baseDensity = height / 200f;
+        float padding = 16f * baseDensity;
         
         int availableWidth = (int) (width - padding * 2);
         int availableHeight = (int) (height - padding * 2);
@@ -591,20 +608,10 @@ public class DotRenderer {
 
     /**
      * Find matching emoji for a date from rules.
+     * DISABLED - Emoji rules feature removed.
      */
     private String findEmoji(LocalDate date, List<EmojiRule> rules) {
-        if (rules == null || rules.isEmpty()) {
-            return null;
-        }
-        
-        for (EmojiRule rule : rules) {
-            if (!rule.isEnabled()) continue;
-            
-            if (matchesRule(date, rule)) {
-                return rule.getEmoji();
-            }
-        }
-        
+        // Emoji rules feature disabled
         return null;
     }
 
@@ -612,23 +619,32 @@ public class DotRenderer {
      * Check if a date matches a rule.
      */
     private boolean matchesRule(LocalDate date, EmojiRule rule) {
+        if (rule.getRuleType() == null) {
+            return false;
+        }
         switch (rule.getRuleType()) {
             case SPECIFIC_DATE:
                 if (rule.getStartDate() != null) {
-                    LocalDate ruleDate = LocalDate.ofEpochDay(rule.getStartDate() / 86400000L);
+                    // MaterialDatePicker returns UTC timestamps, convert to LocalDate properly
+                    java.time.Instant instant = java.time.Instant.ofEpochMilli(rule.getStartDate());
+                    LocalDate ruleDate = instant.atZone(java.time.ZoneId.of("UTC")).toLocalDate();
                     return date.equals(ruleDate);
                 }
                 break;
                 
             case RECURRING_DAY:
                 String daysOfWeek = rule.getDaysOfWeek();
-                if (daysOfWeek != null) {
-                    int dayValue = date.getDayOfWeek().getValue() % 7; // 0 = Sunday
-                    String[] days = daysOfWeek.split(",");
-                    for (String day : days) {
-                        if (Integer.parseInt(day.trim()) == dayValue) {
-                            return true;
+                if (daysOfWeek != null && !daysOfWeek.isEmpty()) {
+                    try {
+                        int dayValue = date.getDayOfWeek().getValue() % 7; // 0 = Sunday
+                        String[] days = daysOfWeek.split(",");
+                        for (String day : days) {
+                            if (Integer.parseInt(day.trim()) == dayValue) {
+                                return true;
+                            }
                         }
+                    } catch (NumberFormatException ignored) {
+                        // Invalid day format in daysOfWeek string
                     }
                 }
                 break;
@@ -645,10 +661,12 @@ public class DotRenderer {
                 
             case DATE_RANGE:
                 if (rule.getStartDate() != null && rule.getEndDate() != null) {
-                    long epochDay = date.toEpochDay();
-                    long start = rule.getStartDate() / 86400000L;
-                    long end = rule.getEndDate() / 86400000L;
-                    return epochDay >= start && epochDay <= end;
+                    // Convert UTC timestamps to LocalDate for comparison
+                    LocalDate startDate = java.time.Instant.ofEpochMilli(rule.getStartDate())
+                            .atZone(java.time.ZoneId.of("UTC")).toLocalDate();
+                    LocalDate endDate = java.time.Instant.ofEpochMilli(rule.getEndDate())
+                            .atZone(java.time.ZoneId.of("UTC")).toLocalDate();
+                    return !date.isBefore(startDate) && !date.isAfter(endDate);
                 }
                 break;
         }

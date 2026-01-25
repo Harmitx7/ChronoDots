@@ -46,15 +46,27 @@ public class DotLayout {
         float requiredWidth = columns * dotSize + (columns - 1) * spacing;
         float requiredHeight = rows * dotSize + (rows - 1) * spacing;
         
-        // 3. Scale down if too big
-        if (requiredWidth > width || requiredHeight > height) {
-            float scaleX = width / requiredWidth;
-            float scaleY = height / requiredHeight;
-            float scale = Math.min(scaleX, scaleY);
-            
-            // Apply scale (keeping minimums to avoid disappearing dots)
-            dotSize = Math.max(dotSize * scale, 2f);
-            spacing = Math.max(spacing * scale, 1f);
+        // Calculate ideal scale to fill width (with some margin)
+        float targetWidth = width * 0.95f; 
+        
+        float spacingRatio = preferredSpacing / preferredDotSize;
+        if (Float.isNaN(spacingRatio) || spacingRatio <= 0) spacingRatio = 0.5f;
+        
+        // columns * size + (columns - 1) * spacing = targetWidth
+        // size * (columns + (columns - 1) * ratio) = targetWidth
+        float newDotSize = targetWidth / (columns + (columns - 1) * spacingRatio);
+        
+        // Allow scaling UP from preferred, but respect min size
+        dotSize = Math.max(newDotSize, 2f);
+        spacing = dotSize * spacingRatio;
+        
+        // Recalculate based on height constraint
+        requiredHeight = rows * dotSize + (rows - 1) * spacing;
+        if (requiredHeight > height * 0.95f) {
+             // Scale down to fit height if needed
+             float scaleY = (height * 0.95f) / requiredHeight;
+             dotSize *= scaleY;
+             spacing *= scaleY;
         }
         
         // 4. Re-calculate final grid dimensions
@@ -88,13 +100,24 @@ public class DotLayout {
         float requiredWidth = columns * dotSize + (columns - 1) * spacing;
         float requiredHeight = rows * dotSize + (rows - 1) * spacing;
         
-        if (requiredWidth > width || requiredHeight > height) {
-            float scaleX = width / requiredWidth;
-            float scaleY = height / requiredHeight;
-            float scale = Math.min(scaleX, scaleY);
-            
-            dotSize = Math.max(dotSize * scale, 3f);
-            spacing = Math.max(spacing * scale, 2f);
+        // Calculate ideal scale to fill width
+        float targetWidth = width * 0.95f;
+        
+        float spacingRatio = preferredSpacing / preferredDotSize;
+        if (Float.isNaN(spacingRatio) || spacingRatio <= 0) spacingRatio = 0.5f;
+        
+        float newDotSize = targetWidth / (columns + (columns - 1) * spacingRatio);
+        
+        // Month view dots can be larger
+        dotSize = Math.max(newDotSize, 3f);
+        spacing = dotSize * spacingRatio;
+        
+        // Recalculate based on height constraint
+        requiredHeight = rows * dotSize + (rows - 1) * spacing;
+        if (requiredHeight > height * 0.9f) {
+             float scaleY = (height * 0.9f) / requiredHeight;
+             dotSize *= scaleY;
+             spacing *= scaleY;
         }
         
         float finalGridWidth = columns * dotSize + (columns - 1) * spacing;
@@ -163,13 +186,35 @@ public class DotLayout {
         float requiredWidth = columns * dotSize + (columns - 1) * spacing;
         float requiredHeight = rows * dotSize + (rows - 1) * spacing;
         
-        if (requiredWidth > width || requiredHeight > height) {
-            float scaleX = width / requiredWidth;
-            float scaleY = height / requiredHeight;
-            float scale = Math.min(scaleX, scaleY);
-            
-            dotSize = Math.max(dotSize * scale, 4f);
-            spacing = Math.max(spacing * scale, 2f);
+        // Calculate ideal scale to fill width (with some margin)
+        // 1. Calculate max possible dot size based on available width
+        // Formula: width = 7 * size + 6 * spacing
+        // Let spacing = size * 0.5 (maintain ratio) -> width = 7*size + 3*size = 10*size
+        // size = width / 10
+        
+        // Use a more dynamic approach:
+        // Try to fill 90% of width
+        float targetWidth = width * 0.95f; // Fill 95% of width
+        
+        // Assume default spacing ratio
+        float spacingRatio = preferredSpacing / preferredDotSize;
+        if (Float.isNaN(spacingRatio) || spacingRatio <= 0) spacingRatio = 0.5f;
+        
+        // 7*newSize + 6*(newSize * ratio) = targetWidth
+        // newSize * (7 + 6 * ratio) = targetWidth
+        float newDotSize = targetWidth / (columns + (columns - 1) * spacingRatio);
+        
+        // Don't go smaller than min, but allow going larger than preferred to fill space
+        dotSize = Math.max(newDotSize, 4f);
+        spacing = dotSize * spacingRatio;
+        
+        // Recalculate based on height constraint (don't overflow height)
+        requiredHeight = rows * dotSize + (rows - 1) * spacing;
+        if (requiredHeight > height * 0.9f) {
+             // Scale down to fit height
+             float scaleY = (height * 0.9f) / requiredHeight;
+             dotSize *= scaleY;
+             spacing *= scaleY;
         }
         
         float finalGridWidth = columns * dotSize + (columns - 1) * spacing;

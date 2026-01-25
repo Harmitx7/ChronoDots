@@ -7,7 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.dotmatrix.calendar.widget.provider.MonthViewWidgetProvider;
-import com.dotmatrix.calendar.widget.provider.ProgressWidgetProvider;
+import com.dotmatrix.calendar.widget.provider.WeekViewWidgetProvider;
 import com.dotmatrix.calendar.widget.provider.YearViewWidgetProvider;
 
 import java.time.LocalDateTime;
@@ -46,9 +46,12 @@ public class MidnightUpdateReceiver extends BroadcastReceiver {
     private void updateAllWidgets(Context context) {
         YearViewWidgetProvider.updateAllWidgets(context, YearViewWidgetProvider.class);
         MonthViewWidgetProvider.updateAllWidgets(context, MonthViewWidgetProvider.class);
-        ProgressWidgetProvider.updateAllWidgets(context, ProgressWidgetProvider.class);
+        WeekViewWidgetProvider.updateAllWidgets(context, WeekViewWidgetProvider.class);
     }
 
+    /**
+     * Schedule an alarm for midnight to update widgets.
+     */
     /**
      * Schedule an alarm for midnight to update widgets.
      */
@@ -70,24 +73,31 @@ public class MidnightUpdateReceiver extends BroadcastReceiver {
                 .toInstant()
                 .toEpochMilli();
 
-        // Schedule alarm
+        // Android 12+ (API 31) requires check for exact alarm permission
+        // Android 14+ (API 34) restricts exact alarms by default
+        boolean canScheduleExact = true;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            canScheduleExact = alarmManager.canScheduleExactAlarms();
+        }
+
         try {
-            if (alarmManager.canScheduleExactAlarms()) {
+            if (canScheduleExact) {
+                // Precise update at midnight
                 alarmManager.setExactAndAllowWhileIdle(
-                        AlarmManager.RTC_WAKEUP,
+                        AlarmManager.RTC, // RTC prevents waking device from doze if not needed, but text says RTC_WAKEUP usually used for clocks
                         midnightMillis,
                         pendingIntent);
             } else {
-                // Fallback to inexact alarm
-                alarmManager.setAndAllowWhileIdle(
-                        AlarmManager.RTC_WAKEUP,
+                // Fallback to inexact if permission denied
+                alarmManager.set(
+                        AlarmManager.RTC,
                         midnightMillis,
                         pendingIntent);
             }
         } catch (SecurityException e) {
-            // Permission not granted, use inexact alarm
-            alarmManager.setAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
+            // Permission revoked strictly at runtime, use fallback
+            alarmManager.set(
+                    AlarmManager.RTC,
                     midnightMillis,
                     pendingIntent);
         }

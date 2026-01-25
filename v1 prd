@@ -1,0 +1,2045 @@
+# Product Requirements Document (PRD)
+## Chameleon Mode: Adaptive Wallpaper Themes
+### For Dot Matrix Calendar Widgets
+
+**Version:** 1.0  
+**Date:** January 26, 2026  
+**Feature Type:** Core Premium Feature  
+**Development Priority:** Phase 2 (Post-MVP Launch)  
+**Target Release:** Month 2-3 after MVP
+
+---
+
+## 1. Executive Summary
+
+### 1.1 Feature Overview
+
+**Feature Name:** Chameleon Mode  
+**Tagline:** "Your widget adapts to any wallpaper, instantly."
+
+Chameleon Mode is an adaptive theming system that automatically extracts colors from the user's wallpaper and generates a harmonious widget theme in real-time. When users change their wallpaper, the widget smoothly transitions to match the new color palette within 2 seconds.
+
+### 1.2 Problem Statement
+
+**Current Pain Points:**
+- Users struggle to manually match widget colors with wallpapers
+- Static themes look out of place on colorful/unique wallpapers
+- Constant manual theme adjustments are tedious
+- Users abandon customization due to decision fatigue
+
+**User Quote (from competitive research):**
+> "I love the widget but it never matches my wallpaper. I spend 10 minutes tweaking colors and it still looks off."
+
+### 1.3 Solution
+
+An intelligent color extraction system that:
+1. Detects wallpaper changes automatically
+2. Extracts dominant colors using Android's native APIs
+3. Generates accessible, beautiful themes algorithmically
+4. Animates smooth color transitions
+5. Requires zero user effort after initial enable
+
+### 1.4 Success Criteria
+
+**Must Achieve:**
+- ✅ Works on Android 8.1+ (API 27+) with 95%+ device coverage
+- ✅ Generates WCAG AA compliant themes (4.5:1 contrast minimum)
+- ✅ Smooth 2-second transition animation
+- ✅ Zero additional permissions required
+- ✅ <0.1% battery drain per day
+- ✅ Updates within 2 seconds of wallpaper change
+
+**Should Achieve:**
+- 60% of users enable Chameleon Mode within first week
+- 80% retention rate (keep it enabled after trying)
+- Top 3 mentioned feature in user reviews
+- 15%+ Pro conversion attributed to this feature
+
+---
+
+## 2. Technical Architecture
+
+### 2.1 System Components
+
+```
+┌─────────────────────────────────────────────────┐
+│           User Changes Wallpaper                │
+└─────────────────┬───────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────┐
+│      WallpaperChangeReceiver (BroadcastReceiver)│
+│      Listens: ACTION_WALLPAPER_CHANGED          │
+└─────────────────┬───────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────┐
+│      WallpaperColorExtractor                    │
+│      - getWallpaperColors() [API 27+]           │
+│      - Palette library fallback [API 26-]       │
+└─────────────────┬───────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────┐
+│      AdaptiveThemeGenerator                     │
+│      - Calculate luminance                      │
+│      - Generate color palette                   │
+│      - Ensure WCAG AA compliance                │
+└─────────────────┬───────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────┐
+│      WidgetColorAnimator                        │
+│      - ValueAnimator for color interpolation    │
+│      - 2-second smooth transition               │
+└─────────────────┬───────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────┐
+│      Widget Update (RemoteViews)                │
+│      - Apply new colors                         │
+│      - Invalidate bitmap cache                  │
+│      - Render with new theme                    │
+└─────────────────────────────────────────────────┘
+```
+
+---
+
+## 3. Detailed Component Specifications
+
+### 3.1 WallpaperColorExtractor
+
+**Purpose:** Extract dominant colors from system wallpaper
+
+**File Location:** `app/src/main/java/com/dotmatrix/widgets/chameleon/WallpaperColorExtractor.kt`
+
+**Class Structure:**
+
+```kotlin
+package com.dotmatrix.widgets.chameleon
+
+import android.app.WallpaperManager
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.palette.graphics.Palette
+import androidx.core.graphics.drawable.toBitmap
+
+/**
+ * Extracts dominant colors from the system wallpaper.
+ * Uses Android 8.1+ native WallpaperColors API when available,
+ * falls back to Palette library for older versions.
+ */
+class WallpaperColorExtractor(private val context: Context) {
+    
+    /**
+     * Extracts colors from current wallpaper.
+     * @return WallpaperThemeColors containing primary, secondary, tertiary colors
+     * @throws WallpaperExtractionException if extraction fails
+     */
+    fun extractColors(): WallpaperThemeColors {
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                extractColorsNative()
+            } else {
+                extractColorsPalette()
+            }
+        } catch (e: Exception) {
+            // Log error but don't crash - return default colors
+            logError("Wallpaper extraction failed", e)
+            getDefaultColors()
+        }
+    }
+    
+    @RequiresApi(Build.VERSION_CODES.O_MR1)
+    private fun extractColorsNative(): WallpaperThemeColors {
+        val wallpaperManager = WallpaperManager.getInstance(context)
+        val wallpaperColors = wallpaperManager.getWallpaperColors(
+            WallpaperManager.FLAG_SYSTEM
+        ) ?: return getDefaultColors()
+        
+        return WallpaperThemeColors(
+            primary = wallpaperColors.primaryColor.toArgb(),
+            secondary = wallpaperColors.secondaryColor?.toArgb() 
+                ?: deriveSecondaryColor(wallpaperColors.primaryColor.toArgb()),
+            tertiary = wallpaperColors.tertiaryColor?.toArgb()
+                ?: deriveTertiaryColor(wallpaperColors.primaryColor.toArgb()),
+            isDark = (wallpaperColors.colorHints and 
+                WallpaperColors.HINT_SUPPORTS_DARK_TEXT) == 0
+        )
+    }
+    
+    private fun extractColorsPalette(): WallpaperThemeColors {
+        val wallpaperManager = WallpaperManager.getInstance(context)
+        val wallpaperDrawable = wallpaperManager.drawable 
+            ?: return getDefaultColors()
+        
+        // Scale down for performance (max 400px on longest side)
+        val bitmap = wallpaperDrawable.toBitmap(
+            width = 400,
+            height = 400,
+            config = Bitmap.Config.ARGB_8888
+        )
+        
+        val palette = Palette.from(bitmap).generate()
+        
+        // Prefer vibrant colors, fall back to muted/dominant
+        val primaryColor = palette.vibrantSwatch?.rgb
+            ?: palette.dominantSwatch?.rgb
+            ?: Color.BLACK
+            
+        val secondaryColor = palette.lightVibrantSwatch?.rgb
+            ?: palette.lightMutedSwatch?.rgb
+            ?: deriveSecondaryColor(primaryColor)
+            
+        val tertiaryColor = palette.darkVibrantSwatch?.rgb
+            ?: palette.darkMutedSwatch?.rgb
+            ?: deriveTertiaryColor(primaryColor)
+        
+        // Recycle bitmap to free memory
+        bitmap.recycle()
+        
+        return WallpaperThemeColors(
+            primary = primaryColor,
+            secondary = secondaryColor,
+            tertiary = tertiaryColor,
+            isDark = calculateLuminance(primaryColor) < 0.5
+        )
+    }
+    
+    private fun deriveSecondaryColor(primaryColor: Int): Int {
+        // Lighten primary color by 30%
+        return adjustLightness(primaryColor, 0.3f)
+    }
+    
+    private fun deriveTertiaryColor(primaryColor: Int): Int {
+        // Get complementary color (opposite on color wheel)
+        return getComplementaryColor(primaryColor)
+    }
+    
+    private fun getDefaultColors(): WallpaperThemeColors {
+        // Return Arctic Frost theme as fallback
+        return WallpaperThemeColors(
+            primary = 0xFF1A1A1A.toInt(),
+            secondary = 0xFFD4D4D4.toInt(),
+            tertiary = 0xFF000000.toInt(),
+            isDark = false
+        )
+    }
+    
+    private fun calculateLuminance(color: Int): Double {
+        // Use standard relative luminance formula
+        val r = Color.red(color) / 255.0
+        val g = Color.green(color) / 255.0
+        val b = Color.blue(color) / 255.0
+        
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b
+    }
+    
+    private fun adjustLightness(color: Int, amount: Float): Int {
+        val hsv = FloatArray(3)
+        Color.colorToHSV(color, hsv)
+        hsv[2] = (hsv[2] + amount).coerceIn(0f, 1f)
+        return Color.HSVToColor(hsv)
+    }
+    
+    private fun getComplementaryColor(color: Int): Int {
+        val hsv = FloatArray(3)
+        Color.colorToHSV(color, hsv)
+        hsv[0] = (hsv[0] + 180) % 360
+        return Color.HSVToColor(hsv)
+    }
+    
+    private fun logError(message: String, exception: Exception) {
+        // TODO: Implement logging (Firebase Crashlytics optional)
+        android.util.Log.e("WallpaperExtractor", message, exception)
+    }
+}
+
+/**
+ * Data class holding extracted wallpaper colors
+ */
+data class WallpaperThemeColors(
+    val primary: Int,      // Dominant color from wallpaper
+    val secondary: Int,    // Complementary or light variant
+    val tertiary: Int,     // Accent or dark variant
+    val isDark: Boolean    // Whether wallpaper is predominantly dark
+)
+```
+
+**Dependencies Required:**
+
+Add to `app/build.gradle`:
+```gradle
+dependencies {
+    // Palette library for color extraction (API 26 and below)
+    implementation 'androidx.palette:palette-ktx:1.0.0'
+}
+```
+
+**Error Handling:**
+- If wallpaper access fails → return default theme (no crash)
+- If bitmap conversion fails → log error, use fallback
+- Always return a valid `WallpaperThemeColors` object
+
+**Performance:**
+- Bitmap scaled to max 400px (extraction takes ~50-100ms)
+- Colors cached until wallpaper changes
+- No continuous background processing
+
+---
+
+### 3.2 AdaptiveThemeGenerator
+
+**Purpose:** Generate accessible, beautiful widget theme from wallpaper colors
+
+**File Location:** `app/src/main/java/com/dotmatrix/widgets/chameleon/AdaptiveThemeGenerator.kt`
+
+**Class Structure:**
+
+```kotlin
+package com.dotmatrix.widgets.chameleon
+
+import android.graphics.Color
+import androidx.core.graphics.ColorUtils
+import com.dotmatrix.widgets.data.WidgetTheme
+
+/**
+ * Generates adaptive widget themes from wallpaper colors.
+ * Ensures WCAG AA compliance (4.5:1 contrast ratio minimum).
+ */
+class AdaptiveThemeGenerator {
+    
+    companion object {
+        private const val MIN_CONTRAST_RATIO = 4.5 // WCAG AA
+        private const val TARGET_BG_LIGHTNESS_LIGHT = 0.95f
+        private const val TARGET_BG_LIGHTNESS_DARK = 0.10f
+    }
+    
+    /**
+     * Generates a complete widget theme from wallpaper colors.
+     * @param wallpaperColors Extracted colors from wallpaper
+     * @param intensity How strongly to apply wallpaper colors (0.0-1.0)
+     * @return Complete WidgetTheme ready to apply
+     */
+    fun generateTheme(
+        wallpaperColors: WallpaperThemeColors,
+        intensity: Float = 0.7f
+    ): WidgetTheme {
+        val clampedIntensity = intensity.coerceIn(0f, 1f)
+        
+        // Determine if we should generate light or dark theme
+        val generateDark = wallpaperColors.isDark
+        
+        val baseTheme = if (generateDark) {
+            generateDarkTheme(wallpaperColors, clampedIntensity)
+        } else {
+            generateLightTheme(wallpaperColors, clampedIntensity)
+        }
+        
+        // Ensure all colors meet contrast requirements
+        return ensureAccessibility(baseTheme)
+    }
+    
+    private fun generateLightTheme(
+        colors: WallpaperThemeColors,
+        intensity: Float
+    ): WidgetTheme {
+        // Background: Very light tint of primary color
+        val backgroundColor = blendColors(
+            Color.WHITE,
+            colors.primary,
+            intensity * 0.05f // 5% of primary color at full intensity
+        )
+        
+        // Past dots: Darkened primary color
+        val dotsPast = blendColors(
+            Color.BLACK,
+            colors.primary,
+            0.7f - (intensity * 0.3f) // Darker with higher intensity
+        )
+        
+        // Current dot: Saturated primary or tertiary
+        val dotsCurrent = adjustSaturation(
+            colors.tertiary,
+            1.0f + (intensity * 0.5f) // More saturated with higher intensity
+        )
+        
+        // Future dots: Light tint
+        val dotsFuture = blendColors(
+            Color.WHITE,
+            colors.secondary,
+            0.3f - (intensity * 0.1f) // Lighter with higher intensity
+        )
+        
+        // Accent: Complementary or tertiary color
+        val accentColor = adjustSaturation(colors.tertiary, 1.2f)
+        
+        return WidgetTheme(
+            themeId = "chameleon_light_${System.currentTimeMillis()}",
+            name = "Chameleon Light",
+            backgroundColor = backgroundColor,
+            dotColor = dotsPast,
+            accentColor = accentColor,
+            dotColorCurrent = dotsCurrent,
+            dotColorFuture = dotsFuture,
+            textPrimaryColor = Color.BLACK,
+            textSecondaryColor = 0xFF666666.toInt(),
+            isChameleonGenerated = true
+        )
+    }
+    
+    private fun generateDarkTheme(
+        colors: WallpaperThemeColors,
+        intensity: Float
+    ): WidgetTheme {
+        // Background: Very dark tint of primary color
+        val backgroundColor = blendColors(
+            Color.BLACK,
+            colors.primary,
+            intensity * 0.10f // 10% of primary color at full intensity
+        )
+        
+        // Past dots: Lightened primary color
+        val dotsPast = blendColors(
+            Color.WHITE,
+            colors.primary,
+            0.7f - (intensity * 0.2f)
+        )
+        
+        // Current dot: Bright saturated color
+        val dotsCurrent = adjustSaturation(
+            adjustLightness(colors.tertiary, 0.2f),
+            1.0f + (intensity * 0.5f)
+        )
+        
+        // Future dots: Dark tint
+        val dotsFuture = blendColors(
+            Color.BLACK,
+            colors.secondary,
+            0.6f - (intensity * 0.2f)
+        )
+        
+        // Accent: Bright version of tertiary
+        val accentColor = adjustSaturation(
+            adjustLightness(colors.tertiary, 0.3f),
+            1.3f
+        )
+        
+        return WidgetTheme(
+            themeId = "chameleon_dark_${System.currentTimeMillis()}",
+            name = "Chameleon Dark",
+            backgroundColor = backgroundColor,
+            dotColor = dotsPast,
+            accentColor = accentColor,
+            dotColorCurrent = dotsCurrent,
+            dotColorFuture = dotsFuture,
+            textPrimaryColor = Color.WHITE,
+            textSecondaryColor = 0xFFB3B3B3.toInt(),
+            isChameleonGenerated = true
+        )
+    }
+    
+    /**
+     * Ensures all color combinations meet WCAG AA contrast requirements.
+     * Adjusts colors if necessary to achieve 4.5:1 contrast ratio.
+     */
+    private fun ensureAccessibility(theme: WidgetTheme): WidgetTheme {
+        var adjustedTheme = theme
+        
+        // Check text on background contrast
+        val textContrast = ColorUtils.calculateContrast(
+            theme.textPrimaryColor,
+            theme.backgroundColor
+        )
+        
+        if (textContrast < MIN_CONTRAST_RATIO) {
+            // Adjust background lightness until contrast is met
+            adjustedTheme = adjustedTheme.copy(
+                backgroundColor = adjustBackgroundForContrast(
+                    theme.backgroundColor,
+                    theme.textPrimaryColor
+                )
+            )
+        }
+        
+        // Check current dot on background contrast
+        val dotContrast = ColorUtils.calculateContrast(
+            theme.dotColorCurrent,
+            adjustedTheme.backgroundColor
+        )
+        
+        if (dotContrast < 3.0) { // Slightly lower requirement for large elements
+            adjustedTheme = adjustedTheme.copy(
+                dotColorCurrent = adjustDotForContrast(
+                    theme.dotColorCurrent,
+                    adjustedTheme.backgroundColor
+                )
+            )
+        }
+        
+        return adjustedTheme
+    }
+    
+    private fun adjustBackgroundForContrast(
+        backgroundColor: Int,
+        textColor: Int
+    ): Int {
+        var adjustedBg = backgroundColor
+        var iterations = 0
+        val maxIterations = 20
+        
+        val isLightText = ColorUtils.calculateLuminance(textColor) > 0.5
+        
+        while (iterations < maxIterations) {
+            val contrast = ColorUtils.calculateContrast(textColor, adjustedBg)
+            
+            if (contrast >= MIN_CONTRAST_RATIO) {
+                break
+            }
+            
+            // Make background lighter or darker depending on text color
+            adjustedBg = if (isLightText) {
+                // Light text needs darker background
+                adjustLightness(adjustedBg, -0.05f)
+            } else {
+                // Dark text needs lighter background
+                adjustLightness(adjustedBg, 0.05f)
+            }
+            
+            iterations++
+        }
+        
+        return adjustedBg
+    }
+    
+    private fun adjustDotForContrast(
+        dotColor: Int,
+        backgroundColor: Int
+    ): Int {
+        var adjustedDot = dotColor
+        var iterations = 0
+        val maxIterations = 20
+        
+        val isDarkBackground = ColorUtils.calculateLuminance(backgroundColor) < 0.5
+        
+        while (iterations < maxIterations) {
+            val contrast = ColorUtils.calculateContrast(adjustedDot, backgroundColor)
+            
+            if (contrast >= 3.0) {
+                break
+            }
+            
+            // Increase saturation and adjust lightness
+            adjustedDot = adjustSaturation(adjustedDot, 1.1f)
+            adjustedDot = if (isDarkBackground) {
+                adjustLightness(adjustedDot, 0.05f)
+            } else {
+                adjustLightness(adjustedDot, -0.05f)
+            }
+            
+            iterations++
+        }
+        
+        return adjustedDot
+    }
+    
+    // Color manipulation utilities
+    
+    private fun blendColors(color1: Int, color2: Int, ratio: Float): Int {
+        val clampedRatio = ratio.coerceIn(0f, 1f)
+        val inverseRatio = 1f - clampedRatio
+        
+        val r = (Color.red(color1) * inverseRatio + Color.red(color2) * clampedRatio).toInt()
+        val g = (Color.green(color1) * inverseRatio + Color.green(color2) * clampedRatio).toInt()
+        val b = (Color.blue(color1) * inverseRatio + Color.blue(color2) * clampedRatio).toInt()
+        
+        return Color.rgb(r, g, b)
+    }
+    
+    private fun adjustLightness(color: Int, amount: Float): Int {
+        val hsv = FloatArray(3)
+        Color.colorToHSV(color, hsv)
+        hsv[2] = (hsv[2] + amount).coerceIn(0f, 1f)
+        return Color.HSVToColor(hsv)
+    }
+    
+    private fun adjustSaturation(color: Int, multiplier: Float): Int {
+        val hsv = FloatArray(3)
+        Color.colorToHSV(color, hsv)
+        hsv[1] = (hsv[1] * multiplier).coerceIn(0f, 1f)
+        return Color.HSVToColor(hsv)
+    }
+}
+```
+
+**Updated WidgetTheme Data Class:**
+
+Add to `app/src/main/java/com/dotmatrix/widgets/data/WidgetTheme.kt`:
+
+```kotlin
+data class WidgetTheme(
+    val themeId: String,
+    val name: String,
+    val backgroundColor: Int,
+    val dotColor: Int,
+    val accentColor: Int,
+    val dotColorCurrent: Int,
+    val dotColorFuture: Int,
+    val textPrimaryColor: Int,
+    val textSecondaryColor: Int,
+    val isChameleonGenerated: Boolean = false, // NEW: Flag for adaptive themes
+    val sourceWallpaperHash: String? = null     // NEW: Track which wallpaper generated this
+)
+```
+
+---
+
+### 3.3 WidgetColorAnimator
+
+**Purpose:** Smoothly animate color transitions when theme changes
+
+**File Location:** `app/src/main/java/com/dotmatrix/widgets/chameleon/WidgetColorAnimator.kt`
+
+```kotlin
+package com.dotmatrix.widgets.chameleon
+
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
+import android.appwidget.AppWidgetManager
+import android.content.Context
+import android.view.animation.DecelerateInterpolator
+import com.dotmatrix.widgets.data.WidgetTheme
+import com.dotmatrix.widgets.rendering.WidgetRenderer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+/**
+ * Animates smooth color transitions when widget theme changes.
+ * Uses ValueAnimator to interpolate between old and new colors.
+ */
+class WidgetColorAnimator(private val context: Context) {
+    
+    companion object {
+        private const val ANIMATION_DURATION_MS = 2000L // 2 seconds
+        private const val FRAME_RATE_MS = 16L // ~60 FPS (1000ms / 60)
+    }
+    
+    private val argbEvaluator = ArgbEvaluator()
+    private val activeAnimators = mutableMapOf<Int, ValueAnimator>()
+    
+    /**
+     * Animates theme transition for a widget.
+     * @param widgetId Widget instance ID
+     * @param oldTheme Current theme
+     * @param newTheme Target theme
+     * @param onUpdate Callback for each frame (to update widget)
+     */
+    suspend fun animateThemeTransition(
+        widgetId: Int,
+        oldTheme: WidgetTheme,
+        newTheme: WidgetTheme,
+        onUpdate: (WidgetTheme) -> Unit
+    ) = withContext(Dispatchers.Main) {
+        
+        // Cancel any existing animation for this widget
+        activeAnimators[widgetId]?.cancel()
+        
+        val animator = ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = ANIMATION_DURATION_MS
+            interpolator = DecelerateInterpolator()
+            
+            addUpdateListener { animation ->
+                val fraction = animation.animatedValue as Float
+                val interpolatedTheme = interpolateThemes(
+                    oldTheme,
+                    newTheme,
+                    fraction
+                )
+                
+                // Call update callback (will render widget)
+                onUpdate(interpolatedTheme)
+            }
+            
+            doOnEnd {
+                // Ensure final theme is applied
+                onUpdate(newTheme)
+                activeAnimators.remove(widgetId)
+            }
+        }
+        
+        activeAnimators[widgetId] = animator
+        animator.start()
+    }
+    
+    /**
+     * Instantly applies new theme without animation.
+     * Use for initial setup or user preference.
+     */
+    fun applyThemeInstantly(
+        widgetId: Int,
+        newTheme: WidgetTheme,
+        onUpdate: (WidgetTheme) -> Unit
+    ) {
+        // Cancel any active animation
+        activeAnimators[widgetId]?.cancel()
+        activeAnimators.remove(widgetId)
+        
+        // Apply immediately
+        onUpdate(newTheme)
+    }
+    
+    /**
+     * Cancels any active animation for a widget.
+     */
+    fun cancelAnimation(widgetId: Int) {
+        activeAnimators[widgetId]?.cancel()
+        activeAnimators.remove(widgetId)
+    }
+    
+    /**
+     * Cancels all active animations (cleanup on app close).
+     */
+    fun cancelAllAnimations() {
+        activeAnimators.values.forEach { it.cancel() }
+        activeAnimators.clear()
+    }
+    
+    /**
+     * Interpolates between two themes based on fraction (0.0-1.0).
+     */
+    private fun interpolateThemes(
+        startTheme: WidgetTheme,
+        endTheme: WidgetTheme,
+        fraction: Float
+    ): WidgetTheme {
+        return WidgetTheme(
+            themeId = endTheme.themeId,
+            name = endTheme.name,
+            backgroundColor = interpolateColor(
+                startTheme.backgroundColor,
+                endTheme.backgroundColor,
+                fraction
+            ),
+            dotColor = interpolateColor(
+                startTheme.dotColor,
+                endTheme.dotColor,
+                fraction
+            ),
+            accentColor = interpolateColor(
+                startTheme.accentColor,
+                endTheme.accentColor,
+                fraction
+            ),
+            dotColorCurrent = interpolateColor(
+                startTheme.dotColorCurrent,
+                endTheme.dotColorCurrent,
+                fraction
+            ),
+            dotColorFuture = interpolateColor(
+                startTheme.dotColorFuture,
+                endTheme.dotColorFuture,
+                fraction
+            ),
+            textPrimaryColor = interpolateColor(
+                startTheme.textPrimaryColor,
+                endTheme.textPrimaryColor,
+                fraction
+            ),
+            textSecondaryColor = interpolateColor(
+                startTheme.textSecondaryColor,
+                endTheme.textSecondaryColor,
+                fraction
+            ),
+            isChameleonGenerated = endTheme.isChameleonGenerated,
+            sourceWallpaperHash = endTheme.sourceWallpaperHash
+        )
+    }
+    
+    /**
+     * Interpolates between two colors using ArgbEvaluator.
+     */
+    private fun interpolateColor(startColor: Int, endColor: Int, fraction: Float): Int {
+        return argbEvaluator.evaluate(fraction, startColor, endColor) as Int
+    }
+}
+
+// Extension function for ValueAnimator
+private inline fun ValueAnimator.doOnEnd(crossinline action: () -> Unit) {
+    addListener(object : android.animation.Animator.AnimatorListener {
+        override fun onAnimationStart(animation: android.animation.Animator) {}
+        override fun onAnimationRepeat(animation: android.animation.Animator) {}
+        override fun onAnimationCancel(animation: android.animation.Animator) {}
+        override fun onAnimationEnd(animation: android.animation.Animator) {
+            action()
+        }
+    })
+}
+```
+
+**Performance Notes:**
+- Animations run at ~60 FPS (every 16ms)
+- Total duration: 2 seconds (120 frames)
+- Memory: ~5KB per active animation
+- CPU: Minimal (color interpolation is fast)
+
+---
+
+### 3.4 WallpaperChangeReceiver
+
+**Purpose:** Detect when user changes wallpaper and trigger theme update
+
+**File Location:** `app/src/main/java/com/dotmatrix/widgets/chameleon/WallpaperChangeReceiver.kt`
+
+```kotlin
+package com.dotmatrix.widgets.chameleon
+
+import android.appwidget.AppWidgetManager
+import android.content.BroadcastReceiver
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import com.dotmatrix.widgets.DotMatrixWidgetProvider
+import com.dotmatrix.widgets.data.WidgetConfigRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+/**
+ * Listens for wallpaper changes and updates widgets with Chameleon Mode enabled.
+ */
+class WallpaperChangeReceiver : BroadcastReceiver() {
+    
+    override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action != Intent.ACTION_WALLPAPER_CHANGED) {
+            return
+        }
+        
+        // Process in background to avoid blocking UI
+        val pendingResult = goAsync()
+        
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                handleWallpaperChange(context)
+            } finally {
+                pendingResult.finish()
+            }
+        }
+    }
+    
+    private suspend fun handleWallpaperChange(context: Context) {
+        // Get all widget IDs
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        val widgetIds = appWidgetManager.getAppWidgetIds(
+            ComponentName(context, DotMatrixWidgetProvider::class.java)
+        )
+        
+        if (widgetIds.isEmpty()) {
+            return
+        }
+        
+        // Get repository
+        val repository = WidgetConfigRepository.getInstance(context)
+        
+        // Extract new wallpaper colors
+        val colorExtractor = WallpaperColorExtractor(context)
+        val newColors = try {
+            colorExtractor.extractColors()
+        } catch (e: Exception) {
+            android.util.Log.e("ChameleonMode", "Failed to extract colors", e)
+            return
+        }
+        
+        // Generate new theme
+        val themeGenerator = AdaptiveThemeGenerator()
+        
+        // Update each widget with Chameleon Mode enabled
+        widgetIds.forEach { widgetId ->
+            val config = repository.getWidgetConfig(widgetId) ?: return@forEach
+            
+            // Only update if Chameleon Mode is enabled
+            if (!config.chameleonModeEnabled) {
+                return@forEach
+            }
+            
+            // Generate theme with user's intensity preference
+            val newTheme = themeGenerator.generateTheme(
+                newColors,
+                intensity = config.chameleonIntensity
+            )
+            
+            // Get old theme for animation
+            val oldTheme = config.currentTheme
+            
+            // Animate transition
+            val animator = WidgetColorAnimator(context)
+            animator.animateThemeTransition(
+                widgetId = wid,
+                oldTheme = oldTheme,
+                newTheme = newTheme
+            ) { interpolatedTheme ->
+                // Update widget with interpolated theme
+                updateWidgetWithTheme(context, widgetId, interpolatedTheme)
+            }
+            
+            // Save new theme to database
+            repository.updateWidgetTheme(widgetId, newTheme)
+        }
+    }
+    
+    private fun updateWidgetWithTheme(
+        context: Context,
+        widgetId: Int,
+        theme: WidgetTheme
+    ) {
+        // Invalidate bitmap cache (colors changed)
+        WidgetBitmapCache.invalidate(widgetId)
+        
+        // Trigger widget update
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        val provider = DotMatrixWidgetProvider()
+        provider.onUpdate(
+            context,
+            appWidgetManager,
+            intArrayOf(widgetId)
+        )
+    }
+}
+```
+
+**AndroidManifest.xml Registration:**
+
+Add to `app/src/main/AndroidManifest.xml`:
+
+```xml
+<application>
+    <!-- ... existing components ... -->
+    
+    <!-- Wallpaper Change Receiver -->
+    <receiver
+        android:name=".chameleon.WallpaperChangeReceiver"
+        android:exported="false">
+        <intent-filter>
+            <action android:name="android.intent.action.WALLPAPER_CHANGED" />
+        </intent-filter>
+    </receiver>
+    
+</application>
+```
+
+**Important Notes:**
+- `exported="false"` for security (only system can trigger)
+- Uses `goAsync()` to process in background (avoid ANR)
+- Only updates widgets with Chameleon Mode enabled
+- Respects user's intensity preference
+
+---
+
+### 3.5 Database Schema Updates
+
+**Purpose:** Store Chameleon Mode settings per widget
+
+**File Location:** `app/src/main/java/com/dotmatrix/widgets/data/WidgetConfig.kt`
+
+**Updated WidgetConfig Entity:**
+
+```kotlin
+@Entity(tableName = "widget_configs")
+data class WidgetConfig(
+    @PrimaryKey
+    val widgetId: Int,
+    
+    val widgetType: WidgetType,
+    
+    // Existing fields...
+    val themeId: String,
+    val dotSize: Float,
+    val dotSpacing: Float,
+    val dotOpacity: Float,
+    val dotShape: DotShape,
+    
+    // NEW: Chameleon Mode fields
+    val chameleonModeEnabled: Boolean = false,
+    val chameleonIntensity: Float = 0.7f,  // 0.0 (subtle) to 1.0 (vibrant)
+    val chameleonAnimationEnabled: Boolean = true,
+    val lastWallpaperHash: String? = null,  // To detect wallpaper changes
+    
+    // Existing metadata...
+    val createdAt: Long,
+    val lastUpdated: Long
+)
+```
+
+**DAO Updates:**
+
+Add to `app/src/main/java/com/dotmatrix/widgets/data/WidgetConfigDao.kt`:
+
+```kotlin
+@Dao
+interface WidgetConfigDao {
+    // Existing methods...
+    
+    @Query("UPDATE widget_configs SET chameleonModeEnabled = :enabled WHERE widgetId = :widgetId")
+    suspend fun setChameleonMode(widgetId: Int, enabled: Boolean)
+    
+    @Query("UPDATE widget_configs SET chameleonIntensity = :intensity WHERE widgetId = :widgetId")
+    suspend fun setChameleonIntensity(widgetId: Int, intensity: Float)
+    
+    @Query("SELECT * FROM widget_configs WHERE chameleonModeEnabled = 1")
+    suspend fun getWidgetsWithChameleonEnabled(): List<WidgetConfig>
+}
+```
+
+---
+
+## 4. User Interface Specifications
+
+### 4.1 Widget Editor UI Updates
+
+**File Location:** `app/src/main/java/com/dotmatrix/widgets/ui/WidgetEditorScreen.kt`
+
+**New Section: Chameleon Mode**
+
+Add this section AFTER "Appearance" section, BEFORE "Colors" section:
+
+```xml
+<!-- Widget Editor Layout -->
+<LinearLayout>
+    
+    <!-- Existing Appearance Section -->
+    <LinearLayout>...</LinearLayout>
+    
+    <!-- NEW: Chameleon Mode Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+        
+        <!-- Section Header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chameleon Mode"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface" />
+        
+        <!-- Enable/Disable Switch -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="12dp">
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Adapt to wallpaper"
+                android:textSize="14sp"
+                android:textColor="?attr/colorOnSurface" />
+            
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/chameleonModeSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        
+        <!-- Description (when disabled) -->
+        <TextView
+            android:id="@+id/chameleonDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Widget colors will automatically match your wallpaper"
+            android:textSize="12sp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:visibility="visible" />
+        
+        <!-- Intensity Slider (when enabled) -->
+        <LinearLayout
+            android:id="@+id/chameleonIntensityContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="16dp"
+            android:visibility="gone">
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Intensity"
+                    android:textSize="14sp"
+                    android:textColor="?attr/colorOnSurface" />
+                
+                <TextView
+                    android:id="@+id/intensityValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="70%"
+                    android:textSize="12sp"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+            </LinearLayout>
+            
+            <com.google.android.material.slider.Slider
+                android:id="@+id/intensitySlider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:valueFrom="0.0"
+                android:valueTo="1.0"
+                android:value="0.7"
+                android:stepSize="0.1" />
+            
+            <!-- Intensity Labels -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Subtle"
+                    android:textSize="10sp"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+                
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Vibrant"
+                    android:textSize="10sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:gravity="end" />
+            </LinearLayout>
+        </LinearLayout>
+        
+        <!-- Pro Badge (for free users) -->
+        <LinearLayout
+            android:id="@+id/chameleonProBadge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="12dp"
+            android:background="@drawable/pro_feature_background"
+            android:visibility="gone">
+            
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_pro_star"
+                android:layout_marginEnd="8dp" />
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Advanced Chameleon features require Pro"
+                android:textSize="12sp"
+                android:textColor="?attr/colorPrimary" />
+            
+            <Button
+                android:id="@+id/unlockProButton"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Unlock"
+                android:textSize="12sp" />
+        </LinearLayout>
+        
+    </LinearLayout>
+    
+    <!-- Existing Colors Section (disabled when Chameleon enabled) -->
+    <LinearLayout
+        android:id="@+id/manualColorsSection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <!-- ... existing color pickers ... -->
+    </LinearLayout>
+    
+</LinearLayout>
+```
+
+**UI Behavior Logic:**
+
+```kotlin
+class WidgetEditorViewModel : ViewModel() {
+    
+    private val _chameleonModeEnabled = MutableStateFlow(false)
+    val chameleonModeEnabled = _chameleonModeEnabled.asStateFlow()
+    
+    private val _chameleonIntensity = MutableStateFlow(0.7f)
+    val chameleonIntensity = _chameleonIntensity.asStateFlow()
+    
+    fun setChameleonMode(enabled: Boolean) {
+        _chameleonModeEnabled.value = enabled
+        
+        if (enabled) {
+            // Generate theme from current wallpaper
+            viewModelScope.launch {
+                val colors = WallpaperColorExtractor(context).extractColors()
+                val theme = AdaptiveThemeGenerator().generateTheme(
+                    colors,
+                    intensity = _chameleonIntensity.value
+                )
+                applyTheme(theme)
+            }
+        }
+    }
+    
+    fun setChameleonIntensity(intensity: Float) {
+        _chameleonIntensity.value = intensity
+        
+        if (_chameleonModeEnabled.value) {
+            // Regenerate theme with new intensity
+            viewModelScope.launch {
+                val colors = WallpaperColorExtractor(context).extractColors()
+                val theme = AdaptiveThemeGenerator().generateTheme(
+                    colors,
+                    intensity = intensity
+                )
+                applyTheme(theme)
+            }
+        }
+    }
+    
+    private fun applyTheme(theme: WidgetTheme) {
+        // Update live preview
+        _currentTheme.value = theme
+        
+        // Invalidate cache
+        WidgetBitmapCache.invalidate(widgetId)
+        
+        // Trigger preview refresh
+        refreshPreview()
+    }
+}
+```
+
+**UI State Management:**
+
+```kotlin
+// In WidgetEditorScreen.kt
+
+LaunchedEffect(chameleonModeEnabled) {
+    // Show/hide intensity slider
+    binding.chameleonIntensityContainer.isVisible = chameleonModeEnabled
+    binding.chameleonDescription.isVisible = !chameleonModeEnabled
+    
+    // Disable manual color pickers when Chameleon enabled
+    binding.manualColorsSection.isEnabled = !chameleonModeEnabled
+    binding.manualColorsSection.alpha = if (chameleonModeEnabled) 0.5f else 1.0f
+}
+
+binding.chameleonModeSwitch.setOnCheckedChangeListener { _, isChecked ->
+    viewModel.setChameleonMode(isChecked)
+    
+    // Show toast
+    if (isChecked) {
+        Toast.makeText(
+            context,
+            "Widget will now match your wallpaper",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+}
+
+binding.intensitySlider.addOnChangeListener { slider, value, fromUser ->
+    if (fromUser) {
+        binding.intensityValue.text = "${(value * 100).toInt()}%"
+        viewModel.setChameleonIntensity(value)
+    }
+}
+```
+
+---
+
+### 4.2 First-Time Setup Flow
+
+**Purpose:** Introduce Chameleon Mode to new users
+
+**Trigger:** When user adds first widget OR in onboarding
+
+**Dialog Layout:**
+
+```xml
+<!-- res/layout/dialog_chameleon_intro.xml -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+    
+    <!-- Animation/GIF showing transformation -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/chameleonAnimation"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center"
+        app:lottie_rawRes="@raw/chameleon_demo"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true" />
+    
+    <!-- Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:text="✨ Try Chameleon Mode"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+    
+    <!-- Description -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Your widget automatically matches your wallpaper colors.\n\nNo setup needed - it just works!"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:textColor="?attr/colorOnSurfaceVariant" />
+    
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
+        android:gravity="end">
+        
+        <Button
+            android:id="@+id/skipButton"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Maybe Later" />
+        
+        <Button
+            android:id="@+id/enableButton"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Enable Now" />
+    </LinearLayout>
+    
+</LinearLayout>
+```
+
+**Dialog Logic:**
+
+```kotlin
+fun showChameleonIntroDialog(context: Context, widgetId: Int) {
+    val dialog = MaterialAlertDialogBuilder(context)
+        .setView(R.layout.dialog_chameleon_intro)
+        .setCancelable(true)
+        .create()
+    
+    dialog.show()
+    
+    dialog.findViewById<Button>(R.id.enableButton)?.setOnClickListener {
+        // Enable Chameleon Mode
+        viewModel.setChameleonMode(true)
+        
+        // Save preference (don't show again)
+        PreferenceManager.getDefaultSharedPreferences(context)
+            .edit()
+            .putBoolean("chameleon_intro_shown", true)
+            .apply()
+        
+        dialog.dismiss()
+    }
+    
+    dialog.findViewById<Button>(R.id.skipButton)?.setOnClickListener {
+        // Don't show again this session
+        dialog.dismiss()
+    }
+}
+```
+
+---
+
+## 5. Free vs Pro Feature Split
+
+### 5.1 Feature Matrix
+
+| Feature | Free | Pro |
+|---------|------|-----|
+| **Basic Chameleon Mode** | ✅ Yes | ✅ Yes |
+| **Auto-update on wallpaper change** | ✅ Yes | ✅ Yes |
+| **Intensity Presets** (Subtle/Balanced/Vibrant) | ✅ 3 presets | ✅ 3 presets |
+| **Custom Intensity Slider** | ❌ No | ✅ Yes (0-100%) |
+| **Transition Animation** | ✅ 2 seconds | ✅ Adjustable (instant/smooth/slow) |
+| **Manual Color Override** (while keeping adaptive) | ❌ No | ✅ Yes |
+| **Save Custom Looks** | ❌ No | ✅ Unlimited |
+| **Per-Wallpaper Memory** | ❌ No | ✅ Remembers theme per wallpaper |
+
+### 5.2 Free Tier Implementation
+
+```kotlin
+// Free users get 3 preset intensities only
+enum class ChameleonPreset(val intensity: Float) {
+    SUBTLE(0.4f),
+    BALANCED(0.7f),
+    VIBRANT(1.0f)
+}
+
+// In Widget Editor
+if (!isProUser()) {
+    // Show radio buttons instead of slider
+    binding.intensitySlider.isVisible = false
+    binding.intensityPresets.isVisible = true
+    
+    binding.chameleonProBadge.isVisible = true
+}
+```
+
+### 5.3 Pro Upsell Messaging
+
+**When free user taps intensity slider:**
+
+```kotlin
+if (!isProUser()) {
+    showProUpsellDialog(
+        title = "Unlock Custom Intensity",
+        message = "Fine-tune how strongly your widget matches wallpaper colors. Pro users get full control with a 0-100% slider.",
+        feature = "custom_chameleon_intensity"
+    )
+}
+```
+
+---
+
+## 6. Testing Requirements
+
+### 6.1 Unit Tests
+
+**File:** `app/src/test/java/com/dotmatrix/widgets/chameleon/AdaptiveThemeGeneratorTest.kt`
+
+```kotlin
+class AdaptiveThemeGeneratorTest {
+    
+    private lateinit var generator: AdaptiveThemeGenerator
+    
+    @Before
+    fun setup() {
+        generator = AdaptiveThemeGenerator()
+    }
+    
+    @Test
+    fun `generateTheme creates light theme for light wallpaper`() {
+        val colors = WallpaperThemeColors(
+            primary = 0xFFE8E8E8.toInt(), // Light gray
+            secondary = 0xFFD4D4D4.toInt(),
+            tertiary = 0xFF4A90E2.toInt(),
+            isDark = false
+        )
+        
+        val theme = generator.generateTheme(colors, intensity = 0.7f)
+        
+        // Background should be light
+        val bgLuminance = ColorUtils.calculateLuminance(theme.backgroundColor)
+        assertTrue("Background should be light", bgLuminance > 0.8)
+        
+        // Text should be dark for contrast
+        val textLuminance = ColorUtils.calculateLuminance(theme.textPrimaryColor)
+        assertTrue("Text should be dark", textLuminance < 0.2)
+    }
+    
+    @Test
+    fun `generateTheme creates dark theme for dark wallpaper`() {
+        val colors = WallpaperThemeColors(
+            primary = 0xFF1A1A1A.toInt(), // Dark gray
+            secondary = 0xFF333333.toInt(),
+            tertiary = 0xFFFF6B35.toInt(),
+            isDark = true
+        )
+        
+        val theme = generator.generateTheme(colors, intensity = 0.7f)
+        
+        // Background should be dark
+        val bgLuminance = ColorUtils.calculateLuminance(theme.backgroundColor)
+        assertTrue("Background should be dark", bgLuminance < 0.2)
+        
+        // Text should be light for contrast
+        val textLuminance = ColorUtils.calculateLuminance(theme.textPrimaryColor)
+        assertTrue("Text should be light", textLuminance > 0.8)
+    }
+    
+    @Test
+    fun `ensureAccessibility meets WCAG AA standards`() {
+        val colors = WallpaperThemeColors(
+            primary = 0xFF808080.toInt(), // Medium gray (could be problematic)
+            secondary = 0xFF999999.toInt(),
+            tertiary = 0xFFAAAAAA.toInt(),
+            isDark = false
+        )
+        
+        val theme = generator.generateTheme(colors, intensity = 1.0f)
+        
+        // Check text-on-background contrast
+        val contrast = ColorUtils.calculateContrast(
+            theme.textPrimaryColor,
+            theme.backgroundColor
+        )
+        
+        assertTrue(
+            "Text contrast should meet WCAG AA (4.5:1)",
+            contrast >= 4.5
+        )
+    }
+    
+    @Test
+    fun `intensity affects color saturation`() {
+        val colors = WallpaperThemeColors(
+            primary = 0xFF4A90E2.toInt(),
+            secondary = 0xFF5FA8D3.toInt(),
+            tertiary = 0xFF2C5F7A.toInt(),
+            isDark = false
+        )
+        
+        val subtleTheme = generator.generateTheme(colors, intensity = 0.3f)
+        val vibrantTheme = generator.generateTheme(colors, intensity = 1.0f)
+        
+        // Vibrant theme should have more saturated colors
+        val subtleSaturation = getColorSaturation(subtleTheme.dotColorCurrent)
+        val vibrantSaturation = getColorSaturation(vibrantTheme.dotColorCurrent)
+        
+        assertTrue(
+            "Vibrant theme should be more saturated",
+            vibrantSaturation > subtleSaturation
+        )
+    }
+    
+    private fun getColorSaturation(color: Int): Float {
+        val hsv = FloatArray(3)
+        Color.colorToHSV(color, hsv)
+        return hsv[1] // Saturation is index 1
+    }
+}
+```
+
+### 6.2 Instrumentation Tests
+
+**File:** `app/src/androidTest/java/com/dotmatrix/widgets/chameleon/WallpaperColorExtractorTest.kt`
+
+```kotlin
+@RunWith(AndroidJUnit4::class)
+class WallpaperColorExtractorTest {
+    
+    @get:Rule
+    val activityRule = ActivityScenarioRule(MainActivity::class.java)
+    
+    private lateinit var context: Context
+    private lateinit var extractor: WallpaperColorExtractor
+    
+    @Before
+    fun setup() {
+        context = InstrumentationRegistry.getInstrumentation().targetContext
+        extractor = WallpaperColorExtractor(context)
+    }
+    
+    @Test
+    fun extractColors_doesNotCrash() {
+        // Should not throw exception even if wallpaper access fails
+        val colors = extractor.extractColors()
+        
+        assertNotNull("Colors should never be null", colors)
+    }
+    
+    @Test
+    fun extractColors_returnsSensibleColors() {
+        val colors = extractor.extractColors()
+        
+        // Colors should not be fully transparent
+        assertTrue("Primary should not be transparent", 
+            Color.alpha(colors.primary) > 0)
+        assertTrue("Secondary should not be transparent",
+            Color.alpha(colors.secondary) > 0)
+        assertTrue("Tertiary should not be transparent",
+            Color.alpha(colors.tertiary) > 0)
+        
+        // Colors should not be identical (low probability)
+        assertFalse("Colors should be distinct",
+            colors.primary == colors.secondary && 
+            colors.secondary == colors.tertiary)
+    }
+}
+```
+
+### 6.3 Manual Test Cases
+
+**Test Plan:**
+
+| Test Case | Steps | Expected Result |
+|-----------|-------|-----------------|
+| **TC1: Enable Chameleon Mode** | 1. Open widget editor<br>2. Toggle Chameleon Mode ON | Widget colors change to match wallpaper within 2 seconds |
+| **TC2: Change Wallpaper** | 1. Enable Chameleon Mode<br>2. Go to system settings<br>3. Change wallpaper | Widget smoothly transitions to new colors |
+| **TC3: Adjust Intensity** | 1. Enable Chameleon Mode (Pro)<br>2. Slide intensity from 0% to 100% | Widget colors become more/less saturated |
+| **TC4: Disable Chameleon Mode** | 1. Enable Chameleon Mode<br>2. Toggle OFF<br>3. Manually pick colors | Manual colors apply, wallpaper changes ignored |
+| **TC5: Multiple Widgets** | 1. Add 3 widgets<br>2. Enable Chameleon on 2 of them<br>3. Change wallpaper | Only 2 widgets update, 3rd stays static |
+| **TC6: Device Reboot** | 1. Enable Chameleon Mode<br>2. Reboot device | Widget retains Chameleon Mode setting |
+| **TC7: API 27 Fallback** | 1. Test on Android 8.1 device<br>2. Enable Chameleon Mode | Uses Palette library, still works correctly |
+| **TC8: Dark Wallpaper** | 1. Set pure black wallpaper<br>2. Enable Chameleon Mode | Widget generates dark theme with light text |
+| **TC9: Colorful Wallpaper** | 1. Set vibrant sunset wallpaper<br>2. Enable Chameleon Mode | Widget extracts orange/purple/gold tones |
+| **TC10: Contrast Compliance** | 1. Set low-contrast wallpaper (e.g., light gray)<br>2. Enable Chameleon Mode | Text remains readable (4.5:1 contrast) |
+
+---
+
+## 7. Performance & Battery Impact
+
+### 7.1 Performance Benchmarks
+
+**Target Performance:**
+
+| Operation | Target | Acceptable | Unacceptable |
+|-----------|--------|------------|--------------|
+| **Color Extraction** | <100ms | <200ms | >300ms |
+| **Theme Generation** | <50ms | <100ms | >150ms |
+| **Single Frame Animation** | <16ms | <33ms | >50ms |
+| **Full Transition (2s)** | ~120 frames | ~60 frames | <30 frames |
+| **Memory Usage** | <5MB | <10MB | >15MB |
+
+**Optimization Strategies:**
+
+```kotlin
+// 1. Cache extracted colors to avoid re-extraction
+object WallpaperColorCache {
+    private var cachedColors: WallpaperThemeColors? = null
+    private var lastWallpaperHash: String? = null
+    
+    fun getColors(context: Context, force: Boolean = false): WallpaperThemeColors {
+        val currentHash = getWallpaperHash(context)
+        
+        if (!force && currentHash == lastWallpaperHash && cachedColors != null) {
+            return cachedColors!!
+        }
+        
+        val extractor = WallpaperColorExtractor(context)
+        val colors = extractor.extractColors()
+        
+        cachedColors = colors
+        lastWallpaperHash = currentHash
+        
+        return colors
+    }
+    
+    private fun getWallpaperHash(context: Context): String {
+        // Generate hash from wallpaper to detect changes
+        val wallpaperManager = WallpaperManager.getInstance(context)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            wallpaperManager.getWallpaperColors(WallpaperManager.FLAG_SYSTEM)
+                ?.hashCode()?.toString() ?: ""
+        } else {
+            System.currentTimeMillis().toString()
+        }
+    }
+}
+
+// 2. Debounce rapid wallpaper changes
+class DebouncedWallpaperReceiver : BroadcastReceiver() {
+    private var lastTriggerTime = 0L
+    private val debounceDelay = 1000L // 1 second
+    
+    override fun onReceive(context: Context, intent: Intent) {
+        val now = System.currentTimeMillis()
+        
+        if (now - lastTriggerTime < debounceDelay) {
+            return // Ignore rapid changes
+        }
+        
+        lastTriggerTime = now
+        handleWallpaperChange(context)
+    }
+}
+
+// 3. Limit animation frame rate on low-end devices
+fun getOptimalFrameDelay(): Long {
+    val isLowEnd = ActivityManager.isLowRamDevice()
+    return if (isLowEnd) 33L else 16L // 30fps vs 60fps
+}
+```
+
+### 7.2 Battery Impact Analysis
+
+**Expected Battery Usage:**
+
+| Scenario | Daily Battery Impact |
+|----------|---------------------|
+| **Chameleon Mode OFF** | 0% (baseline) |
+| **Chameleon Mode ON, no wallpaper change** | <0.05% (just broadcast receiver) |
+| **Chameleon Mode ON, 1 wallpaper change/day** | <0.1% (receiver + extraction + animation) |
+| **Chameleon Mode ON, 10 wallpaper changes/day** | <0.5% (worst case) |
+
+**Battery Optimization:**
+
+```kotlin
+// Only register receiver when screen is ON
+class ChameleonModeManager(private val context: Context) {
+    
+    private var receiverRegistered = false
+    private val receiver = WallpaperChangeReceiver()
+    
+    fun onScreenOn() {
+        if (!receiverRegistered) {
+            val filter = IntentFilter(Intent.ACTION_WALLPAPER_CHANGED)
+            context.registerReceiver(receiver, filter)
+            receiverRegistered = true
+        }
+    }
+    
+    fun onScreenOff() {
+        if (receiverRegistered) {
+            context.unregisterReceiver(receiver)
+            receiverRegistered = false
+        }
+    }
+}
+
+// In Application class
+class DotMatrixApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        
+        registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
+            override fun onActivityResumed(activity: Activity) {
+                ChameleonModeManager.getInstance(this@DotMatrixApp).onScreenOn()
+            }
+            
+            override fun onActivityPaused(activity: Activity) {
+                ChameleonModeManager.getInstance(this@DotMatrixApp).onScreenOff()
+            }
+            
+            // ... other lifecycle methods
+        })
+    }
+}
+```
+
+---
+
+## 8. Error Handling & Edge Cases
+
+### 8.1 Error Scenarios
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| **Wallpaper access denied** | Permission issue (rare) | Use default theme, show toast |
+| **Color extraction fails** | Corrupted wallpaper file | Catch exception, return default colors |
+| **Low memory during animation** | Device running low on RAM | Skip animation, apply theme instantly |
+|Widget deleted during animation | User removes widget | Cancel animation, clean up resources |
+| System kills app during extraction | Background process limit | Use goAsync() in BroadcastReceiver |
+| Transparent wallpaper | Live wallpaper or video | Fall back to system accent colors |
+| Grayscale wallpaper | Black/white photo | Boost saturation artificially |
+8.2 Error Handling Implementation
+kotlinclass SafeWallpaperColorExtractor(private val context: Context) {
+    
+    fun extractColorsOrDefault(): WallpaperThemeColors {
+        return try {
+            extractColorsWithRetry(maxAttempts = 3)
+        } catch (e: SecurityException) {
+            logError("Wallpaper access denied", e)
+            showUserMessage("Cannot access wallpaper. Using default theme.")
+            getDefaultColors()
+        } catch (e: OutOfMemoryError) {
+            logError("Out of memory during extraction", e)
+            System.gc() // Suggest garbage collection
+            getDefaultColors()
+        } catch (e: Exception) {
+            logError("Unexpected error", e)
+            getDefaultColors()
+        }
+    }
+    
+    private fun extractColorsWithRetry(
+        maxAttempts: Int,
+        currentAttempt: Int = 1
+    ): WallpaperThemeColors {
+        try {
+            return WallpaperColorExtractor(context).extractColors()
+        } catch (e: Exception) {
+            if (currentAttempt < maxAttempts) {
+                Thread.sleep(100L * currentAttempt) // Exponential backoff
+                return extractColorsWithRetry(maxAttempts, currentAttempt + 1)
+            }
+            throw e
+        }
+    }
+    
+    private fun showUserMessage(message: String) {
+        // Show toast on main thread
+        Handler(Looper.getMainLooper()).post {
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+}
+
+9. Analytics & Metrics
+9.1 Events to Track
+Firebase Analytics Events:
+kotlinobject ChameleonAnalytics {
+    
+    fun logChameleonEnabled(intensity: Float) {
+        FirebaseAnalytics.getInstance(context).logEvent("chameleon_enabled") {
+            param("intensity", intensity.toDouble())
+        }
+    }
+    
+    fun logChameleonDisabled(durationSeconds: Long) {
+        FirebaseAnalytics.getInstance(context).logEvent("chameleon_disabled") {
+            param("duration_seconds", durationSeconds)
+        }
+    }
+    
+    fun logWallpaperChange(transitionDuration: Long) {
+        FirebaseAnalytics.getInstance(context).logEvent("wallpaper_changed") {
+            param("transition_ms", transitionDuration)
+        }
+    }
+    
+    fun logIntensityAdjusted(oldValue: Float, newValue: Float) {
+        FirebaseAnalytics.getInstance(context).logEvent("intensity_adjusted") {
+            param("old_value", oldValue.toDouble())
+            param("new_value", newValue.toDouble())
+        }
+    }
+    
+    fun logProUpsellShown(trigger: String) {
+        FirebaseAnalytics.getInstance(context).logEvent("pro_upsell_shown") {
+            param("trigger", trigger) // e.g., "intensity_slider_tap"
+        }
+    }
+    
+    fun logProConversion(trigger: String) {
+        FirebaseAnalytics.getInstance(context).logEvent("pro_purchased") {
+            param("attributed_to", trigger) // e.g., "chameleon_feature"
+        }
+    }
+}
+9.2 Success Metrics
+Track Weekly:
+
+Chameleon Mode adoption rate (% of users who enable it)
+Chameleon Mode retention (% who keep it enabled after 7 days)
+Average intensity setting (are users preferring subtle or vibrant?)
+Pro conversion attributed to Chameleon feature
+
+Target Goals:
+
+60% of users try Chameleon Mode in first week
+80% of users who try it keep it enabled
+15% Pro conversion attributed to Chameleon upsells
+
+
+10. Documentation & Developer Handoff
+10.1 Code Documentation Standards
+All public methods MUST include:
+kotlin/**
+ * Brief description of what the method does.
+ *
+ * @param paramName Description of parameter and valid range/values
+ * @return Description of return value
+ * @throws ExceptionType When this exception is thrown
+ *
+ * Example:
+ * ```kotlin
+ * val colors = extractor.extractColors()
+ * val theme = generator.generateTheme(colors, intensity = 0.7f)
+ * ```
+ */
+fun methodName(paramName: Type): ReturnType {
+    // Implementation
+}
+10.2 README for Chameleon Module
+Create: app/src/main/java/com/dotmatrix/widgets/chameleon/README.md
+markdown# Chameleon Mode Implementation
+
+## Overview
+Chameleon Mode automatically adapts widget colors to match the user's wallpaper.
+
+## Architecture
+- **WallpaperColorExtractor**: Extracts dominant colors from system wallpaper
+- **AdaptiveThemeGenerator**: Creates accessible themes from extracted colors
+- **WidgetColorAnimator**: Animates smooth transitions between themes
+- **WallpaperChangeReceiver**: Detects wallpaper changes and triggers updates
+
+## Usage
+
+### Enable Chameleon Mode for a Widget
+```kotlin
+val config = widgetConfig.copy(
+    chameleonModeEnabled = true,
+    chameleonIntensity = 0.7f
+)
+repository.updateConfig(config)
+```
+
+### Manual Theme Generation
+```kotlin
+val extractor = WallpaperColorExtractor(context)
+val colors = extractor.extractColors()
+
+val generator = AdaptiveThemeGenerator()
+val theme = generator.generateTheme(colors, intensity = 0.7f)
+
+// Apply theme to widget
+updateWidgetTheme(widgetId, theme)
+```
+
+## Testing
+Run unit tests: `./gradlew testDebugUnitTest`
+Run instrumentation tests: `./gradlew connectedAndroidTest`
+
+## Performance
+- Color extraction: <100ms
+- Theme generation: <50ms
+- Animation: 2 seconds @ 60fps
+
+## Troubleshooting
+- **Colors look washed out**: Increase intensity value
+- **Poor contrast**: Generator automatically adjusts (check logs)
+- **Animation stutters**: Device may be low-end (check `isLowRamDevice()`)
+```
+
+### 10.3 Implementation Checklist
+
+**Phase 1: Core Implementation (Week 1)**
+- [ ] Create `WallpaperColorExtractor.kt`
+- [ ] Create `AdaptiveThemeGenerator.kt`
+- [ ] Write unit tests for color extraction
+- [ ] Write unit tests for theme generation
+- [ ] Test on 5+ different wallpapers
+
+**Phase 2: Animation (Week 2)**
+- [ ] Create `WidgetColorAnimator.kt`
+- [ ] Implement color interpolation
+- [ ] Test animation smoothness on mid-range device
+- [ ] Optimize for low-end devices (30fps fallback)
+
+**Phase 3: System Integration (Week 3)**
+- [ ] Create `WallpaperChangeReceiver.kt`
+- [ ] Register receiver in AndroidManifest
+- [ ] Test wallpaper change detection
+- [ ] Implement debouncing for rapid changes
+- [ ] Test on Android 8.1, 12, 13, 14, 15
+
+**Phase 4: UI (Week 4)**
+- [ ] Add Chameleon Mode toggle to Widget Editor
+- [ ] Add intensity slider (Pro feature)
+- [ ] Create intro dialog
+- [ ] Implement Pro upsell messaging
+- [ ] Test accessibility (TalkBack, contrast)
+
+**Phase 5: Polish (Week 5)**
+- [ ] Add analytics events
+- [ ] Write developer documentation
+- [ ] Create marketing screenshots/video
+- [ ] Performance profiling
+- [ ] Final QA pass
+
+---
+
+## 11. Launch Strategy
+
+### 11.1 Soft Launch (Week 1)
+- Release to 10% of users (staged rollout)
+- Monitor crash reports daily
+- Track Chameleon Mode adoption
+- Fix critical bugs within 24 hours
+
+### 11.2 Full Launch (Week 2)
+- Roll out to 100% of users
+- Publish blog post: "Introducing Chameleon Mode"
+- Social media campaign (show transformation videos)
+- Submit to Android Authority, 9to5Google for coverage
+
+### 11.3 Marketing Assets Needed
+
+**Video (30 seconds):**
+```
+[0-5s] Show static widget on colorful wallpaper (looks out of place)
+[5-10s] Enable Chameleon Mode
+[10-20s] Widget smoothly transforms to match colors
+[20-25s] Change wallpaper 3 times, widget adapts each time
+[25-30s] Logo + "Download Dot Matrix Widgets"
+Screenshots:
+
+Before/After comparison (5 different wallpapers)
+UI showing toggle and intensity slider
+Animation in progress (mid-transition)
+Pro features highlight
+
+
+12. Future Enhancements (Post-Launch)
+12.1 Phase 2 Features
+Smart Color Selection (Month 4):
+
+AI learns user preferences ("user always prefers blue accents")
+Suggests optimal intensity based on wallpaper type
+"Remember this look for this wallpaper"
+
+Wallpaper Zones (Month 5):
+
+Extract colors from specific area where widget sits
+More accurate matching for complex wallpapers
+
+Color Harmony Rules (Month 6):
+
+Triadic, complementary, analogous color schemes
+User can select preferred harmony type
+
+
+13. Appendix
+13.1 Dependencies
+Add to app/build.gradle:
+gradledependencies {
+    // Core Android
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    
+    // Palette library (for color extraction on API 26 and below)
+    implementation 'androidx.palette:palette-ktx:1.0.0'
+    
+    // Coroutines (for async operations)
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    
+    // Room (database)
+    implementation 'androidx.room:room-runtime:2.6.1'
+    implementation 'androidx.room:room-ktx:2.6.1'
+    kapt 'androidx.room:room-compiler:2.6.1'
+    
+    // Material Design
+    implementation 'com.google.android.material:material:1.11.0'
+    
+    // Testing
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
+13.2 Minimum SDK Requirements
+gradleandroid {
+    defaultConfig {
+        minSdk 27  // Android 8.1 (for WallpaperColors API)
+        targetSdk 34
+        
+        // For older devices (API 26 and below), Palette library is used
+    }
+}
+Note: If supporting API 26 is critical, Palette library provides fallback

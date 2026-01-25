@@ -31,6 +31,9 @@ public class WidgetRepository {
     private static final int FREE_WIDGET_LIMIT = 1;
     private static final int FREE_EMOJI_RULE_LIMIT = 3;
 
+    // Memory cache for rapid access (e.g. during resize)
+    private final java.util.Map<Integer, WidgetConfig> configCache = new java.util.concurrent.ConcurrentHashMap<>();
+
     private WidgetRepository(Context context) {
         AppDatabase db = AppDatabase.getInstance(context);
         this.configDao = db.widgetConfigDao();
@@ -59,7 +62,12 @@ public class WidgetRepository {
      * Get widget configuration by ID.
      */
     public WidgetConfig getWidgetConfig(int widgetId) {
-        return configDao.getConfig(widgetId);
+        if (configCache.containsKey(widgetId)) {
+            return configCache.get(widgetId);
+        }
+        WidgetConfig config = configDao.getConfig(widgetId);
+        if (config != null) configCache.put(widgetId, config);
+        return config;
     }
 
     /**
@@ -72,8 +80,12 @@ public class WidgetRepository {
     /**
      * Save widget configuration.
      */
+    /**
+     * Save widget configuration.
+     */
     public void saveWidgetConfig(WidgetConfig config) {
         config.markUpdated();
+        configCache.put(config.getWidgetId(), config);
         executor.execute(() -> configDao.saveConfig(config));
     }
 
@@ -82,6 +94,7 @@ public class WidgetRepository {
      */
     public void saveWidgetConfigSync(WidgetConfig config) {
         config.markUpdated();
+        configCache.put(config.getWidgetId(), config);
         configDao.saveConfig(config);
     }
 
@@ -89,6 +102,7 @@ public class WidgetRepository {
      * Delete widget configuration.
      */
     public void deleteWidgetConfig(int widgetId) {
+        configCache.remove(widgetId);
         executor.execute(() -> configDao.deleteById(widgetId));
     }
 
@@ -96,11 +110,18 @@ public class WidgetRepository {
      * Get or create widget configuration.
      */
     public WidgetConfig getOrCreateConfig(int widgetId, WidgetType type) {
+        // Check cache first
+        if (configCache.containsKey(widgetId)) {
+            return configCache.get(widgetId);
+        }
+        
         WidgetConfig config = configDao.getConfig(widgetId);
         if (config == null) {
             config = WidgetConfig.createDefault(widgetId, type);
+            // Sync save
             configDao.saveConfig(config);
         }
+        configCache.put(widgetId, config);
         return config;
     }
 
@@ -109,6 +130,20 @@ public class WidgetRepository {
      */
     public int getWidgetCount() {
         return configDao.getWidgetCount();
+    }
+
+    // ==================== Chameleon Mode Operations ====================
+
+    public void setChameleonMode(int widgetId, boolean enabled) {
+        executor.execute(() -> configDao.setChameleonMode(widgetId, enabled));
+    }
+
+    public void setChameleonIntensity(int widgetId, float intensity) {
+        executor.execute(() -> configDao.setChameleonIntensity(widgetId, intensity));
+    }
+
+    public List<WidgetConfig> getWidgetsWithChameleonEnabled() {
+        return configDao.getWidgetsWithChameleonEnabled();
     }
 
     // ==================== Emoji Rule Operations ====================
@@ -149,10 +184,10 @@ public class WidgetRepository {
     }
 
     /**
-     * Delete emoji rule.
+     * Delete emoji rule (synchronous - caller handles threading).
      */
     public void deleteEmojiRule(long ruleId) {
-        executor.execute(() -> emojiRuleDao.deleteById(ruleId));
+        emojiRuleDao.deleteById(ruleId);
     }
 
     /**

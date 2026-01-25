@@ -18,8 +18,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.DotMatrixCalendar"
-        tools:targetApi="35">
+        android:theme="@style/Theme.DotMatrixCalendar">
 
 
 
@@ -89,18 +88,6 @@
                 android:resource="@xml/widget_month_info" />
         </receiver>
 
-        <!-- Progress Widget Provider -->
-        <receiver
-            android:name=".widget.provider.ProgressWidgetProvider"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_progress_info" />
-        </receiver>
-
         <!-- Week View Widget Provider -->
         <receiver
             android:name=".widget.provider.WeekViewWidgetProvider"
@@ -129,6 +116,15 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Chameleon Wallpaper Receiver -->
+        <receiver
+            android:name=".chameleon.WallpaperChangeReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.WALLPAPER_CHANGED" />
             </intent-filter>
         </receiver>
 

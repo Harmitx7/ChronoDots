@@ -17,6 +17,15 @@ import java.util.List;
 @Dao
 public interface WidgetConfigDao {
 
+    @Query("UPDATE widget_configs SET chameleonModeEnabled = :enabled WHERE widgetId = :widgetId")
+    void setChameleonMode(int widgetId, boolean enabled);
+
+    @Query("UPDATE widget_configs SET chameleonIntensity = :intensity WHERE widgetId = :widgetId")
+    void setChameleonIntensity(int widgetId, float intensity);
+
+    @Query("SELECT * FROM widget_configs WHERE chameleonModeEnabled = 1")
+    List<WidgetConfig> getWidgetsWithChameleonEnabled();
+
     @Query("SELECT * FROM widget_configs WHERE widgetId = :widgetId")
     WidgetConfig getConfig(int widgetId);
 

@@ -71,14 +71,13 @@ public class EmojiRuleAdapter extends RecyclerView.Adapter<EmojiRuleAdapter.Rule
             labelView.setText(rule.getLabel() != null && !rule.getLabel().isEmpty() 
                     ? rule.getLabel() : "Custom Rule");
             
-            // Generate description based on rule type
-            String desc = "Rule details"; 
-            // In a real app we'd format this based on rule type (Specific Date, Recurring, etc)
-            // For MVP we can just show generic text or format date if we had a helper
+            // Generate description based on rule type with formatted date
+            String desc;
             if (rule.getStartDate() != null && rule.getStartDate() > 0) {
-               desc = "Specific Date"; 
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM dd, yyyy", java.util.Locale.getDefault());
+                desc = sdf.format(new java.util.Date(rule.getStartDate()));
             } else {
-               desc = "Recurring Rule";
+                desc = rule.getDescription();
             }
             descView.setText(desc);
 
