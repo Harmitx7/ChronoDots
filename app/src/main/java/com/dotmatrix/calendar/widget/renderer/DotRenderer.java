@@ -39,21 +39,29 @@ public class DotRenderer {
     private final RectF borderRect;
 
     public DotRenderer() {
-        dotPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        accentPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        pastDotPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        futureDotPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        // PRESET: Premium Rendering Flags
+        int flags = Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG | Paint.DITHER_FLAG;
+
+        dotPaint = new Paint(flags);
+        accentPaint = new Paint(flags);
+        pastDotPaint = new Paint(flags);
+        futureDotPaint = new Paint(flags);
         
-        textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        textPaint = new Paint(flags);
         textPaint.setTextAlign(Paint.Align.CENTER);
-        textPaint.setTypeface(Typeface.DEFAULT);
+        // Premium Font: San Francisco style (approximate with sans-serif-medium)
+        textPaint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        // Letter spacing for modern look (API 21+)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            textPaint.setLetterSpacing(0.03f);
+        }
         
-        emojiPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        emojiPaint = new Paint(flags);
         emojiPaint.setTextAlign(Paint.Align.CENTER);
         
         // Background paints
-        bgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        bgPaint = new Paint(flags);
+        borderPaint = new Paint(flags);
         borderPaint.setStyle(Paint.Style.STROKE);
         borderPaint.setStrokeWidth(2f);
         
@@ -64,12 +72,45 @@ public class DotRenderer {
     /**
      * Draw background with support for glassmorphism.
      */
-    private void drawBackground(Canvas canvas, int width, int height, WidgetConfig config) {
+    /**
+     * Draw background with support for glassmorphism.
+     */
+    private void drawBackground(android.content.Context context, Canvas canvas, int width, int height, WidgetConfig config) {
+        String themeId = config.getThemeId();
+        if (themeId != null && themeId.startsWith("glass_")) {
+            // Glassmorphism Effect
+            try {
+                com.dotmatrix.calendar.widget.glassmorphism.GlassMaterial material;
+                if ("glass_dark".equals(themeId)) {
+                    material = com.dotmatrix.calendar.widget.glassmorphism.GlassMaterial.iosDarkGlass();
+                } else {
+                    material = com.dotmatrix.calendar.widget.glassmorphism.GlassMaterial.iosLightGlass();
+                }
+                
+                com.dotmatrix.calendar.widget.glassmorphism.GlassRenderer glassRenderer = 
+                    new com.dotmatrix.calendar.widget.glassmorphism.GlassRenderer(context);
+                
+                Bitmap glassBitmap = glassRenderer.renderGlass(material, width, height, config.getWidgetId());
+                canvas.drawBitmap(glassBitmap, 0, 0, null);
+                // glassBitmap is cached/managed by renderer, do not recycle here if it came from cache
+                // Actually GlassRenderer.renderGlass returns a bitmap that might be cached. 
+                // Using it is fine.
+            } catch (Exception e) {
+                e.printStackTrace();
+                // Fallback to standard drawing
+                drawStandardBackground(canvas, width, height, config);
+            }
+        } else {
+            drawStandardBackground(canvas, width, height, config);
+        }
+    }
+
+    private void drawStandardBackground(Canvas canvas, int width, int height, WidgetConfig config) {
         float cornerRadius = 48f; // Larger corners for minimal aesthetic
         rectF.set(0, 0, width, height);
 
         if (config.isHasBlur()) {
-            // Glassmorphism Effect
+            // Glassmorphism Effect (Legacy/Simple Blur)
             
             // 1. Fill (Semi-transparent)
             bgPaint.reset();
@@ -108,13 +149,16 @@ public class DotRenderer {
     /**
      * Render Year View widget.
      */
-    public Bitmap renderYearView(int width, int height, WidgetConfig config, 
+    /**
+     * Render Year View widget.
+     */
+    public Bitmap renderYearView(android.content.Context context, int width, int height, WidgetConfig config, 
                                   List<EmojiRule> rules, LocalDate currentDate) {
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         
         // Draw background
-        drawBackground(canvas, width, height, config);
+        drawBackground(context, canvas, width, height, config);
         
         // Setup paints
         setupPaints(config);
@@ -143,8 +187,14 @@ public class DotRenderer {
         
         // Adjust text paint for footer
         textPaint.setColor(config.getDotColor());
-        textPaint.setTextSize(displayMetricsAwareTextSize(14f)); // 14sp - slightly larger for readability
-        textPaint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL)); // Geometric/Medium style
+        // Footer Size: 13sp (slightly smaller, more elegant)
+        textPaint.setTextSize(displayMetricsAwareTextSize(13f)); 
+        // Footer Font: sans-serif-medium for "2026", sans-serif-light could be used for "days left" if we split styles
+        // For now, consistent medium weight looks best on widgets
+        textPaint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            textPaint.setLetterSpacing(0.05f); // Slightly wider for small caps/footer feel
+        }
         textPaint.setTextAlign(Paint.Align.LEFT);
 
         // Adjust available space for dots to leave room for footer
@@ -228,13 +278,16 @@ public class DotRenderer {
     /**
      * Render Month View widget.
      */
-    public Bitmap renderMonthView(int width, int height, WidgetConfig config,
+    /**
+     * Render Month View widget.
+     */
+    public Bitmap renderMonthView(android.content.Context context, int width, int height, WidgetConfig config,
                                    List<EmojiRule> rules, LocalDate currentDate) {
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         
         // Draw background
-        drawBackground(canvas, width, height, config);
+        drawBackground(context, canvas, width, height, config);
         
         // Setup paints
         setupPaints(config);
@@ -338,13 +391,16 @@ public class DotRenderer {
     /**
      * Render Progress View widget.
      */
-    public Bitmap renderProgressView(int width, int height, WidgetConfig config,
+    /**
+     * Render Progress View widget.
+     */
+    public Bitmap renderProgressView(android.content.Context context, int width, int height, WidgetConfig config,
                                       LocalDate currentDate) {
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         
         // Draw background
-        drawBackground(canvas, width, height, config);
+        drawBackground(context, canvas, width, height, config);
         
         // Setup paints
         setupPaints(config);
@@ -430,13 +486,16 @@ public class DotRenderer {
     /**
      * Render Week View widget.
      */
-    public Bitmap renderWeekView(int width, int height, WidgetConfig config,
+    /**
+     * Render Week View widget.
+     */
+    public Bitmap renderWeekView(android.content.Context context, int width, int height, WidgetConfig config,
                                   List<EmojiRule> rules, LocalDate currentDate) {
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         
         // Draw background
-        drawBackground(canvas, width, height, config);
+        drawBackground(context, canvas, width, height, config);
         
         // Setup paints
         setupPaints(config);
@@ -525,12 +584,43 @@ public class DotRenderer {
     private void setupPaints(WidgetConfig config) {
         int dotColor = config.getDotColor();
         int accentColor = config.getAccentColor();
+        
+        // Enhance contrast for glass themes
+        String themeId = config.getThemeId();
+        if (themeId != null && themeId.startsWith("glass_")) {
+             boolean isDark = "glass_dark".equals(themeId);
+             dotColor = enhanceContrastForGlass(dotColor, isDark);
+             accentColor = enhanceContrastForGlass(accentColor, isDark);
+        }
+        
         float opacity = config.getDotOpacity();
         
         dotPaint.setColor(applyOpacity(dotColor, opacity));
         accentPaint.setColor(accentColor);
         pastDotPaint.setColor(applyOpacity(dotColor, opacity * 0.7f));
         futureDotPaint.setColor(applyOpacity(dotColor, opacity * 0.3f));
+    }
+    
+    /**
+     * Enhances color contrast for visibility on glass background.
+     */
+    private int enhanceContrastForGlass(int color, boolean isDarkGlass) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        
+        // Boost saturation
+        hsv[1] = Math.min(1.0f, hsv[1] * 1.2f);
+        
+        // Adjust lightness for contrast
+        if (isDarkGlass) {
+            // Lighten for dark glass (ensure at least 60% brightness)
+            hsv[2] = Math.max(0.6f, Math.min(1.0f, hsv[2] * 1.3f));
+        } else {
+            // Darken for light glass (ensure at most 40% brightness)
+            hsv[2] = Math.max(0.0f, Math.min(0.4f, hsv[2] * 0.7f));
+        }
+        
+        return Color.HSVToColor(hsv);
     }
 
     /**

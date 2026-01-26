@@ -27,8 +27,8 @@ public class WeekViewWidgetProvider extends BaseWidgetProvider {
     }
 
     @Override
-    protected Bitmap renderWidget(int width, int height, WidgetConfig config,
+    protected Bitmap renderWidget(android.content.Context context, int width, int height, WidgetConfig config,
                                    List<EmojiRule> rules, LocalDate currentDate) {
-        return renderer.renderWeekView(width, height, config, rules, currentDate);
+        return renderer.renderWeekView(context, width, height, config, rules, currentDate);
     }
 }

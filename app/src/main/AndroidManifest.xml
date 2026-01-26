@@ -6,6 +6,11 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     
+    <!-- External Storage for Wallpaper Access (Legacy) -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <!-- For Android 13+ (though strictly WallpaperManager often doesn't need this if using system drawable, good to have for custom implementations) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    
     <!-- Billing permission -->
     <uses-permission android:name="com.android.vending.BILLING" />
 

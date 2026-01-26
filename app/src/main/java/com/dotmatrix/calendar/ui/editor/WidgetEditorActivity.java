@@ -550,14 +550,14 @@ public class WidgetEditorActivity extends AppCompatActivity {
                 try {
                     switch (config.getWidgetType()) {
                         case MONTH:
-                            preview = renderer.renderMonthView(renderWidth, renderHeight, config, rules, today);
+                            preview = renderer.renderMonthView(WidgetEditorActivity.this, renderWidth, renderHeight, config, rules, today);
                             break;
                         case WEEK:
-                            preview = renderer.renderWeekView(renderWidth, renderHeight, config, rules, today);
+                            preview = renderer.renderWeekView(WidgetEditorActivity.this, renderWidth, renderHeight, config, rules, today);
                             break;
                         case YEAR:
                         default:
-                            preview = renderer.renderYearView(renderWidth, renderHeight, config, rules, today);
+                            preview = renderer.renderYearView(WidgetEditorActivity.this, renderWidth, renderHeight, config, rules, today);
                             break;
                     }
                 } catch (Exception e) {
@@ -581,7 +581,7 @@ public class WidgetEditorActivity extends AppCompatActivity {
             });
         };
 
-        // Post with short delay (100ms) to debounce rapid changes
+        // Post with short delay (100ms) to debounce rapid changes and ensure Context valid
         debounceHandler.postDelayed(previewRunnable, 100);
     }
 
@@ -709,13 +709,13 @@ public class WidgetEditorActivity extends AppCompatActivity {
                 
                 switch (config.getWidgetType()) {
                     case YEAR:
-                        bitmap = renderer.renderYearView(width, height, config, widgetRules, today);
+                        bitmap = renderer.renderYearView(appContext, width, height, config, widgetRules, today);
                         break;
                     case MONTH:
-                        bitmap = renderer.renderMonthView(width, height, config, widgetRules, today);
+                        bitmap = renderer.renderMonthView(appContext, width, height, config, widgetRules, today);
                         break;
                     case WEEK:
-                        bitmap = renderer.renderWeekView(width, height, config, widgetRules, today);
+                        bitmap = renderer.renderWeekView(appContext, width, height, config, widgetRules, today);
                         break;
                 }
                 

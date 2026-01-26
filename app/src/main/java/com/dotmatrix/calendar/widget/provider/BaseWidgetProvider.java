@@ -24,10 +24,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import android.os.Handler;
-import android.os.Looper;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Base class for widget providers with common functionality.
@@ -37,10 +33,7 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
     protected static final ExecutorService executor = Executors.newSingleThreadExecutor();
     protected static final DotRenderer renderer = new DotRenderer();
     
-    // Resize Debouncing
-    private static final Handler mainHandler = new Handler(Looper.getMainLooper());
-    private static final Map<Integer, Runnable> pendingResizeRunnables = new ConcurrentHashMap<>();
-    private static final long RESIZE_DEBOUNCE_DELAY_MS = 300;
+    // Note: Resize handling moved to WidgetResizeHandler for launcher-specific optimizations
 
     /**
      * Get the widget type for this provider.
@@ -59,41 +52,18 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
         }
     }
 
-    // Use a separate map to store the latest options for each widget
-    private static final Map<Integer, Bundle> latestResizeOptions = new ConcurrentHashMap<>();
-    private static final long RESIZE_THROTTLE_MS = 60;   // ~16 FPS updates for fluidity
-
     public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager,
                                           int appWidgetId, Bundle newOptions) {
-        // Update the latest options for this widget
-        if (newOptions != null) {
-            latestResizeOptions.put(appWidgetId, newOptions);
-        }
-
-        // If an update is already scheduled/running for this widget, do nothing.
-        // The existing task will pick up the latest options when it runs.
-        if (pendingResizeRunnables.containsKey(appWidgetId)) {
-            return;
-        }
-        
-        // Capture ApplicationContext to prevent memory leaks or crashes when Receiver context is invalided
+        // Use the comprehensive WidgetResizeHandler for launcher-specific handling
         final Context appContext = context.getApplicationContext();
-
-        // Schedule a new update task
-        Runnable updateTask = () -> {
-            pendingResizeRunnables.remove(appWidgetId);
-            
-            // Get the freshest options
-            Bundle finalOptions = latestResizeOptions.remove(appWidgetId);
-            
-            // Widget was resized, invalidate cache and re-render with NEW options
-            WidgetBitmapCache.getInstance().invalidate(appWidgetId);
-            updateWidget(appContext, appWidgetManager, appWidgetId, finalOptions);
-        };
+        final AppWidgetManager awm = appWidgetManager;
         
-        pendingResizeRunnables.put(appWidgetId, updateTask);
-        // Throttle updates: Run at most once every 100ms
-        mainHandler.postDelayed(updateTask, RESIZE_THROTTLE_MS);
+        com.dotmatrix.calendar.widget.resize.WidgetResizeHandler.getInstance()
+            .handleResize(appContext, appWidgetId, newOptions, (widgetId, width, height, options) -> {
+                // Widget was resized, invalidate cache and re-render
+                WidgetBitmapCache.getInstance().invalidate(widgetId);
+                updateWidget(appContext, awm, widgetId, options);
+            });
     }
 
     @Override
@@ -145,13 +115,17 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                     int minHeight = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT);
                     
                     if (minWidth > 0 && minHeight > 0) {
+                        // Use DeviceCompatHelper for OEM-specific dimension correction
+                        com.dotmatrix.calendar.util.DeviceCompatHelper compatHelper = 
+                            new com.dotmatrix.calendar.util.DeviceCompatHelper(appContext);
                         float density = appContext.getResources().getDisplayMetrics().density;
-                        width = (int) (minWidth * density);
-                        height = (int) (minHeight * density);
+                        int[] correctedDims = compatHelper.correctWidgetDimensions(minWidth, minHeight, density);
+                        width = correctedDims[0];
+                        height = correctedDims[1];
                     }
                 }
                 
-                // Ensure reasonable texture limits
+                // Universal safety clamps (also in compatHelper, but belt-and-suspenders)
                 width = Math.max(100, Math.min(width, 2048));
                 height = Math.max(100, Math.min(height, 2048));
                 
@@ -174,7 +148,7 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                 if (bitmap == null || bitmap.isRecycled()) {
                     // Cache miss - render new bitmap
                     List<EmojiRule> rules = repository.getEmojiRules(widgetId);
-                    bitmap = renderWidget(width, height, config, rules, today);
+                    bitmap = renderWidget(appContext, width, height, config, rules, today);
                     
                     // Store in cache for future updates
                     if (bitmap != null) {
@@ -209,7 +183,7 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
     /**
      * Render the widget bitmap based on type.
      */
-    protected abstract Bitmap renderWidget(int width, int height, WidgetConfig config,
+    protected abstract Bitmap renderWidget(Context context, int width, int height, WidgetConfig config,
                                             List<EmojiRule> rules, LocalDate currentDate);
 
     /**
@@ -310,13 +284,13 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                 
                 switch (config.getWidgetType()) {
                     case YEAR:
-                        bitmap = updateRenderer.renderYearView(width, height, config, rules, today);
+                        bitmap = updateRenderer.renderYearView(context, width, height, config, rules, today);
                         break;
                     case MONTH:
-                        bitmap = updateRenderer.renderMonthView(width, height, config, rules, today);
+                        bitmap = updateRenderer.renderMonthView(context, width, height, config, rules, today);
                         break;
                     case WEEK:
-                        bitmap = updateRenderer.renderWeekView(width, height, config, rules, today);
+                        bitmap = updateRenderer.renderWeekView(context, width, height, config, rules, today);
                         break;
                 }
                 

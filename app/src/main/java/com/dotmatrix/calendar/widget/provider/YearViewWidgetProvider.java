@@ -27,8 +27,8 @@ public class YearViewWidgetProvider extends BaseWidgetProvider {
     }
 
     @Override
-    protected Bitmap renderWidget(int width, int height, WidgetConfig config,
+    protected Bitmap renderWidget(android.content.Context context, int width, int height, WidgetConfig config,
                                    List<EmojiRule> rules, LocalDate currentDate) {
-        return renderer.renderYearView(width, height, config, rules, currentDate);
+        return renderer.renderYearView(context, width, height, config, rules, currentDate);
     }
 }

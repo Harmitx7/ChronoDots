@@ -27,8 +27,8 @@ public class MonthViewWidgetProvider extends BaseWidgetProvider {
     }
 
     @Override
-    protected Bitmap renderWidget(int width, int height, WidgetConfig config,
+    protected Bitmap renderWidget(android.content.Context context, int width, int height, WidgetConfig config,
                                    List<EmojiRule> rules, LocalDate currentDate) {
-        return renderer.renderMonthView(width, height, config, rules, currentDate);
+        return renderer.renderMonthView(context, width, height, config, rules, currentDate);
     }
 }
