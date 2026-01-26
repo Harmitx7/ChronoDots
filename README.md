@@ -1,5 +1,9 @@
 # ChronoDots 📅✨
 
+<p align="center">
+  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=2196F3&background=00000000&center=true&vCenter=true&width=435&lines=Premium+Calendar+Widgets;Glassmorphism+%2B+Material+You;Year+in+Pixels;Perfect+Dots+Aesthetic" alt="Typing Animation" />
+</p>
+
 > **Time, visualized beautifully.**  
 > A premium "Year in Pixels" widget suite for Android, featuring iOS-style Glassmorphism and pixel-perfect rendering.
 
