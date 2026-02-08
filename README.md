@@ -11,7 +11,8 @@
 ![Java](https://img.shields.io/badge/Java-17-orange.svg?style=for-the-badge&logo=java)
 ![Kotlin](https://img.shields.io/badge/Kotlin-1.9-purple.svg?style=for-the-badge&logo=kotlin)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)
-[![Download APK](https://img.shields.io/badge/Download-APK-success?style=for-the-badge&logo=android)](releases/ChronoDots.v1.apk)
+![Version](https://img.shields.io/badge/Version-1.2.0-brightgreen.svg?style=for-the-badge)
+[![Download APK](https://img.shields.io/badge/Download-v1.2.0-success?style=for-the-badge&logo=android)](https://github.com/Harmitx7/ChronoDots/releases/tag/v1.2.0)
 
 ---
 
