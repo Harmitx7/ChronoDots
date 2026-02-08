@@ -39,31 +39,47 @@ public class DotRenderer {
     private final RectF borderRect;
 
     public DotRenderer() {
-        // PRESET: Premium Rendering Flags
+        // PRESET: Premium Rendering Flags (iOS-quality)
+        // ANTI_ALIAS: Smooth edges
+        // FILTER_BITMAP: High-quality bitmap scaling
+        // DITHER: Reduce color banding
+        // SUBPIXEL_TEXT: Sharp text rendering
         int flags = Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG | Paint.DITHER_FLAG;
 
         dotPaint = new Paint(flags);
+        dotPaint.setSubpixelText(true); // Premium text quality
+        
         accentPaint = new Paint(flags);
+        accentPaint.setSubpixelText(true);
+        
         pastDotPaint = new Paint(flags);
+        pastDotPaint.setSubpixelText(true);
+        
         futureDotPaint = new Paint(flags);
+        futureDotPaint.setSubpixelText(true);
         
         textPaint = new Paint(flags);
         textPaint.setTextAlign(Paint.Align.CENTER);
-        // Premium Font: San Francisco style (approximate with sans-serif-medium)
+        textPaint.setSubpixelText(true);
+        // Premium Font: Sans-Serif Medium (San Francisco approximation)
         textPaint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
         // Letter spacing for modern look (API 21+)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             textPaint.setLetterSpacing(0.03f);
         }
+        // Enable subpixel positioning for crisp text
+        textPaint.setHinting(Paint.HINTING_OFF); // Let subpixel rendering dominate
         
         emojiPaint = new Paint(flags);
         emojiPaint.setTextAlign(Paint.Align.CENTER);
+        emojiPaint.setSubpixelText(true);
         
         // Background paints
         bgPaint = new Paint(flags);
         borderPaint = new Paint(flags);
         borderPaint.setStyle(Paint.Style.STROKE);
         borderPaint.setStrokeWidth(2f);
+        borderPaint.setStrokeCap(Paint.Cap.ROUND); // Smooth corners
         
         rectF = new RectF();
         borderRect = new RectF();
@@ -106,40 +122,51 @@ public class DotRenderer {
     }
 
     private void drawStandardBackground(Canvas canvas, int width, int height, WidgetConfig config) {
-        float cornerRadius = 48f; // Larger corners for minimal aesthetic
+        // iOS-style corner radius (larger, more premium)
+        float cornerRadius = Math.min(width, height) * 0.12f; // 12% of smallest dimension
+        cornerRadius = Math.max(32f, Math.min(cornerRadius, 64f)); // Clamp between 32-64dp
+        
         rectF.set(0, 0, width, height);
 
         if (config.isHasBlur()) {
             // Glassmorphism Effect (Legacy/Simple Blur)
             
-            // 1. Fill (Semi-transparent)
+            // 1. Fill (Semi-transparent with subtle gradient)
             bgPaint.reset();
             bgPaint.setAntiAlias(true);
-            bgPaint.setColor(applyOpacity(config.getBackgroundColor(), config.getBackgroundOpacity()));
+            bgPaint.setDither(true);
+            
+            int baseColor = applyOpacity(config.getBackgroundColor(), config.getBackgroundOpacity());
+            bgPaint.setColor(baseColor);
             canvas.drawRoundRect(rectF, cornerRadius, cornerRadius, bgPaint);
 
-            // 2. Border/Stroke (Gradient for Shine)
-            // Create a diagonal gradient for the border (Top-Left White to Bottom-Right Transparent)
-            int startColor = Color.argb(100, 255, 255, 255); // White with alpha
-            int endColor = Color.argb(20, 255, 255, 255);   // Faint white
+            // 2. Border/Stroke (Diagonal gradient for premium shine)
+            int startColor = Color.argb(120, 255, 255, 255); // Slightly more visible
+            int endColor = Color.argb(20, 255, 255, 255);
             
-            // Shader must be recreated as size changes
+            // Recreate shader for current dimensions
             android.graphics.Shader gradient = new android.graphics.LinearGradient(
                 0, 0, width, height,
                 new int[]{startColor, endColor},
                 null,
                 android.graphics.Shader.TileMode.CLAMP
             );
+            borderPaint.reset();
+            borderPaint.setAntiAlias(true);
+            borderPaint.setStyle(Paint.Style.STROKE);
+            borderPaint.setStrokeWidth(2.5f); // Slightly thicker for visibility
+            borderPaint.setStrokeCap(Paint.Cap.ROUND);
             borderPaint.setShader(gradient);
             
-            // Inset rect slightly for border so it doesn't clip
-            borderRect.set(1f, 1f, width - 1f, height - 1f);
+            // Inset rect for border
+            borderRect.set(1.5f, 1.5f, width - 1.5f, height - 1.5f);
             canvas.drawRoundRect(borderRect, cornerRadius, cornerRadius, borderPaint);
 
         } else {
             // Standard Solid Background
             bgPaint.reset();
             bgPaint.setAntiAlias(true);
+            bgPaint.setDither(true);
             bgPaint.setColor(applyOpacity(config.getBackgroundColor(), config.getBackgroundOpacity()));
             
             canvas.drawRoundRect(rectF, cornerRadius, cornerRadius, bgPaint);
