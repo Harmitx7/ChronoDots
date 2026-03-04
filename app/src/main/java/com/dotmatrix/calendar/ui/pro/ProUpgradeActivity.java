@@ -3,6 +3,7 @@ package com.dotmatrix.calendar.ui.pro;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.dotmatrix.calendar.R;
@@ -20,6 +21,7 @@ public class ProUpgradeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         binding = ActivityProUpgradeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 

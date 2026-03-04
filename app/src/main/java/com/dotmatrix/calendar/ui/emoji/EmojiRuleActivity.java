@@ -2,6 +2,7 @@ package com.dotmatrix.calendar.ui.emoji;
 
 import android.os.Bundle;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.dotmatrix.calendar.databinding.ActivityEmojiRulesBinding;
@@ -19,6 +20,7 @@ public class EmojiRuleActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         binding = ActivityEmojiRulesBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         

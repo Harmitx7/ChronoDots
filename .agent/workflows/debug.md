@@ -2,102 +2,103 @@
 description: Debugging command. Activates DEBUG mode for systematic problem investigation.
 ---
 
-# /debug - Systematic Problem Investigation
+# /debug — Root Cause Investigation
 
 $ARGUMENTS
 
 ---
 
-## Purpose
-
-This command activates DEBUG mode for systematic investigation of issues, errors, or unexpected behavior.
+This command switches the AI into **investigation mode**. No fixes are suggested until the root cause is identified. No random changes. No guessing.
 
 ---
 
-## Behavior
+## The Investigation Contract
 
-When `/debug` is triggered:
+> "A fix without a root cause is a patch on a symptom. It will fail again."
 
-1. **Gather information**
-   - Error message
-   - Reproduction steps
-   - Expected vs actual behavior
-   - Recent changes
-
-2. **Form hypotheses**
-   - List possible causes
-   - Order by likelihood
-
-3. **Investigate systematically**
-   - Test each hypothesis
-   - Check logs, data flow
-   - Use elimination method
-
-4. **Fix and prevent**
-   - Apply fix
-   - Explain root cause
-   - Add prevention measures
+The `debugger` agent follows this sequence without skipping steps:
 
 ---
 
-## Output Format
+## Investigation Sequence
 
-```markdown
-## 🔍 Debug: [Issue]
+**Collect evidence first:**
+- Exact error text (full stack trace, not a summary)
+- Minimum reproduction steps
+- Last known-good state (commit, date, config)
+- Recent changes (code, dependency updates, env vars, infrastructure)
 
-### 1. Symptom
-[What's happening]
+**Map possible causes — label them honestly:**
 
-### 2. Information Gathered
-- Error: `[error message]`
-- File: `[filepath]`
-- Line: [line number]
-
-### 3. Hypotheses
-1. ❓ [Most likely cause]
-2. ❓ [Second possibility]
-3. ❓ [Less likely cause]
-
-### 4. Investigation
-
-**Testing hypothesis 1:**
-[What I checked] → [Result]
-
-**Testing hypothesis 2:**
-[What I checked] → [Result]
-
-### 5. Root Cause
-🎯 **[Explanation of why this happened]**
-
-### 6. Fix
-```[language]
-// Before
-[broken code]
-
-// After
-[fixed code]
+```
+Cause A: [what it is] — Likelihood: High / Medium / Low
+Cause B: [what it is] — Likelihood: High / Medium / Low
+Cause C: [what it is] — Likelihood: High / Medium / Low
 ```
 
-### 7. Prevention
-🛡️ [How to prevent this in the future]
-```
+Every entry labeled as a **hypothesis**, not a diagnosis.
+
+**Test causes one at a time:**
+Check one. Mark resolved or eliminated. Move to next. Never test two simultaneously.
+
+**Find the root cause:**
+The thing that, if changed, prevents the entire failure chain. Fixing a symptom doesn't count.
+
+**Apply a targeted fix + prevent recurrence:**
+One change. Then verify. Then add a regression test.
 
 ---
 
-## Examples
+## Report Format
 
 ```
-/debug login not working
-/debug API returns 500
-/debug form doesn't submit
-/debug data not saving
+━━━ Debug Report ━━━━━━━━━━━━━━━━━━━━━━━
+
+Symptom:      [what the user sees]
+Error:        [exact message or trace]
+Reproduced:   [Yes | No | Sometimes]
+Last working: [commit / date / known-good state]
+
+━━━ Hypotheses ━━━━━━━━━━━━━━━━━━━━━━━
+
+H1 [High]   — [cause and why it's likely]
+H2 [Medium] — [cause and why it's possible]
+H3 [Low]    — [cause and why it's a stretch]
+
+━━━ Investigation ━━━━━━━━━━━━━━━━━━━
+
+H1: checked [what was examined] → ✅ Confirmed root cause
+H2: ruled out — [evidence against it]
+
+━━━ Root Cause ━━━━━━━━━━━━━━━━━━━━━
+
+[Single sentence explaining WHY this happened]
+
+━━━ Fix ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Before:  [original code]
+After:   [corrected code]
+
+Regression test: [what test was added to prevent this]
+Similar patterns: [anywhere else in the codebase this might exist]
 ```
 
 ---
 
-## Key Principles
+## Hallucination Guard
 
-- **Ask before assuming** - get full error context
-- **Test hypotheses** - don't guess randomly
-- **Explain why** - not just what to fix
-- **Prevent recurrence** - add tests, validation
+- Every hypothesis is explicitly labeled as a hypothesis — never as confirmed fact
+- Proposed fixes only use real, documented APIs — `// VERIFY: check method exists` on uncertainty
+- One change per fix — multi-file rewrites presented as "a debug session" are a red flag
+- Debug logging added during investigation must be removed before the fix is presented
+
+---
+
+## Usage
+
+```
+/debug TypeError: Cannot read properties of undefined
+/debug API returns 500 only in production
+/debug useEffect runs on every render instead of once
+/debug login works locally but fails in CI
+```

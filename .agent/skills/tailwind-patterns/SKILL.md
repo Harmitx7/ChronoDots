@@ -1,269 +1,158 @@
 ---
 name: tailwind-patterns
-description: Tailwind CSS v4 principles. CSS-first configuration, container queries, modern patterns, design token architecture.
+description: Tailwind CSS v4+ principles for extreme frontend engineering. CSS-first configuration, scroll-driven animations, logical properties, advanced container style queries, and `@property` Houdini patterns.
 allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 
-# Tailwind CSS Patterns (v4 - 2025)
+# Tailwind CSS v4+ Pro-Max Patterns
 
-> Modern utility-first CSS with CSS-native configuration.
-
----
-
-## 1. Tailwind v4 Architecture
-
-### What Changed from v3
-
-| v3 (Legacy) | v4 (Current) |
-|-------------|--------------|
-| `tailwind.config.js` | CSS-based `@theme` directive |
-| PostCSS plugin | Oxide engine (10x faster) |
-| JIT mode | Native, always-on |
-| Plugin system | CSS-native features |
-| `@apply` directive | Still works, discouraged |
-
-### v4 Core Concepts
-
-| Concept | Description |
-|---------|-------------|
-| **CSS-first** | Configuration in CSS, not JavaScript |
-| **Oxide Engine** | Rust-based compiler, much faster |
-| **Native Nesting** | CSS nesting without PostCSS |
-| **CSS Variables** | All tokens exposed as `--*` vars |
+> Tailwind is not inline styles. It is a highly-tuned, statically extracted token constraint system.
+> The moment you write arbitrary values everywhere (`w-[317px]`), you've lost the benefit. The moment you ignore CSS-first `@theme`, you are writing legacy code.
 
 ---
 
-## 2. CSS-Based Configuration
+## v4+ Key Paradigm: CSS-First & Generative
 
-### Theme Definition
+Tailwind CSS v4+ completely removes the need for `tailwind.config.js`. Everything is a native CSS variable controlled via `@theme`.
 
-```
+```css
+/* v4+: configure via CSS @theme */
+@import "tailwindcss";
+
 @theme {
-  /* Colors - use semantic names */
-  --color-primary: oklch(0.7 0.15 250);
-  --color-surface: oklch(0.98 0 0);
-  --color-surface-dark: oklch(0.15 0 0);
+  /* Generative Color Base via OKLCH */
+  --hue-brand: 250;
   
-  /* Spacing scale */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 2rem;
+  --color-brand-base: oklch(65% 0.25 var(--hue-brand));
+  --color-brand-surface: oklch(15% 0.02 var(--hue-brand));
   
-  /* Typography */
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  /* Fluid Typography Native Setup */
+  --font-sans: "Inter Variable", sans-serif;
+  --text-fluid-body: clamp(1rem, 0.8rem + 1vw, 1.25rem);
+  
+  /* Logical Padding variables (RTL/LTR native) */
+  --spacing-fluid-inline: clamp(1rem, 5vw, 3rem);
 }
 ```
 
-### When to Extend vs Override
+---
 
-| Action | Use When |
-|--------|----------|
-| **Extend** | Adding new values alongside defaults |
-| **Override** | Replacing default scale entirely |
-| **Semantic tokens** | Project-specific naming (primary, surface) |
+## Bleeding-Edge Architectures
+
+### 1. Logical Properties (Mandatory for i18n)
+Never use physical properties (`ml-4`, `pr-2`, `w-screen`) in modern web development. They break on Right-To-Left (RTL) languages or horizontal writing modes.
+- **Use `ms-4` (margin-start)** instead of `ml-4`.
+- **Use `px-4` / `pi-4` (padding-inline)** instead of explicit left/right.
+- **Use `dvw` / `dvh` (dynamic viewport)** instead of `vw` / `vh` to account for mobile browser UI shifts.
+
+### 2. Container Style Queries
+v4+ makes container queries (`@container`) first-class. A component should not care about the viewport; it only cares about where it is placed.
+
+```html
+<!-- Parent sets the query context -->
+<div class="@container">
+  <!-- Child responds to parent size, not browser window size -->
+  <div class="grid grid-cols-1 @md:grid-cols-2 @[800px]:grid-cols-3">
+    ...
+  </div>
+</div>
+```
+
+**Advanced Querying:** Container queries can now query *styles*, not just sizes.
+*(Always use `// VERIFY: CSS Style Queries browser support` if heavily relying on them).*
+
+### 3. Native Scroll-Driven Animations
+CSS `@scroll-timeline` natively hooks into scroll position without JS listeners. Integrate this directly into Tailwind workflows.
+
+```css
+@layer utilities {
+  .animate-on-scroll {
+    animation: fade-in-up linear both;
+    animation-timeline: view();
+    animation-range: entry 10% cover 30%;
+  }
+}
+```
 
 ---
 
-## 3. Container Queries (v4 Native)
+## Houdini `@property` Patterns
 
-### Breakpoint vs Container
+To animate gradients or specific variable values, you must declare them explicitly in your main CSS to allow the browser to interplate them.
 
-| Type | Responds To |
-|------|-------------|
-| **Breakpoint** (`md:`) | Viewport width |
-| **Container** (`@container`) | Parent element width |
+```css
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
 
-### Container Query Usage
-
-| Pattern | Classes |
-|---------|---------|
-| Define container | `@container` on parent |
-| Container breakpoint | `@sm:`, `@md:`, `@lg:` on children |
-| Named containers | `@container/card` for specificity |
-
-### When to Use
-
-| Scenario | Use |
-|----------|-----|
-| Page-level layouts | Viewport breakpoints |
-| Component-level responsive | Container queries |
-| Reusable components | Container queries (context-independent) |
+@layer utilities {
+  .animated-gradient-border {
+    background: conic-gradient(from var(--angle), transparent, var(--color-brand-base));
+    animation: rotate 3s linear infinite;
+  }
+}
+@keyframes rotate { to { --angle: 360deg; } }
+```
 
 ---
 
-## 4. Responsive Design
+## Extreme Anti-Patterns
 
-### Breakpoint System
+| Pattern | Problem | Fix |
+|---|---|---|
+| `[400px]` arbitrary values | Breaks the constraint system | Add to `@theme` and use the token |
+| `w-screen` / `h-screen` | Causes scrollbars / mobile jumps | Use `w-dvw` and `h-dvh` |
+| `!important` | Specificity arms race | Correct the layer ordering or CSS specificity |
+| String concatenation for classes | Tailwind purges them | Use `clsx` or `tailwind-merge` properly |
 
-| Prefix | Min Width | Target |
-|--------|-----------|--------|
-| (none) | 0px | Mobile-first base |
-| `sm:` | 640px | Large phone / small tablet |
-| `md:` | 768px | Tablet |
-| `lg:` | 1024px | Laptop |
-| `xl:` | 1280px | Desktop |
-| `2xl:` | 1536px | Large desktop |
+### Dynamic Class Pitfall & `tailwind-merge`
 
-### Mobile-First Principle
+```tsx
+// ❌ Tailwind cannot detect this — will be purged
+const color = isDanger ? 'red' : 'green';
+<div class={`bg-${color}-500`}>
 
-1. Write mobile styles first (no prefix)
-2. Add larger screen overrides with prefixes
-3. Example: `w-full md:w-1/2 lg:w-1/3`
+// ✅ Use full class names
+const className = isDanger ? 'bg-red-500' : 'bg-green-500';
 
----
-
-## 5. Dark Mode
-
-### Configuration Strategies
-
-| Method | Behavior | Use When |
-|--------|----------|----------|
-| `class` | `.dark` class toggles | Manual theme switcher |
-| `media` | Follows system preference | No user control |
-| `selector` | Custom selector (v4) | Complex theming |
-
-### Dark Mode Pattern
-
-| Element | Light | Dark |
-|---------|-------|------|
-| Background | `bg-white` | `dark:bg-zinc-900` |
-| Text | `text-zinc-900` | `dark:text-zinc-100` |
-| Borders | `border-zinc-200` | `dark:border-zinc-700` |
+// 🚀 PRO-MAX LEVEL: Use tailwind-merge to prevent clash bugs
+import { twMerge } from 'tailwind-merge';
+export const Button = ({ className }) => (
+  <button className={twMerge('px-4 py-2 bg-blue-500 rounded-md', className)}>
+    Click
+  </button>
+)
+```
 
 ---
 
-## 6. Modern Layout Patterns
+## True OLED Dark Mode via CSS
 
-### Flexbox Patterns
+Do not rely on Javascript to toggle simple dark modes if it can be avoided. Media queries prevent FOUC (Flash of Unstyled Content).
 
-| Pattern | Classes |
-|---------|---------|
-| Center (both axes) | `flex items-center justify-center` |
-| Vertical stack | `flex flex-col gap-4` |
-| Horizontal row | `flex gap-4` |
-| Space between | `flex justify-between items-center` |
-| Wrap grid | `flex flex-wrap gap-4` |
+```css
+/* v4 dark mode via CSS media query */
+@layer base {
+  :root {
+    --color-bg: oklch(98% 0.002 250);
+    --color-text: oklch(15% 0.005 250);
+  }
 
-### Grid Patterns
-
-| Pattern | Classes |
-|---------|---------|
-| Auto-fit responsive | `grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))]` |
-| Asymmetric (Bento) | `grid grid-cols-3 grid-rows-2` with spans |
-| Sidebar layout | `grid grid-cols-[auto_1fr]` |
-
-> **Note:** Prefer asymmetric/Bento layouts over symmetric 3-column grids.
-
----
-
-## 7. Modern Color System
-
-### OKLCH vs RGB/HSL
-
-| Format | Advantage |
-|--------|-----------|
-| **OKLCH** | Perceptually uniform, better for design |
-| **HSL** | Intuitive hue/saturation |
-| **RGB** | Legacy compatibility |
-
-### Color Token Architecture
-
-| Layer | Example | Purpose |
-|-------|---------|---------|
-| **Primitive** | `--blue-500` | Raw color values |
-| **Semantic** | `--color-primary` | Purpose-based naming |
-| **Component** | `--button-bg` | Component-specific |
+  /* OLED optimization: True 0% lightness */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-bg: oklch(0% 0 0); 
+      --color-text: oklch(95% 0.002 250);
+    }
+  }
+}
+```
 
 ---
 
-## 8. Typography System
-
-### Font Stack Pattern
-
-| Type | Recommended |
-|------|-------------|
-| Sans | `'Inter', 'SF Pro', system-ui, sans-serif` |
-| Mono | `'JetBrains Mono', 'Fira Code', monospace` |
-| Display | `'Outfit', 'Poppins', sans-serif` |
-
-### Type Scale
-
-| Class | Size | Use |
-|-------|------|-----|
-| `text-xs` | 0.75rem | Labels, captions |
-| `text-sm` | 0.875rem | Secondary text |
-| `text-base` | 1rem | Body text |
-| `text-lg` | 1.125rem | Lead text |
-| `text-xl`+ | 1.25rem+ | Headings |
-
----
-
-## 9. Animation & Transitions
-
-### Built-in Animations
-
-| Class | Effect |
-|-------|--------|
-| `animate-spin` | Continuous rotation |
-| `animate-ping` | Attention pulse |
-| `animate-pulse` | Subtle opacity pulse |
-| `animate-bounce` | Bouncing effect |
-
-### Transition Patterns
-
-| Pattern | Classes |
-|---------|---------|
-| All properties | `transition-all duration-200` |
-| Specific | `transition-colors duration-150` |
-| With easing | `ease-out` or `ease-in-out` |
-| Hover effect | `hover:scale-105 transition-transform` |
-
----
-
-## 10. Component Extraction
-
-### When to Extract
-
-| Signal | Action |
-|--------|--------|
-| Same class combo 3+ times | Extract component |
-| Complex state variants | Extract component |
-| Design system element | Extract + document |
-
-### Extraction Methods
-
-| Method | Use When |
-|--------|----------|
-| **React/Vue component** | Dynamic, JS needed |
-| **@apply in CSS** | Static, no JS needed |
-| **Design tokens** | Reusable values |
-
----
-
-## 11. Anti-Patterns
-
-| Don't | Do |
-|-------|-----|
-| Arbitrary values everywhere | Use design system scale |
-| `!important` | Fix specificity properly |
-| Inline `style=` | Use utilities |
-| Duplicate long class lists | Extract component |
-| Mix v3 config with v4 | Migrate fully to CSS-first |
-| Use `@apply` heavily | Prefer components |
-
----
-
-## 12. Performance Principles
-
-| Principle | Implementation |
-|-----------|----------------|
-| **Purge unused** | Automatic in v4 |
-| **Avoid dynamism** | No template string classes |
-| **Use Oxide** | Default in v4, 10x faster |
-| **Cache builds** | CI/CD caching |
-
----
-
-> **Remember:** Tailwind v4 is CSS-first. Embrace CSS variables, container queries, and native features. The config file is now optional.
+## Performance Rules
+- **Layer Splitting:** `@layer components` and `@layer utilities` prevent specificity issues and allow Tailwind's engine to order CSS correctly.
+- **Do not install plugins without measuring:** Heavy plugins (like unpruned icon libraries) destroy CSS parsing times.
+- **Validate DOM Depth:** Tailwind encourages flat HTML. Avoid nested `<div class="flex">` chains that go 10 layers deep; rebuild with CSS Grid.

@@ -2,58 +2,85 @@
 description: Create new application command. Triggers App Builder skill and starts interactive dialogue with user.
 ---
 
-# /create - Create Application
+# /create — Build Something New
 
 $ARGUMENTS
 
 ---
 
-## Task
-
-This command starts a new application creation process.
-
-### Steps:
-
-1. **Request Analysis**
-   - Understand what the user wants
-   - If information is missing, use `conversation-manager` skill to ask
-
-2. **Project Planning**
-   - Use `project-planner` agent for task breakdown
-   - Determine tech stack
-   - Plan file structure
-   - Create plan file and proceed to building
-
-3. **Application Building (After Approval)**
-   - Orchestrate with `app-builder` skill
-   - Coordinate expert agents:
-     - `database-architect` → Schema
-     - `backend-specialist` → API
-     - `frontend-specialist` → UI
-
-4. **Preview**
-   - Start with `auto_preview.py` when complete
-   - Present URL to user
+This command starts a structured creation process. Code only appears after requirements are clear and a plan is approved.
 
 ---
 
-## Usage Examples
+## The Four Stages
+
+### Stage 1 — Understand (not optional)
+
+Before any planning begins, these four things must be established:
 
 ```
-/create blog site
-/create e-commerce app with product listing and cart
-/create todo app
-/create Instagram clone
-/create crm system with customer management
+1. What is the user's actual goal?     (not the feature — the outcome)
+2. What stack are we working in?       (existing project or greenfield?)
+3. What is explicitly out of scope?    (boundary prevents scope creep)
+4. What's the observable done state?   (how do we know it's finished?)
 ```
+
+If anything is unclear → ask. Do not skip to Stage 2 on assumptions.
+
+### Stage 2 — Plan
+
+Engage `project-planner` to write a structured plan:
+
+```
+Location: docs/PLAN-{task-slug}.md
+
+Must contain:
+  - Goal (one sentence)
+  - OOS list (what we won't build)
+  - Task table with: task / agent / dependency / done-condition
+  - Tribunal gate per task
+```
+
+**The plan is shown to the user before any code is written.**
+
+> ⏸️ "Here's the plan: `docs/PLAN-{slug}.md` — proceed?"
+> Do not advance until explicitly confirmed.
+
+### Stage 3 — Build (Parallel agents, after approval)
+
+| Layer | Agent | Review Gate |
+|---|---|---|
+| Data schema | `database-architect` | `/tribunal-database` |
+| API & server | `backend-specialist` | `/tribunal-backend` |
+| UI & components | `frontend-specialist` | `/tribunal-frontend` |
+| Test coverage | `test-engineer` | `logic + test-coverage` |
+
+Each agent's code goes through Tribunal before being shown to the user.
+
+### Stage 4 — Verify
+
+```
+Did the code satisfy every done-condition from Stage 1?   Y / N
+Did all Tribunal reviewers return APPROVED?               Y / N
+Are untested paths labeled // TODO with an explanation?  Y / N
+```
+
+All three must be Y before the task is declared done.
 
 ---
 
-## Before Starting
+## Hallucination Rules
 
-If request is unclear, ask these questions:
-- What type of application?
-- What are the basic features?
-- Who will use it?
+- Every import must exist in the project's `package.json` or carry `// VERIFY: add to deps`
+- No invented framework methods — `// VERIFY: check docs for this method` on any uncertain call
+- No agent touches code outside its domain
 
-Use defaults, add details later.
+---
+
+## Usage
+
+```
+/create a REST API with JWT auth
+/create a React dashboard with real-time chart updates
+/create a complete user onboarding flow (frontend + backend + DB)
+```

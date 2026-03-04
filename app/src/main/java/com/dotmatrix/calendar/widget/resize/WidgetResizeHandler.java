@@ -231,10 +231,17 @@ public class WidgetResizeHandler {
         return corrected;
     }
     
+    private String cachedLauncherType = null;
+
     /**
      * Detects the current launcher for launcher-specific handling.
+     * Cached to avoid expensive IPC calls during rapid resize events.
      */
     private String detectLauncher(Context context) {
+        if (cachedLauncherType != null) {
+            return cachedLauncherType;
+        }
+
         try {
             android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_MAIN);
             intent.addCategory(android.content.Intent.CATEGORY_HOME);
@@ -245,26 +252,30 @@ public class WidgetResizeHandler {
                 String packageName = resolveInfo.activityInfo.packageName.toLowerCase();
                 
                 if (packageName.contains("nova")) {
-                    return "nova";
+                    cachedLauncherType = "nova";
                 } else if (packageName.contains("sec.android.app.launcher") || 
                            packageName.contains("samsung")) {
-                    return "oneui";
+                    cachedLauncherType = "oneui";
                 } else if (packageName.contains("google.android.apps.nexuslauncher") ||
                            packageName.contains("pixel")) {
-                    return "pixel";
+                    cachedLauncherType = "pixel";
                 } else if (packageName.contains("miui") || packageName.contains("xiaomi")) {
-                    return "miui";
+                    cachedLauncherType = "miui";
                 } else if (packageName.contains("oneplus")) {
-                    return "oneplus";
+                    cachedLauncherType = "oneplus";
                 } else if (packageName.contains("huawei") || packageName.contains("emui")) {
-                    return "emui";
+                    cachedLauncherType = "emui";
+                } else {
+                    cachedLauncherType = "default";
                 }
+                return cachedLauncherType;
             }
         } catch (Exception e) {
             Log.w(TAG, "Could not detect launcher", e);
         }
         
-        return "default";
+        cachedLauncherType = "default";
+        return cachedLauncherType;
     }
     
     /**

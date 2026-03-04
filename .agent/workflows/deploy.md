@@ -2,175 +2,101 @@
 description: Deployment command for production releases. Pre-flight checks and deployment execution.
 ---
 
-# /deploy - Production Deployment
+# /deploy — Production Release
 
 $ARGUMENTS
 
 ---
 
-## Purpose
-
-This command handles production deployment with pre-flight checks, deployment execution, and verification.
+This command runs a structured, gate-enforced deployment sequence. Nothing reaches production without passing all three gates.
 
 ---
 
-## Sub-commands
+## The Non-Negotiable Rule
 
-```
-/deploy            - Interactive deployment wizard
-/deploy check      - Run pre-deployment checks only
-/deploy preview    - Deploy to preview/staging
-/deploy production - Deploy to production
-/deploy rollback   - Rollback to previous version
-```
+> **The Human Gate is never skipped.**
+> Even if every automated gate passes, a human sees the deployment summary and explicitly approves before anything executes.
 
 ---
 
-## Pre-Deployment Checklist
+## Three-Gate Sequence
 
-Before any deployment:
+### Gate 1 — Security Sweep
 
-```markdown
-## 🚀 Pre-Deploy Checklist
-
-### Code Quality
-- [ ] No TypeScript errors (`npx tsc --noEmit`)
-- [ ] ESLint passing (`npx eslint .`)
-- [ ] All tests passing (`npm test`)
-
-### Security
-- [ ] No hardcoded secrets
-- [ ] Environment variables documented
-- [ ] Dependencies audited (`npm audit`)
-
-### Performance
-- [ ] Bundle size acceptable
-- [ ] No console.log statements
-- [ ] Images optimized
-
-### Documentation
-- [ ] README updated
-- [ ] CHANGELOG updated
-- [ ] API docs current
-
-### Ready to deploy? (y/n)
-```
-
----
-
-## Deployment Flow
+`security-auditor` scans all files in the deployment diff:
 
 ```
-┌─────────────────┐
-│  /deploy        │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  Pre-flight     │
-│  checks         │
-└────────┬────────┘
-         │
-    Pass? ──No──► Fix issues
-         │
-        Yes
-         │
-         ▼
-┌─────────────────┐
-│  Build          │
-│  application    │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  Deploy to      │
-│  platform       │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  Health check   │
-│  & verify       │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  ✅ Complete    │
-└─────────────────┘
+Expected clean state:
+  ✅ No secrets or credentials in any changed file
+  ✅ No unparameterized query added
+  ✅ No new CVE-affected dependency introduced
+  ✅ No debug endpoints left active
+```
+
+**If any Critical or High issue is found → deployment is blocked.**
+The issue must be fixed and re-scanned before proceeding.
+
+### Gate 2 — Tribunal Verification
+
+`/tribunal-full` runs on all changed code:
+
+```
+  ✅ logic-reviewer: APPROVED
+  ✅ security-auditor: APPROVED
+  ✅ dependency-reviewer: APPROVED
+  ✅ type-safety-reviewer: APPROVED
+```
+
+**Any REJECTED verdict → deployment blocked.** Fix and re-review.
+
+### Gate 3 — Human Approval
+
+A deployment summary is shown before execution:
+
+```
+━━━ Release Summary ━━━━━━━━━
+Target:        [staging | production]
+Files changed: [N]
+Security gate: ✅ Passed
+Tribunal gate: ✅ All APPROVED
+Tests:         ✅ N passed
+
+Rollback to:   [previous tag / commit SHA]
+Rollback time: [estimate]
+DB-safe:       [Yes | No — explain]
+
+Proceed with deployment? (Y to execute | N to cancel)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ---
 
-## Output Format
+## Rollback is a Prerequisite
 
-### Successful Deploy
+Before any deployment executes, the rollback plan must be established:
 
-```markdown
-## 🚀 Deployment Complete
-
-### Summary
-- **Version:** v1.2.3
-- **Environment:** production
-- **Duration:** 47 seconds
-- **Platform:** Vercel
-
-### URLs
-- 🌐 Production: https://app.example.com
-- 📊 Dashboard: https://vercel.com/project
-
-### What Changed
-- Added user profile feature
-- Fixed login bug
-- Updated dependencies
-
-### Health Check
-✅ API responding (200 OK)
-✅ Database connected
-✅ All services healthy
+```
+What does this roll back to?          → [tag or SHA]
+How long will rollback take?          → [estimate]
+Is the DB migration reversible?       → Yes | No
+Who gets notified on rollback?        → [name or channel]
 ```
 
-### Failed Deploy
-
-```markdown
-## ❌ Deployment Failed
-
-### Error
-Build failed at step: TypeScript compilation
-
-### Details
-```
-error TS2345: Argument of type 'string' is not assignable...
-```
-
-### Resolution
-1. Fix TypeScript error in `src/services/user.ts:45`
-2. Run `npm run build` locally to verify
-3. Try `/deploy` again
-
-### Rollback Available
-Previous version (v1.2.2) is still active.
-Run `/deploy rollback` if needed.
-```
+No rollback plan = no deployment.
 
 ---
 
-## Platform Support
+## Hallucination Guard
 
-| Platform | Command | Notes |
-|----------|---------|-------|
-| Vercel | `vercel --prod` | Auto-detected for Next.js |
-| Railway | `railway up` | Needs Railway CLI |
-| Fly.io | `fly deploy` | Needs flyctl |
-| Docker | `docker compose up -d` | For self-hosted |
+- No invented CLI flags — `# VERIFY: check docs for this flag` on any uncertain command
+- All secrets via environment variables — never hardcoded in deploy configs
+- All images tagged with a specific version — `latest` is forbidden in production configs
 
 ---
 
-## Examples
+## Usage
 
 ```
-/deploy
-/deploy check
-/deploy preview
-/deploy production --skip-tests
-/deploy rollback
+/deploy to staging
+/deploy to production after staging validation
 ```

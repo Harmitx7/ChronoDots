@@ -61,6 +61,7 @@
     <string name="date_range">Date Range</string>
     <string name="choose_emoji">Choose Emoji</string>
     <string name="rule_label">Label (optional)</string>
+    <string name="date">Date</string>
     <string name="free_limit">Free: %1$d / %2$d rules</string>
     
     <!-- Themes -->

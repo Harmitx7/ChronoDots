@@ -2,236 +2,99 @@
 description: Coordinate multiple agents for complex tasks. Use for multi-perspective analysis, comprehensive reviews, or tasks requiring different domain expertise.
 ---
 
-# Multi-Agent Orchestration
+# /orchestrate — Multi-Agent Coordination
 
-You are now in **ORCHESTRATION MODE**. Your task: coordinate specialized agents to solve this complex problem.
-
-## Task to Orchestrate
 $ARGUMENTS
 
 ---
 
-## 🔴 CRITICAL: Minimum Agent Requirement
-
-> ⚠️ **ORCHESTRATION = MINIMUM 3 DIFFERENT AGENTS**
-> 
-> If you use fewer than 3 agents, you are NOT orchestrating - you're just delegating.
-> 
-> **Validation before completion:**
-> - Count invoked agents
-> - If `agent_count < 3` → STOP and invoke more agents
-> - Single agent = FAILURE of orchestration
-
-### Agent Selection Matrix
-
-| Task Type | REQUIRED Agents (minimum) |
-|-----------|---------------------------|
-| **Web App** | frontend-specialist, backend-specialist, test-engineer |
-| **API** | backend-specialist, security-auditor, test-engineer |
-| **UI/Design** | frontend-specialist, seo-specialist, performance-optimizer |
-| **Database** | database-architect, backend-specialist, security-auditor |
-| **Full Stack** | project-planner, frontend-specialist, backend-specialist, devops-engineer |
-| **Debug** | debugger, explorer-agent, test-engineer |
-| **Security** | security-auditor, penetration-tester, devops-engineer |
+This command coordinates multiple specialists to solve a problem that requires more than one domain. One agent is not orchestration.
 
 ---
 
-## Pre-Flight: Mode Check
+## The Minimum Rule
 
-| Current Mode | Task Type | Action |
-|--------------|-----------|--------|
-| **plan** | Any | ✅ Proceed with planning-first approach |
-| **edit** | Simple execution | ✅ Proceed directly |
-| **edit** | Complex/multi-file | ⚠️ Ask: "This task requires planning. Switch to plan mode?" |
-| **ask** | Any | ⚠️ Ask: "Ready to orchestrate. Switch to edit or plan mode?" |
+> **Fewer than 3 agents = not orchestration.**
+>
+> Before marking any orchestration session as complete, count the agents invoked. If the count is less than 3, activate more. A single agent delegated to is just a delegation.
 
 ---
 
-## 🔴 STRICT 2-PHASE ORCHESTRATION
+## Agent Selection by Task Type
 
-### PHASE 1: PLANNING (Sequential - NO parallel agents)
-
-| Step | Agent | Action |
-|------|-------|--------|
-| 1 | `project-planner` | Create docs/PLAN.md |
-| 2 | (optional) `explorer-agent` | Codebase discovery if needed |
-
-> 🔴 **NO OTHER AGENTS during planning!** Only project-planner and explorer-agent.
-
-### ⏸️ CHECKPOINT: User Approval
-
-```
-After PLAN.md is complete, ASK:
-
-"✅ Plan created: docs/PLAN.md
-
-Do you approve? (Y/N)
-- Y: Start implementation
-- N: I'll revise the plan"
-```
-
-> 🔴 **DO NOT proceed to Phase 2 without explicit user approval!**
-
-### PHASE 2: IMPLEMENTATION (Parallel agents after approval)
-
-| Parallel Group | Agents |
-|----------------|--------|
-| Foundation | `database-architect`, `security-auditor` |
-| Core | `backend-specialist`, `frontend-specialist` |
-| Polish | `test-engineer`, `devops-engineer` |
-
-> ✅ After user approval, invoke multiple agents in PARALLEL.
-
-## Available Agents (17 total)
-
-| Agent | Domain | Use When |
-|-------|--------|----------|
-| `project-planner` | Planning | Task breakdown, PLAN.md |
-| `explorer-agent` | Discovery | Codebase mapping |
-| `frontend-specialist` | UI/UX | React, Vue, CSS, HTML |
-| `backend-specialist` | Server | API, Node.js, Python |
-| `database-architect` | Data | SQL, NoSQL, Schema |
-| `security-auditor` | Security | Vulnerabilities, Auth |
-| `penetration-tester` | Security | Active testing |
-| `test-engineer` | Testing | Unit, E2E, Coverage |
-| `devops-engineer` | Ops | CI/CD, Docker, Deploy |
-| `mobile-developer` | Mobile | React Native, Flutter |
-| `performance-optimizer` | Speed | Lighthouse, Profiling |
-| `seo-specialist` | SEO | Meta, Schema, Rankings |
-| `documentation-writer` | Docs | README, API docs |
-| `debugger` | Debug | Error analysis |
-| `game-developer` | Games | Unity, Godot |
-| `orchestrator` | Meta | Coordination |
+| Task | Required Specialists |
+|---|---|
+| Full-stack feature | `frontend-specialist` + `backend-specialist` + `test-engineer` |
+| API build | `backend-specialist` + `security-auditor` + `test-engineer` |
+| Database-heavy work | `database-architect` + `backend-specialist` + `security-auditor` |
+| Complete product | `project-planner` + `frontend-specialist` + `backend-specialist` + `devops-engineer` |
+| Security investigation | `security-auditor` + `penetration-tester` + `devops-engineer` |
+| Complex bug | `debugger` + `explorer-agent` + `test-engineer` |
 
 ---
 
-## Orchestration Protocol
+## Two-Phase Protocol (Strict)
 
-### Step 1: Analyze Task Domains
-Identify ALL domains this task touches:
+### Phase A — Planning Only
+
+Only two agents are allowed during planning:
+
 ```
-□ Security     → security-auditor, penetration-tester
-□ Backend/API  → backend-specialist
-□ Frontend/UI  → frontend-specialist
-□ Database     → database-architect
-□ Testing      → test-engineer
-□ DevOps       → devops-engineer
-□ Mobile       → mobile-developer
-□ Performance  → performance-optimizer
-□ SEO          → seo-specialist
-□ Planning     → project-planner
+project-planner   → writes docs/PLAN-{slug}.md
+explorer-agent    → (if working in existing code) maps the codebase
 ```
 
-### Step 2: Phase Detection
+No other agent runs. No code is produced.
 
-| If Plan Exists | Action |
-|----------------|--------|
-| NO `docs/PLAN.md` | → Go to PHASE 1 (planning only) |
-| YES `docs/PLAN.md` + user approved | → Go to PHASE 2 (implementation) |
+After planning, the plan is shown to the user:
 
-### Step 3: Execute Based on Phase
-
-**PHASE 1 (Planning):**
 ```
-Use the project-planner agent to create PLAN.md
-→ STOP after plan is created
-→ ASK user for approval
+✅ Plan ready: docs/PLAN-{slug}.md
+
+Approve to start implementation? (Y / N)
 ```
 
-**PHASE 2 (Implementation - after approval):**
+**Phase B does NOT start without a Y.**
+
+### Phase B — Implementation (Manager & Micro-Workers)
+
+After approval, the Orchestrator acts as Manager and dispatches Micro-Workers using isolated JSON payloads.
+
 ```
-Invoke agents in PARALLEL:
-Use the frontend-specialist agent to [task]
-Use the backend-specialist agent to [task]
-Use the test-engineer agent to [task]
-```
+Wave 1:  database-architect + security-auditor (JSON dispatch #1)
+[Wait for completion & Tribunal]
 
-**🔴 CRITICAL: Context Passing (MANDATORY)**
-
-When invoking ANY subagent, you MUST include:
-
-1. **Original User Request:** Full text of what user asked
-2. **Decisions Made:** All user answers to Socratic questions
-3. **Previous Agent Work:** Summary of what previous agents did
-4. **Current Plan State:** If plan files exist in workspace, include them
-
-**Example with FULL context:**
-```
-Use the project-planner agent to create PLAN.md:
-
-**CONTEXT:**
-- User Request: "A social platform for students, using mock data"
-- Decisions: Tech=Vue 3, Layout=Grid Widgets, Auth=Mock, Design=Youthful & dynamic
-- Previous Work: Orchestrator asked 6 questions, user chose all options
-- Current Plan: playful-roaming-dream.md exists in workspace with initial structure
-
-**TASK:** Create detailed PLAN.md based on ABOVE decisions. Do NOT infer from folder name.
+Wave 2:  backend-specialist + frontend-specialist (JSON dispatch #2)
+[Wait for completion & Tribunal]
 ```
 
-> ⚠️ **VIOLATION:** Invoking subagent without full context = subagent will make wrong assumptions!
-
-
-### Step 4: Verification (MANDATORY)
-The LAST agent must run appropriate verification scripts:
-```bash
-python .agent/skills/vulnerability-scanner/scripts/security_scan.py .
-python .agent/skills/lint-and-validate/scripts/lint_runner.py .
-```
-
-### Step 5: Synthesize Results
-Combine all agent outputs into unified report.
+Workers execute in parallel within their wave, receiving ONLY their specific file context to minimize tokens and hallucination risk.
 
 ---
 
-## Output Format
+## Hierarchical Context Pruning
 
-```markdown
-## 🎼 Orchestration Report
+When dispatching workers, the Orchestrator MUST use the `dispatch_micro_workers` JSON format.
+The context rule is strict:
+- **No full chat histories** are passed to workers.
+- The `context_summary` injected by the Orchestrator is the ONLY context the worker sees regarding the larger goal.
+- Files attached must be strictly limited to the absolute minimum needed to complete the task.
 
-### Task
-[Original task summary]
+---
 
-### Mode
-[Current Antigravity Agent mode: plan/edit/ask]
+## Hallucination Guard
 
-### Agents Invoked (MINIMUM 3)
-| # | Agent | Focus Area | Status |
-|---|-------|------------|--------|
-| 1 | project-planner | Task breakdown | ✅ |
-| 2 | frontend-specialist | UI implementation | ✅ |
-| 3 | test-engineer | Verification scripts | ✅ |
+- Every agent's output goes through Tribunal before it reaches the user
+- The Human Gate fires before any file is written — the user sees the diff and approves
+- Retry limit: 3 Maker revisions per agent. After 3 failures, stop and report to the user.
+- Per-agent scope is enforced — `frontend-specialist` never writes DB migrations
 
-### Verification Scripts Executed
-- [x] security_scan.py → Pass/Fail
-- [x] lint_runner.py → Pass/Fail
+---
 
-### Key Findings
-1. **[Agent 1]**: Finding
-2. **[Agent 2]**: Finding
-3. **[Agent 3]**: Finding
+## Usage
 
-### Deliverables
-- [ ] PLAN.md created
-- [ ] Code implemented
-- [ ] Tests passing
-- [ ] Scripts verified
-
-### Summary
-[One paragraph synthesis of all agent work]
 ```
-
----
-
-## 🔴 EXIT GATE
-
-Before completing orchestration, verify:
-
-1. ✅ **Agent Count:** `invoked_agents >= 3`
-2. ✅ **Scripts Executed:** At least `security_scan.py` ran
-3. ✅ **Report Generated:** Orchestration Report with all agents listed
-
-> **If any check fails → DO NOT mark orchestration complete. Invoke more agents or run scripts.**
-
----
-
-**Begin orchestration now. Select 3+ agents, execute sequentially, run verification scripts, synthesize results.**
+/orchestrate build a complete auth system with JWT and refresh tokens
+/orchestrate review the entire API layer for security issues
+/orchestrate build a multi-tenant SaaS onboarding flow
+```

@@ -160,3 +160,25 @@ Every game has this cycle:
 ---
 
 > **Ask me about**: Engine selection, game mechanics, optimization, multiplayer architecture, VR/AR development, or game design principles.
+
+---
+
+##  Tribunal Integration (Anti-Hallucination)
+
+**Active reviewers: `logic`  `performance`**
+
+### Game-Dev Hallucination Rules
+
+When generating game logic or engine code, you MUST:
+
+1. **Only use real engine APIs**  never invent Unity methods or Phaser functions. Write `// VERIFY: check Unity docs for this method`
+2. **Flag Update loop cost**  any code placed in `Update()`/`FixedUpdate()` must be justified as necessary per-frame work
+3. **Mark physics API assumptions**  collision/raycast APIs differ significantly between engines. Verify before generating
+
+### Self-Audit
+
+```
+ Are all engine/framework APIs real and documented?
+ Is per-frame code justified as necessary?
+ Are physics API calls verified for the specific engine?
+```

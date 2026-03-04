@@ -2,85 +2,68 @@
 description: Display agent and project status. Progress tracking and status board.
 ---
 
-# /status - Show Status
+# /status — Session View
 
 $ARGUMENTS
 
 ---
 
-## Task
-
-Show current project and agent status.
-
-### What It Shows
-
-1. **Project Info**
-   - Project name and path
-   - Tech stack
-   - Current features
-
-2. **Agent Status Board**
-   - Which agents are running
-   - Which tasks are completed
-   - Pending work
-
-3. **File Statistics**
-   - Files created count
-   - Files modified count
-
-4. **Preview Status**
-   - Is server running
-   - URL
-   - Health check
+This command shows the current state of the active Tribunal session — what has run, what passed, what was rejected, and what is waiting at the Human Gate.
 
 ---
 
-## Example Output
+## Session Dashboard
 
 ```
-=== Project Status ===
+━━━ Tribunal Session ━━━━━━━━━━━━━━━━━━━━
 
-📁 Project: my-ecommerce
-📂 Path: C:/projects/my-ecommerce
-🏷️ Type: nextjs-ecommerce
-📊 Status: active
+Mode:     [Generate | Review | Plan | Audit]
+Request:  [original prompt or task name]
 
-🔧 Tech Stack:
-   Framework: next.js
-   Database: postgresql
-   Auth: clerk
-   Payment: stripe
+━━━ Agent Activity ━━━━━━━━━━━━━━━━━━━━━
 
-✅ Features (5):
-   • product-listing
-   • cart
-   • checkout
-   • user-auth
-   • order-history
+  logic-reviewer          ✅ APPROVED
+  security-auditor        ❌ REJECTED — 1 issue
+  dependency-reviewer     ✅ APPROVED
+  type-safety-reviewer    🔄 Running
+  performance-reviewer    ⏸️  Queued
 
-⏳ Pending (2):
-   • admin-panel
-   • email-notifications
+━━━ Blocked Issues ━━━━━━━━━━━━━━━━━━━━━
 
-📄 Files: 73 created, 12 modified
+❌ security-auditor flagged:
+   File: src/routes/user.ts — Line 34
+   Type: SQL injection
+   Fix:  Replace string interpolation with parameterized query
 
-=== Agent Status ===
+━━━ Human Gate ━━━━━━━━━━━━━━━━━━━━━━━━
 
-✅ database-architect → Completed
-✅ backend-specialist → Completed
-🔄 frontend-specialist → Dashboard components (60%)
-⏳ test-engineer → Waiting
+  Status: ⏸️  Awaiting your decision before any file is written.
 
-=== Preview ===
-
-🌐 URL: http://localhost:3000
-💚 Health: OK
+  Options:
+    ✅ Approve  — write the approved changes to disk
+    🔄 Revise   — send back to the Maker with feedback
+    ❌ Discard  — drop this generation entirely
 ```
 
 ---
 
-## Technical
+## Status Symbols
 
-Status uses these scripts:
-- `python .agent/scripts/session_manager.py status`
-- `python .agent/scripts/auto_preview.py status`
+| Symbol | Meaning |
+|---|---|
+| ✅ | Agent complete — verdict returned |
+| 🔄 | Agent currently running |
+| ⏸️ | Queued — waiting for a prior stage |
+| ❌ | Rejected — issue found, cannot proceed |
+| ⚠️ | Warning — non-blocking, review before approving |
+
+---
+
+## Sub-commands
+
+```
+/status              → Full session view
+/status issues       → Show only REJECTED and WARNING verdicts
+/status gate         → Show what's currently at the Human Gate awaiting approval
+/status agents       → Show only the agent activity table
+```

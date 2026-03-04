@@ -2,112 +2,99 @@
 description: Structured brainstorming for projects and features. Explores multiple options before implementation.
 ---
 
-# /brainstorm - Structured Idea Exploration
+# /brainstorm — Idea Space
 
 $ARGUMENTS
 
 ---
 
-## Purpose
-
-This command activates BRAINSTORM mode for structured idea exploration. Use when you need to explore options before committing to an implementation.
+This command puts the AI into **exploration mode** — no implementation, no code. The goal is to map the problem and surface real alternatives before committing to a path.
 
 ---
 
-## Behavior
+## When to Use This
 
-When `/brainstorm` is triggered:
-
-1. **Understand the goal**
-   - What problem are we solving?
-   - Who is the user?
-   - What constraints exist?
-
-2. **Generate options**
-   - Provide at least 3 different approaches
-   - Each with pros and cons
-   - Consider unconventional solutions
-
-3. **Compare and recommend**
-   - Summarize tradeoffs
-   - Give a recommendation with reasoning
+Before any `/create` or `/enhance` command when:
+- The problem is not yet well-defined
+- You want to evaluate multiple architectural paths
+- You need an honest assessment of tradeoffs before starting
 
 ---
 
-## Output Format
+## What Happens
 
-```markdown
-## 🧠 Brainstorm: [Topic]
+**First, the problem is clarified:**
 
-### Context
-[Brief problem statement]
+> "What specific outcome should exist that doesn't exist today? Who experiences the problem? What constraints are fixed?"
 
----
+If those aren't answered, I ask before going further.
 
-### Option A: [Name]
-[Description]
+**Then, at least 3 distinct approaches are surfaced.** Not variations — genuinely different paths with different tradeoffs.
 
-✅ **Pros:**
-- [benefit 1]
-- [benefit 2]
+**Each approach is assessed on:**
+- What problem it solves well
+- Where it creates friction
+- Realistic effort level
 
-❌ **Cons:**
-- [drawback 1]
-
-📊 **Effort:** Low | Medium | High
+**Finally, one approach is recommended** — not hedged, not "it depends." A clear pick with a clear reason.
 
 ---
 
-### Option B: [Name]
-[Description]
+## Response Template
 
-✅ **Pros:**
-- [benefit 1]
+```
+## Exploration: [Problem Statement]
 
-❌ **Cons:**
-- [drawback 1]
-- [drawback 2]
+Why we're looking at this:
+[What's the actual friction being solved]
 
-📊 **Effort:** Low | Medium | High
+────────────────────────────────────────
 
----
+Approach 1 — [Name]
+[What this is and how it works]
 
-### Option C: [Name]
-[Description]
+Where it wins:
+› [Specific advantage 1]
+› [Specific advantage 2]
 
-✅ **Pros:**
-- [benefit 1]
+Where it struggles:
+› [Real tradeoff — not a vague concern]
 
-❌ **Cons:**
-- [drawback 1]
+Effort: ◼◼◽◽◽ (Low) | ◼◼◼◽◽ (Medium) | ◼◼◼◼◽ (High)
 
-📊 **Effort:** Low | Medium | High
+────────────────────────────────────────
 
----
+Approach 2 — [Name]
+...
 
-## 💡 Recommendation
+────────────────────────────────────────
 
-**Option [X]** because [reasoning].
+Approach 3 — [Name]
+...
 
-What direction would you like to explore?
+────────────────────────────────────────
+
+Verdict:
+Approach [N] — because [specific reason tied to the user's stated constraints].
+
+What direction should we go deeper on?
 ```
 
 ---
 
-## Examples
+## Hallucination Guard
 
-```
-/brainstorm authentication system
-/brainstorm state management for complex form
-/brainstorm database schema for social app
-/brainstorm caching strategy
-```
+- No invented libraries or tools — every named option must be a real, documented choice
+- No performance claims without a cited benchmark
+- Every "pro" must be grounded in how this approach actually works — not wishful thinking
+- Assumptions about the user's codebase are always labeled: `[ASSUMPTION — verify first]`
 
 ---
 
-## Key Principles
+## Usage
 
-- **No code** - this is about ideas, not implementation
-- **Visual when helpful** - use diagrams for architecture
-- **Honest tradeoffs** - don't hide complexity
-- **Defer to user** - present options, let them decide
+```
+/brainstorm caching layer for a high-traffic API
+/brainstorm auth approach for a multi-tenant SaaS
+/brainstorm how to structure shared state in a large React app
+```

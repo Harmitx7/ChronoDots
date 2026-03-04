@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.widget.RadioGroup;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.dotmatrix.calendar.R;
@@ -63,6 +64,7 @@ public class WidgetEditorActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         binding = ActivityWidgetEditorBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 

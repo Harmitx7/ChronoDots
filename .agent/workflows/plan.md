@@ -2,88 +2,107 @@
 description: Create project plan using project-planner agent. No code writing - only plan file generation.
 ---
 
-# /plan - Project Planning Mode
+# /plan — Write the Plan First
 
 $ARGUMENTS
 
 ---
 
-## 🔴 CRITICAL RULES
-
-1. **NO CODE WRITING** - This command creates plan file only
-2. **Use project-planner agent** - NOT Antigravity Agent's native Plan mode
-3. **Socratic Gate** - Ask clarifying questions before planning
-4. **Dynamic Naming** - Plan file named based on task
+This command produces one thing: a structured plan file. Nothing is implemented. No code is written. The plan is the output.
 
 ---
 
-## Task
+## Why Plan Before Building
 
-Use the `project-planner` agent with this context:
-
-```
-CONTEXT:
-- User Request: $ARGUMENTS
-- Mode: PLANNING ONLY (no code)
-- Output: docs/PLAN-{task-slug}.md (dynamic naming)
-
-NAMING RULES:
-1. Extract 2-3 key words from request
-2. Lowercase, hyphen-separated
-3. Max 30 characters
-4. Example: "e-commerce cart" → PLAN-ecommerce-cart.md
-
-RULES:
-1. Follow project-planner.md Phase -1 (Context Check)
-2. Follow project-planner.md Phase 0 (Socratic Gate)
-3. Create PLAN-{slug}.md with task breakdown
-4. DO NOT write any code files
-5. REPORT the exact file name created
-```
+> Tasks without plans get rebuilt three times.
+> Plans expose ambiguity before it becomes broken code.
 
 ---
 
-## Expected Output
+## How It Works
 
-| Deliverable | Location |
-|-------------|----------|
-| Project Plan | `docs/PLAN-{task-slug}.md` |
-| Task Breakdown | Inside plan file |
-| Agent Assignments | Inside plan file |
-| Verification Checklist | Phase X in plan file |
+### Gate: Clarify Before You Plan
 
----
+The `project-planner` agent asks:
 
-## After Planning
-
-Tell user:
 ```
-[OK] Plan created: docs/PLAN-{slug}.md
+What outcome needs to exist that doesn't exist today?
+What are the hard constraints? (stack, existing code, deadline)
+What's explicitly not being built in this version?
+How will we confirm it's done?
+```
 
-Next steps:
-- Review the plan
-- Run `/create` to start implementation
-- Or modify plan manually
+If any answer is "I don't know" — those are clarified before the plan is written, not after.
+
+### Plan File Creation
+
+```
+Location: docs/PLAN-{task-slug}.md
+
+Slug naming:
+  Pull 2–3 key words from the request
+  Lowercase + hyphens
+  Max 30 characters
+  "build auth with JWT" → PLAN-auth-jwt.md
+  "shopping cart checkout" → PLAN-cart-checkout.md
+```
+
+### After the File is Written
+
+```
+✅ Plan written: docs/PLAN-{slug}.md
+
+Review it, then:
+  Run /create to begin implementation
+  Or edit the file to refine scope first
 ```
 
 ---
 
-## Naming Examples
+## Plan File Structure
 
-| Request | Plan File |
-|---------|-----------|
-| `/plan e-commerce site with cart` | `docs/PLAN-ecommerce-cart.md` |
-| `/plan mobile app for fitness` | `docs/PLAN-fitness-app.md` |
-| `/plan add dark mode feature` | `docs/PLAN-dark-mode.md` |
-| `/plan fix authentication bug` | `docs/PLAN-auth-fix.md` |
-| `/plan SaaS dashboard` | `docs/PLAN-saas-dashboard.md` |
+```markdown
+# Plan: [Feature Name]
+
+## What Done Looks Like
+[Observable outcome — one sentence]
+
+## Won't Include in This Version
+- [Explicit exclusion]
+
+## Unresolved Questions
+- [Thing that needs external confirmation: VERIFY]
+
+## Estimates (Ranges + Confidence)
+All time estimates include: optimistic / realistic / pessimistic + confidence level
+
+## Task Table
+| # | Task | Agent | Depends on | Done when |
+|---|------|-------|-----------|-----------|
+| 1 | ... | database-architect | none | migration runs |
+| 2 | ... | backend-specialist | #1 | returns 201 |
+
+## Review Gates
+| Task | Tribunal |
+|---|---|
+| #1 schema | /tribunal-database |
+| #2 API | /tribunal-backend |
+```
+
+---
+
+## Hallucination Guard
+
+- Every tool/library mentioned in the plan must be real and verified
+- All time estimates are ranges with a confidence label — never single-point guarantees
+- External dependencies that aren't confirmed get a `[VERIFY: check this exists]` tag
 
 ---
 
 ## Usage
 
 ```
-/plan e-commerce site with cart
-/plan mobile app for fitness tracking
-/plan SaaS dashboard with analytics
+/plan REST API with user auth
+/plan dark mode toggle for the settings page
+/plan multi-tenant account switching
 ```

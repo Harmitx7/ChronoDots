@@ -2,80 +2,80 @@
 description: Preview server start, stop, and status check. Local development server management.
 ---
 
-# /preview - Preview Management
+# /preview — Local Server Control
 
 $ARGUMENTS
 
 ---
 
-## Task
+Start, stop, or check the development server so you can verify generated code before approving it for your codebase.
 
-Manage preview server: start, stop, status check.
+---
 
-### Commands
+## Sub-commands
 
 ```
-/preview           - Show current status
-/preview start     - Start server
-/preview stop      - Stop server
-/preview restart   - Restart
-/preview check     - Health check
+/preview start     → Launch the dev server
+/preview stop      → Shut down the running server
+/preview status    → Check if server is live and on which URL
+/preview restart   → Stop + start in sequence
 ```
 
 ---
 
-## Usage Examples
+## On Start
 
-### Start Server
 ```
-/preview start
+Step 1:  Check if a process is already using the target port (warn if yes)
+Step 2:  Read package.json → scripts.dev or scripts.start to find the actual command
+Step 3:  Launch the server
+Step 4:  Wait for the ready signal (port open or "ready" in output)
+Step 5:  Report back
 
-Response:
-🚀 Starting preview...
-   Port: 3000
-   Type: Next.js
+━━━ Server Started ━━━━━━━━━━━━━━━
+URL:     http://localhost:[port]
+Command: [actual command used]
 
-✅ Preview ready!
-   URL: http://localhost:3000
-```
-
-### Status Check
-```
-/preview
-
-Response:
-=== Preview Status ===
-
-🌐 URL: http://localhost:3000
-📁 Project: C:/projects/my-app
-🏷️ Type: nextjs
-💚 Health: OK
-```
-
-### Port Conflict
-```
-/preview start
-
-Response:
-⚠️ Port 3000 is in use.
-
-Options:
-1. Start on port 3001
-2. Close app on 3000
-3. Specify different port
-
-Which one? (default: 1)
+Run /preview stop to shut down.
 ```
 
 ---
 
-## Technical
+## On Stop
 
-Auto preview uses `auto_preview.py` script:
+```
+Step 1: Locate the running process by port or PID
+Step 2: Send graceful shutdown
+Step 3: Confirm port is released
 
-```bash
-python .agent/scripts/auto_preview.py start [port]
-python .agent/scripts/auto_preview.py stop
-python .agent/scripts/auto_preview.py status
+━━━ Server Stopped ━━━━━━━━━━━━━━━
+Port [N] is now free.
 ```
 
+---
+
+## On Status
+
+```
+🟢  Running — http://localhost:[port]  (PID [N])
+🔴  Not running — no active process found on this port
+```
+
+---
+
+## Hallucination Guard
+
+- `package.json` is always read before assuming the start command — never assume it's `npm run dev`
+- The actual port is checked from the config — never hardcoded to 3000
+- No invented server flags added to the start command
+
+---
+
+## Usage
+
+```
+/preview start
+/preview stop
+/preview status
+/preview restart
+```

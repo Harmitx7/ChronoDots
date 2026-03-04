@@ -1,296 +1,149 @@
 ---
-description: Plan and implement UI
+description: Plan and implement cutting-edge advanced UI/UX
 ---
 
----
-description: AI-powered design intelligence with 50+ styles, 95+ color palettes, and automated design system generation
----
+# /ui-ux-pro-max — Advanced Cutting-Edge UI/UX Design Mode
 
-# ui-ux-pro-max
-
-Comprehensive design guide for web and mobile applications. Contains 50+ styles, 97 color palettes, 57 font pairings, 99 UX guidelines, and 25 chart types across 9 technology stacks. Searchable database with priority-based recommendations.
-
-## Prerequisites
-
-Check if Python is installed:
-
-```bash
-python3 --version || python --version
-```
-
-If Python is not installed, install it based on user's OS:
-
-**macOS:**
-```bash
-brew install python3
-```
-
-**Ubuntu/Debian:**
-```bash
-sudo apt update && sudo apt install python3
-```
-
-**Windows:**
-```powershell
-winget install Python.Python.3.12
-```
+$ARGUMENTS
 
 ---
 
-## How to Use This Workflow
+This command activates the absolute highest-fidelity UI/UX workflow, meant for 2026+ web and mobile standards. It combines deep neuro-inclusive design thinking, spatial UI concepts, advanced component architecture, and generative styling. This is not just "generate a pretty layout" — it is the creation of a responsive, living, and hyper-optimized interface.
 
-When user requests UI/UX work (design, build, create, implement, review, fix, improve), follow this workflow:
-
-### Step 1: Analyze User Requirements
-
-Extract key information from user request:
-- **Product type**: SaaS, e-commerce, portfolio, dashboard, landing page, etc.
-- **Style keywords**: minimal, playful, professional, elegant, dark mode, etc.
-- **Industry**: healthcare, fintech, gaming, education, etc.
-- **Stack**: React, Vue, Next.js, or default to `html-tailwind`
-
-### Step 2: Generate Design System (REQUIRED)
-
-**Always start with `--design-system`** to get comprehensive recommendations with reasoning:
-
-```bash
-python3 .agent/.shared/ui-ux-pro-max/scripts/search.py "<product_type> <industry> <keywords>" --design-system [-p "Project Name"]
-```
-
-This command:
-1. Searches 5 domains in parallel (product, style, color, landing, typography)
-2. Applies reasoning rules from `ui-reasoning.csv` to select best matches
-3. Returns complete design system: pattern, style, colors, typography, effects
-4. Includes anti-patterns to avoid
-
-**Example:**
-```bash
-python3 .agent/.shared/ui-ux-pro-max/scripts/search.py "beauty spa wellness service" --design-system -p "Serenity Spa"
-```
-
-### Step 2b: Persist Design System (Master + Overrides Pattern)
-
-To save the design system for hierarchical retrieval across sessions, add `--persist`:
-
-```bash
-python3 .agent/.shared/ui-ux-pro-max/scripts/search.py "<query>" --design-system --persist -p "Project Name"
-```
-
-This creates:
-- `design-system/MASTER.md` — Global Source of Truth with all design rules
-- `design-system/pages/` — Folder for page-specific overrides
-
-**With page-specific override:**
-```bash
-python3 .agent/.shared/ui-ux-pro-max/scripts/search.py "<query>" --design-system --persist -p "Project Name" --page "dashboard"
-```
-
-This also creates:
-- `design-system/pages/dashboard.md` — Page-specific deviations from Master
-
-**How hierarchical retrieval works:**
-1. When building a specific page (e.g., "Checkout"), first check `design-system/pages/checkout.md`
-2. If the page file exists, its rules **override** the Master file
-3. If not, use `design-system/MASTER.md` exclusively
-
-### Step 3: Supplement with Detailed Searches (as needed)
-
-After getting the design system, use domain searches to get additional details:
-
-```bash
-python3 .agent/.shared/ui-ux-pro-max/scripts/search.py "<keyword>" --domain <domain> [-n <max_results>]
-```
-
-**When to use detailed searches:**
-
-| Need | Domain | Example |
-|------|--------|---------|
-| More style options | `style` | `--domain style "glassmorphism dark"` |
-| Chart recommendations | `chart` | `--domain chart "real-time dashboard"` |
-| UX best practices | `ux` | `--domain ux "animation accessibility"` |
-| Alternative fonts | `typography` | `--domain typography "elegant luxury"` |
-| Landing structure | `landing` | `--domain landing "hero social-proof"` |
-
-### Step 4: Stack Guidelines (Default: html-tailwind)
-
-Get implementation-specific best practices. If user doesn't specify a stack, **default to `html-tailwind`**.
-
-```bash
-python3 .agent/.shared/ui-ux-pro-max/scripts/search.py "<keyword>" --stack html-tailwind
-```
-
-Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `svelte`, `swiftui`, `react-native`, `flutter`, `shadcn`, `jetpack-compose`
-, `jetpack-compose`
----
-
-## Search Reference
-
-### Available Domains
-
-| Domain | Use For | Example Keywords |
-|--------|---------|------------------|
-| `product` | Product type recommendations | SaaS, e-commerce, portfolio, healthcare, beauty, service |
-| `style` | UI styles, colors, effects | glassmorphism, minimalism, dark mode, brutalism |
-| `typography` | Font pairings, Google Fonts | elegant, playful, professional, modern |
-| `color` | Color palettes by product type | saas, ecommerce, healthcare, beauty, fintech, service |
-| `landing` | Page structure, CTA strategies | hero, hero-centric, testimonial, pricing, social-proof |
-| `chart` | Chart types, library recommendations | trend, comparison, timeline, funnel, pie |
-| `ux` | Best practices, anti-patterns | animation, accessibility, z-index, loading |
-| `react` | React/Next.js performance | waterfall, bundle, suspense, memo, rerender, cache |
-| `web` | Web interface guidelines | aria, focus, keyboard, semantic, virtualize |
-| `prompt` | AI prompts, CSS keywords | (style name) |
-
-### Available Stacks
-
-| Stack | Focus |
-|-------|-------|
-| `html-tailwind` | Tailwind utilities, responsive, a11y (DEFAULT) |
-| `react` | State, hooks, performance, patterns |
-| `nextjs` | SSR, routing, images, API routes |
-| `vue` | Composition API, Pinia, Vue Router |
-| `svelte` | Runes, stores, SvelteKit |
-| `swiftui` | Views, State, Navigation, Animation |
-| `react-native` | Components, Navigation, Lists |
-| `flutter` | Widgets, State, Layout, Theming |
-| `shadcn` | shadcn/ui components, theming, forms, patterns |
-| `jetpack-compose` | Composables, Modifiers, State Hoisting, Recomposition |
+> This is a full state-of-the-art design session. We are pushing pixels, physics, and perceptual psychology.
 
 ---
 
-## Example Workflow
+## What Makes This Different From `/create`
 
-**User request:** "Làm landing page cho dịch vụ chăm sóc da chuyên nghiệp"
+`/create` builds standard features. `/ui-ux-pro-max` obsesses over extreme craft and futuristic patterns:
 
-### Step 1: Analyze Requirements
-- Product type: Beauty/Spa service
-- Style keywords: elegant, professional, soft
-- Industry: Beauty/Wellness
-- Stack: html-tailwind (default)
-
-### Step 2: Generate Design System (REQUIRED)
-
-```bash
-python3 .agent/.shared/ui-ux-pro-max/scripts/search.py "beauty spa wellness service elegant" --design-system -p "Serenity Spa"
-```
-
-**Output:** Complete design system with pattern, style, colors, typography, effects, and anti-patterns.
-
-### Step 3: Supplement with Detailed Searches (as needed)
-
-```bash
-# Get UX guidelines for animation and accessibility
-python3 .agent/.shared/ui-ux-pro-max/scripts/search.py "animation accessibility" --domain ux
-
-# Get alternative typography options if needed
-python3 .agent/.shared/ui-ux-pro-max/scripts/search.py "elegant luxury serif" --domain typography
-```
-
-### Step 4: Stack Guidelines
-
-```bash
-python3 .agent/.shared/ui-ux-pro-max/scripts/search.py "layout responsive form" --stack html-tailwind
-```
-
-**Then:** Synthesize design system + detailed searches and implement the design.
+- **Generative & Algorithmic Color**: Using OKLCH/LCH for perceptual uniformity, not just picking hex codes that "look nice."
+- **Fluid & Variable Typography**: Designing with `clamp()`, `ch` units, and Variable Fonts for infinite scaling, not fixed breakpoints.
+- **Adaptive Psychology & Neuro-Inclusivity**: Respecting `prefers-reduced-motion`, varying cognitive load based on context, and utilizing OLED battery-saving true black themes.
+- **Advanced Micro-Interactions**: Spring-physics based animations and scroll-driven interactions instead of static, linear CSS transitions.
+- **Spatial & Contextual UI**: Considering z-axis depth (glass, blurs, multi-layered shadows) and contextual adaptation (UI conforming to user behavior).
 
 ---
 
-## Output Formats
+## Extreme Design Rules (Always Active in This Mode)
 
-The `--design-system` flag supports two output formats:
+### Generative Color & Light
+- **No purple/violet as primary color** — the most overused "AI design" cliché is banned.
+- Color palettes must be derived using algorithmic relationships (e.g., OKLCH lightness/chroma stepping).
+- **True Black & OLED Optimization**: Use `#000000` or `#010101` for deep backgrounds on mobile/PWA to save battery, utilizing high-contrast borders for separation instead of gray backgrounds.
+- Contrast must pass **WCAG 3.0 APCA** (Advanced Perceptual Contrast Algorithm) standards for readability, not just older WCAG 2.1 math.
 
-```bash
-# ASCII box (default) - best for terminal display
-python3 .agent/.shared/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system
+### Fluid & Variable Typography
+- Use system variable fonts or explicitly loaded modern Variable Fonts to reduce network requests.
+- Body text uses **fluid typography** `clamp(1rem, 0.8rem + 1vw, 1.25rem)` to scale linearly between screen sizes.
+- strict adherence to max line lengths (`max-w-[65ch]`) to prevent cognitive fatigue.
 
-# Markdown - best for documentation
-python3 .agent/.shared/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system -f markdown
+### Spatial & Layout Architecture
+- Standard hero layouts (left text / right image) are prohibited unless explicitly justified. Use asymmetric, dynamic, or scroll-locked interactive hero sections.
+- The Z-axis matters: build depth using multi-layer shadows or contextual background blurs (`backdrop-filter`) carefully applied for performance.
+- Use **Logical Properties** (`margin-inline`, `padding-block`) exclusively to enforce automatic RTL (Right-to-Left) and LTR compatibility.
+
+### Advanced Interaction & Physics
+- Linear easing (`ease`, `linear`) is banned for layout shifts. You must use **spring physics** or custom `cubic-bezier` curves for natural, organic motion.
+- **Scroll-Driven Animations**: UI elements should react to scroll position natively using modern CSS `@scroll-timeline` or performant JS Observers.
+- **Zero-Wait UI**: Streaming UI components (like React Server Components or Optimistic UI updates) must be designed so the user never sees a raw loading spinner for action responses.
+
+---
+
+## The Pro-Max Design Protocol
+
+### Step 1 — Perceptual & Contextual Mapping
+
+Before painting a pixel, determine:
+
+```
+Who is the specific user persona?
+What is the cognitive load capacity here? (e.g., dashboard = high data density, landing page = low friction)
+What is the desired emotional & visceral impact?
+How will the UI adapt to user input?
+```
+
+### Step 2 — Spatial Layout Skeleton (No Colors yet)
+
+Define the structural architecture with depth in mind:
+- What is the structural grid? (Subgrid, Container Queries)
+- What exists on the Z-axis? (What floats, what is grounded?)
+- How does the layout mutate on scroll?
+
+### Step 3 — Generative Color + Fluid Typography System
+
+Define the algorithmic base:
+
+```css
+/* Example OKLCH System */
+Base hue:         [OKLCH Hue Value]
+Surface (Dark):   oklch(15% 0.02 [Hue])
+Surface (OLED):   oklch(0% 0 0)
+Text Primary:     oklch(96% 0.01 [Hue])
+Accent:           oklch(70% 0.25 [Complementary Hue])
+```
+
+### Step 4 — Component Build (Tribunal: logic + frontend)
+
+Every component built goes through `/tribunal-frontend` before being shown.
+Focus on **Container Queries** (`@container`) so components contextualize themselves based on where they map, not window width.
+
+### Step 5 — Physics & Interaction Layer
+
+Define organic movement:
+```css
+/* Spring-like organic transition */
+transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+```
+Ensure all interactions check for `@media (prefers-reduced-motion: reduce)`.
+
+### Step 6 — Extreme Accessibility Audit
+
+```
+✅ APCA Contrast verified.
+✅ Logical properties used for full i18n support.
+✅ Touch targets mathematically enforce Fitts' Law (>48px minimum).
+✅ Cognitive boundaries respected (No sudden layout shifts, CLS = 0).
+✅ Screen reader flows tested via semantic HTML5.
 ```
 
 ---
 
-## Tips for Better Results
+## 🏛️ Anti-Hallucination Rules for UI
 
-1. **Be specific with keywords** - "healthcare SaaS dashboard" > "app"
-2. **Search multiple times** - Different keywords reveal different insights
-3. **Combine domains** - Style + Typography + Color = Complete design system
-4. **Always check UX** - Search "animation", "z-index", "accessibility" for common issues
-5. **Use stack flag** - Get implementation-specific best practices
-6. **Iterate** - If first search doesn't match, try different keywords
+- **No invented CSS properties** — Do not guess syntax for scroll timelines or `@property` declarations; write `// VERIFY: check browser compatibility` if using bleach-edge CSS.
+- **No placeholder images** — generate real structural visualizations or use SVG abstractions.
+- **Do not invent React/Next.js features** that don't exist in the current stable or canary builds.
 
 ---
 
-## Common Rules for Professional UI
+## Output Format
 
-These are frequently overlooked issues that make UI look unprofessional:
+Each step produces a high-fidelity summary:
 
-### Icons & Visual Elements
+```
+📐 Spatial Layout: [description of grid, container queries, and z-axis layers]
 
-| Rule | Do | Don't |
-|------|----|----- |
-| **No emoji icons** | Use SVG icons (Heroicons, Lucide, Simple Icons) | Use emojis like 🎨 🚀 ⚙️ as UI icons |
-| **Stable hover states** | Use color/opacity transitions on hover | Use scale transforms that shift layout |
-| **Correct brand logos** | Research official SVG from Simple Icons | Guess or use incorrect logo paths |
-| **Consistent icon sizing** | Use fixed viewBox (24x24) with w-6 h-6 | Mix different icon sizes randomly |
+🎨 Generative Color:
+   [OKLCH base mapped variables]
+   APCA Contrast Check: [Pass/Fail for Text/Bg combinations]
 
-### Interaction & Cursor
+🧱 Component Schema:
+   [Name] + [State transitions: Hover, Focus, Active, Skeleton]
+   Tribunal: [Verdict]
 
-| Rule | Do | Don't |
-|------|----|----- |
-| **Cursor pointer** | Add `cursor-pointer` to all clickable/hoverable cards | Leave default cursor on interactive elements |
-| **Hover feedback** | Provide visual feedback (color, shadow, border) | No indication element is interactive |
-| **Smooth transitions** | Use `transition-colors duration-200` | Instant state changes or too slow (>500ms) |
-
-### Light/Dark Mode Contrast
-
-| Rule | Do | Don't |
-|------|----|----- |
-| **Glass card light mode** | Use `bg-white/80` or higher opacity | Use `bg-white/10` (too transparent) |
-| **Text contrast light** | Use `#0F172A` (slate-900) for text | Use `#94A3B8` (slate-400) for body text |
-| **Muted text light** | Use `#475569` (slate-600) minimum | Use gray-400 or lighter |
-| **Border visibility** | Use `border-gray-200` in light mode | Use `border-white/10` (invisible) |
-
-### Layout & Spacing
-
-| Rule | Do | Don't |
-|------|----|----- |
-| **Floating navbar** | Add `top-4 left-4 right-4` spacing | Stick navbar to `top-0 left-0 right-0` |
-| **Content padding** | Account for fixed navbar height | Let content hide behind fixed elements |
-| **Consistent max-width** | Use same `max-w-6xl` or `max-w-7xl` | Mix different container widths |
+♿ Neuro-Inclusive Audit:
+   [Compliance with cognitive safety, motion reduction, and touch targets]
+```
 
 ---
 
-## Pre-Delivery Checklist
+## Usage
 
-Before delivering UI code, verify these items:
-
-### Visual Quality
-- [ ] No emojis used as icons (use SVG instead)
-- [ ] All icons from consistent icon set (Heroicons/Lucide)
-- [ ] Brand logos are correct (verified from Simple Icons)
-- [ ] Hover states don't cause layout shift
-- [ ] Use theme colors directly (bg-primary) not var() wrapper
-
-### Interaction
-- [ ] All clickable elements have `cursor-pointer`
-- [ ] Hover states provide clear visual feedback
-- [ ] Transitions are smooth (150-300ms)
-- [ ] Focus states visible for keyboard navigation
-
-### Light/Dark Mode
-- [ ] Light mode text has sufficient contrast (4.5:1 minimum)
-- [ ] Glass/transparent elements visible in light mode
-- [ ] Borders visible in both modes
-- [ ] Test both modes before delivery
-
-### Layout
-- [ ] Floating elements have proper spacing from edges
-- [ ] No content hidden behind fixed navbars
-- [ ] Responsive at 375px, 768px, 1024px, 1440px
-- [ ] No horizontal scroll on mobile
-
-### Accessibility
-- [ ] All images have alt text
-- [ ] Form inputs have labels
-- [ ] Color is not the only indicator
-- [ ] `prefers-reduced-motion` respected
+```
+/ui-ux-pro-max design a generative AI prompt dashboard
+/ui-ux-pro-max build an e-commerce checkout with extreme conversion optimization
+/ui-ux-pro-max create a spatial WebXR-inspired landing page
+/ui-ux-pro-max redesign a high-frequency trading interface for minimum cognitive load
+```

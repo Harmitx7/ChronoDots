@@ -4,330 +4,250 @@ description: Node.js development principles and decision-making. Framework selec
 allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 
-# Node.js Best Practices
+# Node.js Development Principles
 
-> Principles and decision-making for Node.js development in 2025.
-> **Learn to THINK, not memorize code patterns.**
-
----
-
-## ⚠️ How to Use This Skill
-
-This skill teaches **decision-making principles**, not fixed code to copy.
-
-- ASK user for preferences when unclear
-- Choose framework/pattern based on CONTEXT
-- Don't default to same solution every time
+> Node.js is not a problem — unpredictable async behavior is.
+> Understand the event loop and half of Node.js "gotchas" disappear.
 
 ---
 
-## 1. Framework Selection (2025)
+## Framework Selection
 
-### Decision Tree
+| Context | Recommended | Why |
+|---|---|---|
+| REST API, standard patterns | Express + TypeScript | Mature, flexible, most hiring knowledge |
+| REST API, speed + TypeScript-first | Fastify | 2x Express throughput, built-in validation |
+| Full-stack React | Next.js API routes | Colocated API and UI, serverless-friendly |
+| REST + tRPC | Next.js + tRPC | Type-safe end-to-end with no code generation |
+| RPC across services | gRPC | Binary protocol, contract-first |
+| Edge function / Cloudflare Worker | Hono | Tiny, Web Platform API-native, zero cold start |
+| Scripts / tooling / bun-native | Bun | Built-in bundler, test runner, near-Node compat |
 
-```
-What are you building?
-│
-├── Edge/Serverless (Cloudflare, Vercel)
-│   └── Hono (zero-dependency, ultra-fast cold starts)
-│
-├── High Performance API
-│   └── Fastify (2-3x faster than Express)
-│
-├── Enterprise/Team familiarity
-│   └── NestJS (structured, DI, decorators)
-│
-├── Legacy/Stable/Maximum ecosystem
-│   └── Express (mature, most middleware)
-│
-└── Full-stack with frontend
-    └── Next.js API Routes or tRPC
-```
+**Questions to ask before choosing:**
 
-### Comparison Principles
-
-| Factor | Hono | Fastify | Express |
-|--------|------|---------|---------|
-| **Best for** | Edge, serverless | Performance | Legacy, learning |
-| **Cold start** | Fastest | Fast | Moderate |
-| **Ecosystem** | Growing | Good | Largest |
-| **TypeScript** | Native | Excellent | Good |
-| **Learning curve** | Low | Medium | Low |
-
-### Selection Questions to Ask:
-1. What's the deployment target?
-2. Is cold start time critical?
-3. Does team have existing experience?
-4. Is there legacy code to maintain?
+- Is this public-facing or internal?
+- Do we control the deployment environment (server vs. serverless vs. edge)?
+- Is the team already familiar with a framework?
+- Does this need to compose with an existing TypeScript frontend?
 
 ---
 
-## 2. Runtime Considerations (2025)
+## Modern Runtime Landscape (2025+)
 
-### Native TypeScript
+The Node.js monopoly is ending. Understand constraints before picking a runtime:
 
-```
-Node.js 22+: --experimental-strip-types
-├── Run .ts files directly
-├── No build step needed for simple projects
-└── Consider for: scripts, simple APIs
-```
+| Runtime | `fs` | `crypto` | `child_process` | `process.env` | Deploy Target |
+|---|---|---|---|---|---|
+| **Node.js** | ✅ | ✅ | ✅ | ✅ | Server, serverless |
+| **Bun** | ✅ | ✅ | ✅ | ✅ | Server (Node-compatible) |
+| **Deno** | ✅ (explicit perm) | ✅ | ✅ (explicit perm) | ✅ | Server, Deno Deploy |
+| **Edge (Cloudflare Workers)** | ❌ | Web only | ❌ | via `env` binding | Edge (global) |
 
-### Module System Decision
+```ts
+// ❌ Portability anti-pattern — works in Node, breaks at edge
+import { createHash } from 'crypto';      // Node crypto — not available at edge
+import fs from 'fs';                       // No filesystem at edge
 
-```
-ESM (import/export)
-├── Modern standard
-├── Better tree-shaking
-├── Async module loading
-└── Use for: new projects
-
-CommonJS (require)
-├── Legacy compatibility
-├── More npm packages support
-└── Use for: existing codebases, some edge cases
+// ✅ Web Platform APIs — work everywhere (Node ≥18, Bun, Deno, Edge)
+const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
+const response = await fetch('https://api.example.com/data');
 ```
 
-### Runtime Selection
+### When to Consider Bun
 
-| Runtime | Best For |
-|---------|----------|
-| **Node.js** | General purpose, largest ecosystem |
-| **Bun** | Performance, built-in bundler |
-| **Deno** | Security-first, built-in TypeScript |
+```ts
+// Bun is Node-compatible but: starts faster, ships a bundler + test runner built-in
+// Use Bun when: scripts, tooling, new greenfield backends, or test-heavy projects
 
----
+// package.json — identical, works in both
+// bun install  → 10x faster than npm install
+// bun test     → built-in Vitest-compatible runner
+// bun run      → direct TypeScript execution, no transpile step
 
-## 3. Architecture Principles
-
-### Layered Structure Concept
-
-```
-Request Flow:
-│
-├── Controller/Route Layer
-│   ├── Handles HTTP specifics
-│   ├── Input validation at boundary
-│   └── Calls service layer
-│
-├── Service Layer
-│   ├── Business logic
-│   ├── Framework-agnostic
-│   └── Calls repository layer
-│
-└── Repository Layer
-    ├── Data access only
-    ├── Database queries
-    └── ORM interactions
-```
-
-### Why This Matters:
-- **Testability**: Mock layers independently
-- **Flexibility**: Swap database without touching business logic
-- **Clarity**: Each layer has single responsibility
-
-### When to Simplify:
-- Small scripts → Single file OK
-- Prototypes → Less structure acceptable
-- Always ask: "Will this grow?"
-
----
-
-## 4. Error Handling Principles
-
-### Centralized Error Handling
-
-```
-Pattern:
-├── Create custom error classes
-├── Throw from any layer
-├── Catch at top level (middleware)
-└── Format consistent response
-```
-
-### Error Response Philosophy
-
-```
-Client gets:
-├── Appropriate HTTP status
-├── Error code for programmatic handling
-├── User-friendly message
-└── NO internal details (security!)
-
-Logs get:
-├── Full stack trace
-├── Request context
-├── User ID (if applicable)
-└── Timestamp
-```
-
-### Status Code Selection
-
-| Situation | Status | When |
-|-----------|--------|------|
-| Bad input | 400 | Client sent invalid data |
-| No auth | 401 | Missing or invalid credentials |
-| No permission | 403 | Valid auth, but not allowed |
-| Not found | 404 | Resource doesn't exist |
-| Conflict | 409 | Duplicate or state conflict |
-| Validation | 422 | Schema valid but business rules fail |
-| Server error | 500 | Our fault, log everything |
-
----
-
-## 5. Async Patterns Principles
-
-### When to Use Each
-
-| Pattern | Use When |
-|---------|----------|
-| `async/await` | Sequential async operations |
-| `Promise.all` | Parallel independent operations |
-| `Promise.allSettled` | Parallel where some can fail |
-| `Promise.race` | Timeout or first response wins |
-
-### Event Loop Awareness
-
-```
-I/O-bound (async helps):
-├── Database queries
-├── HTTP requests
-├── File system
-└── Network operations
-
-CPU-bound (async doesn't help):
-├── Crypto operations
-├── Image processing
-├── Complex calculations
-└── → Use worker threads or offload
-```
-
-### Avoiding Event Loop Blocking
-
-- Never use sync methods in production (fs.readFileSync, etc.)
-- Offload CPU-intensive work
-- Use streaming for large data
-
----
-
-## 6. Validation Principles
-
-### Validate at Boundaries
-
-```
-Where to validate:
-├── API entry point (request body/params)
-├── Before database operations
-├── External data (API responses, file uploads)
-└── Environment variables (startup)
-```
-
-### Validation Library Selection
-
-| Library | Best For |
-|---------|----------|
-| **Zod** | TypeScript first, inference |
-| **Valibot** | Smaller bundle (tree-shakeable) |
-| **ArkType** | Performance critical |
-| **Yup** | Existing React Form usage |
-
-### Validation Philosophy
-
-- Fail fast: Validate early
-- Be specific: Clear error messages
-- Don't trust: Even "internal" data
-
----
-
-## 7. Security Principles
-
-### Security Checklist (Not Code)
-
-- [ ] **Input validation**: All inputs validated
-- [ ] **Parameterized queries**: No string concatenation for SQL
-- [ ] **Password hashing**: bcrypt or argon2
-- [ ] **JWT verification**: Always verify signature and expiry
-- [ ] **Rate limiting**: Protect from abuse
-- [ ] **Security headers**: Helmet.js or equivalent
-- [ ] **HTTPS**: Everywhere in production
-- [ ] **CORS**: Properly configured
-- [ ] **Secrets**: Environment variables only
-- [ ] **Dependencies**: Regularly audited
-
-### Security Mindset
-
-```
-Trust nothing:
-├── Query params → validate
-├── Request body → validate
-├── Headers → verify
-├── Cookies → validate
-├── File uploads → scan
-└── External APIs → validate response
+// Gotcha: some native Node addons (e.g. bcrypt, canvas) need Bun alternatives
+// Use: @node-rs/bcrypt instead of bcrypt (N-API native, works in both)
 ```
 
 ---
 
-## 8. Testing Principles
+## Async Patterns
 
-### Test Strategy Selection
+### Always: Handle rejection
 
-| Type | Purpose | Tools |
-|------|---------|-------|
-| **Unit** | Business logic | node:test, Vitest |
-| **Integration** | API endpoints | Supertest |
-| **E2E** | Full flows | Playwright |
+Every Promise needs a rejection handler. Unhandled rejections crash Node.js processes in modern versions.
 
-### What to Test (Priorities)
+```ts
+// ❌ Unhandled rejection
+fetchData().then(process);
 
-1. **Critical paths**: Auth, payments, core business
-2. **Edge cases**: Empty inputs, boundaries
-3. **Error handling**: What happens when things fail?
-4. **Not worth testing**: Framework code, trivial getters
+// ✅ Handled
+fetchData().then(process).catch(handleError);
 
-### Built-in Test Runner (Node.js 22+)
-
-```
-node --test src/**/*.test.ts
-├── No external dependency
-├── Good coverage reporting
-└── Watch mode available
+// ✅ Or with async/await
+try {
+  const data = await fetchData();
+  process(data);
+} catch (err) {
+  handleError(err);
+}
 ```
 
+### Avoid: Blocking the event loop
+
+The event loop is single-threaded. Anything synchronous that takes more than a few ms blocks all other requests.
+
+```ts
+// ❌ Blocks event loop for large files
+const data = fs.readFileSync('huge.csv');
+
+// ✅ Non-blocking
+const data = await fs.promises.readFile('huge.csv');
+
+// ❌ CPU-intensive work on main thread
+const result = computeHuge(dataset);
+
+// ✅ Offload to worker thread
+const { Worker } = require('worker_threads');
+```
+
+### Concurrency vs. Parallelism
+
+```ts
+// Sequential — each awaits the previous (use when order matters or requests are dependent)
+for (const id of ids) {
+  await processItem(id);
+}
+
+// Concurrent — all start immediately, await all completions (use for independent operations)
+await Promise.all(ids.map(id => processItem(id)));
+
+// Concurrent with limit — avoid overwhelming downstream services
+import pLimit from 'p-limit';
+const limit = pLimit(5); // max 5 concurrent
+await Promise.all(ids.map(id => limit(() => processItem(id))));
+```
+
 ---
 
-## 10. Anti-Patterns to Avoid
+## Error Handling Architecture
 
-### ❌ DON'T:
-- Use Express for new edge projects (use Hono)
-- Use sync methods in production code
-- Put business logic in controllers
-- Skip input validation
-- Hardcode secrets
-- Trust external data without validation
-- Block event loop with CPU work
+Structure errors so they carry meaning, not just messages:
 
-### ✅ DO:
-- Choose framework based on context
-- Ask user for preferences when unclear
-- Use layered architecture for growing projects
-- Validate all inputs
-- Use environment variables for secrets
-- Profile before optimizing
+```ts
+// Base application error
+class AppError extends Error {
+  constructor(
+    message: string,
+    public code: string,
+    public statusCode: number,
+    public isOperational = true
+  ) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}
+
+// Domain-specific errors
+class NotFoundError extends AppError {
+  constructor(resource: string, id: string) {
+    super(`${resource} ${id} not found`, 'NOT_FOUND', 404);
+  }
+}
+
+class ValidationError extends AppError {
+  constructor(message: string) {
+    super(message, 'VALIDATION_FAILED', 400);
+  }
+}
+```
+
+**Global error handler:**
+```ts
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  if (err instanceof AppError && err.isOperational) {
+    return res.status(err.statusCode).json({
+      error: err.message,
+      code: err.code,
+    });
+  }
+  // Non-operational errors — log fully, don't expose details
+  logger.error('Unexpected error', { err, url: req.url });
+  res.status(500).json({ error: 'Internal server error' });
+});
+```
 
 ---
 
-## 11. Decision Checklist
+## Security Baseline
 
-Before implementing:
+```ts
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
-- [ ] **Asked user about stack preference?**
-- [ ] **Chosen framework for THIS context?** (not just default)
-- [ ] **Considered deployment target?**
-- [ ] **Planned error handling strategy?**
-- [ ] **Identified validation points?**
-- [ ] **Considered security requirements?**
+// Security headers
+app.use(helmet());
+
+// Rate limiting — protect all routes
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,               // requests per window
+  standardHeaders: true,
+  legacyHeaders: false,
+}));
+
+// Body size limit — prevent payload bombs
+app.use(express.json({ limit: '10kb' }));
+
+// Trust proxy correctly for rate limiting behind load balancer
+app.set('trust proxy', 1);
+```
+
+**Never:**
+- Use `eval()` or `new Function()` with user input
+- Pass unvalidated user input to `exec()`, `spawn()`, or `child_process`
+- Log full request bodies (may contain credentials or PII)
 
 ---
 
-> **Remember**: Node.js best practices are about decision-making, not memorizing patterns. Every project deserves fresh consideration based on its requirements.
+## Project Structure
+
+```
+src/
+  routes/      HTTP route definitions (thin — only parse and delegate)
+  controllers/ Request handling, validation, response formatting
+  services/    Business logic (no HTTP awareness)
+  repositories/ Database access (no business logic)
+  middleware/  Auth, rate limit, logging
+  lib/         Shared utilities (date, crypto, validation)
+  types/       TypeScript interfaces and type exports
+  config/      Environment config with validation
+```
+
+**Dependency direction:** routes → controllers → services → repositories
+**Never:** repositories calling services, or services knowing about HTTP
+
+---
+
+## 🏛️ Tribunal Integration (Anti-Hallucination)
+
+**Slash command: `/tribunal-backend`**
+**Active reviewers: `logic` · `security` · `dependency` · `type-safety`**
+
+### ❌ Forbidden AI Tropes in Node.js
+
+1. **Blindly mixing `require` and `import`** — pick ESM or CommonJS and stick to it strictly based on `package.json`.
+2. **"Catch-all and ignore" error handling** — e.g., `catch (e) { console.log(e); }` without throwing or returning an error response.
+3. **Assuming Express** — if the project is Next.js, Fastify, or NestJS, do not hallucinate Express code.
+4. **Unparameterized queries** — never interpolate strings into SQL.
+5. **No `any` types** — unless an external library leaves no choice, type all request bodies and responses.
+
+### ✅ Pre-Flight Self-Audit
+
+Review these questions before generating Node.js code:
+```
+✅ Did I use the correct module system (CJS vs ESM) for this context?
+✅ Is every Promise rejection properly handled?
+✅ Did I block the event loop with synchronous FS or Crypto operations?
+✅ Are all inputs validated before business logic runs?
+✅ Is this code safe from memory leaks (e.g., unbounded arrays/maps)?
+```

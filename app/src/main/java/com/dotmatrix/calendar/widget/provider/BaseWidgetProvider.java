@@ -214,10 +214,15 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
         if (config == null) return;
         
         executor.execute(() -> {
-            try {
-                WidgetRepository repository = WidgetRepository.getInstance(context);
-                
-                // 2. Identify the correct Provider class and layout based on type
+            doForceUpdate(context, widgetId, config);
+        });
+    }
+
+    private static void doForceUpdate(Context context, int widgetId, WidgetConfig config) {
+        try {
+            WidgetRepository repository = WidgetRepository.getInstance(context);
+            
+            // 2. Identify the correct Provider class and layout based on type
                 // This mimics the abstract methods getWidgetType() / getLayoutResource()
                 Class<?> providerClass;
                 int layoutId;
@@ -311,10 +316,9 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
                     appWidgetManager.updateAppWidget(widgetId, views);
                 }
                 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -326,9 +330,8 @@ public abstract class BaseWidgetProvider extends AppWidgetProvider {
             WidgetRepository repository = WidgetRepository.getInstance(context);
             WidgetConfig config = repository.getWidgetConfig(widgetId);
             if (config != null) {
-                // Re-invoke with config loaded from DB
-                // Since we're already on the executor, use this pattern
-                forceUpdate(context.getApplicationContext(), widgetId, config);
+                // We're already on the executor, so call doForceUpdate directly
+                doForceUpdate(context.getApplicationContext(), widgetId, config);
             }
         });
     }

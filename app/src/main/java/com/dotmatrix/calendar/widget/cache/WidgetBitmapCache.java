@@ -102,12 +102,10 @@ public class WidgetBitmapCache {
      */
     public void invalidate(int widgetId) {
         String prefix = widgetId + "-";
-        for (String key : cache.snapshot().keySet()) {
+        java.util.Map<String, Bitmap> snapshot = cache.snapshot();
+        for (String key : snapshot.keySet()) {
             if (key.startsWith(prefix)) {
-                Bitmap bitmap = cache.remove(key);
-                if (bitmap != null && !bitmap.isRecycled()) {
-                    bitmap.recycle();
-                }
+                cache.remove(key); // entryRemoved handles recycling automatically
             }
         }
     }
